@@ -16,7 +16,7 @@ import tensorflow as tf
 import pandas as pd
 
 from PIL import Image
-import dataset_util
+import data_script.dataset_util as dataset_util
 from collections import namedtuple, OrderedDict
 
 
