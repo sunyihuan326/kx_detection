@@ -46,7 +46,7 @@ __C.TEST.BATCH_SIZE             = 8
 __C.TEST.INPUT_SIZE             = 416
 __C.TEST.DATA_AUG               = False
 __C.TEST.WRITE_IMAGE            = True
-__C.TEST.WRITE_IMAGE_PATH       = "E:/multi_food_detection/data/detection"
+__C.TEST.WRITE_IMAGE_PATH       = "E:/kx_detection/multi_detection/data/detection"
 __C.TEST.WRITE_IMAGE_SHOW_LABEL = False
 __C.TEST.WEIGHT_FILE            = "E:/ckpt_dirs/Food_detection/tf_yolov3/20190823/yolov3_train_loss=9.3529.ckpt-51"
 __C.TEST.SHOW_LABEL             = True

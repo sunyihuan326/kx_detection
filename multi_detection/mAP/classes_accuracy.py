@@ -12,8 +12,8 @@ import os
 import shutil
 from sklearn.metrics import confusion_matrix
 
-gt_txt_root = "E:/multi_food_detection/mAP/ground-truth"
-pre_txt_root = "E:/multi_food_detection/mAP/predicted"
+gt_txt_root = "E:/kx_detection/multi_detection/mAP/ground-truth"
+pre_txt_root = "E:/kx_detection/multi_detection/mAP/predicted"
 
 CLASSES = ["beefsteak", "cartooncookies", "chickenwings", "chiffoncake", "cookies",
            "cranberrycookies", "cupcake", "eggtart", "nofood", "peanuts",
@@ -31,11 +31,11 @@ def get_accuracy(error_write=True):
             acc
     '''
 
-    error_dir = "E:/Joyoung_WLS_github/tf_yolov3/mAP/error/"
+    error_dir = "E:/kx_detection/multi_detection/mAP/error/"
     if os.path.exists(error_dir): shutil.rmtree(error_dir)
     os.mkdir(error_dir)
 
-    detection_dir = "E:/multi_food_detection/data/detection/"
+    detection_dir = "E:/kx_detection/multi_detection/data/detection/"
 
     pre_txt_list = os.listdir(pre_txt_root)
 

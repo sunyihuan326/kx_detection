@@ -22,7 +22,7 @@ class YoloTest(object):
         self.iou_threshold = cfg.TEST.IOU_THRESHOLD
         self.moving_ave_decay = cfg.YOLO.MOVING_AVE_DECAY
         self.annotation_path = cfg.TEST.ANNOT_PATH
-        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food/20190923/yolov3_train_loss=4.9217.ckpt-220"
+        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food/20190924/yolov3_train_loss=4.4975.ckpt-300"
         self.write_image = cfg.TEST.WRITE_IMAGE
         self.write_image_path = cfg.TEST.WRITE_IMAGE_PATH
         self.show_label = cfg.TEST.SHOW_LABEL
@@ -69,7 +69,7 @@ class YoloTest(object):
     def evaluate(self):
         predicted_dir_path = './mAP/predicted'
         ground_truth_dir_path = './mAP/ground-truth'
-        error_layer_dir = "E:/multi_food_detection/mAP/error_layer"
+        error_layer_dir = "E:/kx_detection/multi_detection/mAP/error_layer"
         if os.path.exists(predicted_dir_path): shutil.rmtree(predicted_dir_path)
         if os.path.exists(ground_truth_dir_path): shutil.rmtree(ground_truth_dir_path)
         if os.path.exists(self.write_image_path): shutil.rmtree(self.write_image_path)

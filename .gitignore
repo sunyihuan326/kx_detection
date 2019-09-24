@@ -10,3 +10,5 @@ multi_detection/data/
 multi_detection/docs/
 multi_detection/checkpoint/
 multi_detection/model/
+*.jpg
+*.txt
