@@ -180,11 +180,12 @@
 #     train_single()
 
 import cv2
+
 img_path = "C:/Users/sunyihuan/Desktop/test/3.jpg"
 
 im = cv2.imread(img_path)
 print(im.shape)
 print(im)
-hsv=cv2.cvtColor(im,cv2.COLOR_RGB2HSV)
+hsv = cv2.cvtColor(im, cv2.COLOR_RGB2HSV)
 print(hsv.shape)
 print(hsv)

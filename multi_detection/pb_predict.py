@@ -35,13 +35,16 @@ class YoloPredic(object):
 
             self.sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
 
+            # 输入
             self.input = self.sess.graph.get_tensor_by_name("define_input/input_data:0")
             self.trainable = self.sess.graph.get_tensor_by_name("define_input/training:0")
 
+            # 输出
             self.pred_sbbox = self.sess.graph.get_tensor_by_name("define_loss/pred_sbbox/concat_2:0")
             self.pred_mbbox = self.sess.graph.get_tensor_by_name("define_loss/pred_mbbox/concat_2:0")
             self.pred_lbbox = self.sess.graph.get_tensor_by_name("define_loss/pred_lbbox/concat_2:0")
 
+            # 烤层
             self.layer_num = graph.get_tensor_by_name("define_loss/layer_classes:0")
 
     def predict(self, image):
@@ -74,7 +77,7 @@ class YoloPredic(object):
         print(bboxes_pr)
         print(layer_n)
         if self.write_image:
-            image = utils.draw_bbox(image, bboxes_pr, show_label=self.show_label)
+            image = utils.draw_bbox(image, bboxes_pr, show_label=self.show_label)  # 画图
             drawed_img_save_to_path = str(image_path).split("/")[-1]
             cv2.imwrite(drawed_img_save_to_path, image)
 
