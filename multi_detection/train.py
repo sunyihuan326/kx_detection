@@ -191,7 +191,7 @@ class YoloTrain(object):
             output = ["define_loss/pred_sbbox/concat_2", "define_loss/pred_mbbox/concat_2",
                       "define_loss/pred_lbbox/concat_2", "define_loss/layer_classes"]
             constant_graph = graph_util.convert_variables_to_constants(self.sess, self.sess.graph_def, output)
-            with tf.gfile.GFile('model/yolo_model.pb', mode='wb') as f:
+            with tf.gfile.GFile('./model/yolo_model.pb', mode='wb') as f:
                 f.write(constant_graph.SerializeToString())
 
             # 保存为pb用于tf_serving
