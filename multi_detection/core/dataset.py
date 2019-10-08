@@ -151,8 +151,8 @@ class Dataset(object):
 
         if not os.path.exists(image_path):
             raise KeyError("%s does not exist ... " % image_path)
-        # image = np.array(cv2.imread(image_path))
-        image = np.array(cv2.cvtColor(cv2.imread(image_path), cv2.COLOR_RGB2HSV))
+        image = np.array(cv2.imread(image_path))
+        # image = np.array(cv2.cvtColor(cv2.imread(image_path), cv2.COLOR_RGB2HSV))  # RGB空间转为HSV空间
         layer_label = int(line[1])
 
         bboxes = np.array([list(map(int, box.split(','))) for box in line[2:]])

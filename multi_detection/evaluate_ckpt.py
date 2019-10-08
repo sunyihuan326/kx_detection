@@ -22,7 +22,7 @@ class YoloTest(object):
         self.iou_threshold = cfg.TEST.IOU_THRESHOLD
         self.moving_ave_decay = cfg.YOLO.MOVING_AVE_DECAY
         self.annotation_path = cfg.TEST.ANNOT_PATH
-        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food/20190929/yolov3_train_loss=4.5052.ckpt-300"
+        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food/20191008/yolov3_train_loss=4.5447.ckpt-300"
         self.write_image = cfg.TEST.WRITE_IMAGE
         self.write_image_path = cfg.TEST.WRITE_IMAGE_PATH
         self.show_label = cfg.TEST.SHOW_LABEL
@@ -92,6 +92,7 @@ class YoloTest(object):
 
                 image_name = image_path.split('/')[-1]
                 image = cv2.imread(image_path)
+                # image = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)   # RGB空间转为HSV空间
                 bbox_data_gt = np.array([list(map(int, box.split(','))) for box in annotation[2:]])
 
                 if len(bbox_data_gt) == 0:

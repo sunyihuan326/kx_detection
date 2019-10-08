@@ -59,7 +59,8 @@ def convert_voc_annotation(data_path, data_type, anno_path, use_difficult_bbox=T
             # image_path = os.path.join(data_path, 'JPEGImages', image_ind + '.jpg')
             # print("image_path::::::::", image_path)
             st = "/"
-            image_path = (data_path, 'JPGImages', image_ind + '.jpg')
+            image_path = (data_path, 'JPGImages', image_ind + '.jpg')  #原图片
+            # image_path = (data_path, 'JPGImages', image_ind + '_pad.jpg')   #padding图片
             image_path = st.join(image_path)
             print("image_path::::::::", image_path)
 
@@ -74,7 +75,8 @@ def convert_voc_annotation(data_path, data_type, anno_path, use_difficult_bbox=T
                 layer_label = 3
             annotation += ' ' + str(layer_label)  # annotation中写入烤层的标签
 
-            label_path = (data_path, 'Annotations', image_ind + '.xml')
+            label_path = (data_path, 'Annotations', image_ind + '.xml')    #原数据
+            # label_path = (data_path, 'Annotations', image_ind + '_pad.xml')  #padding数据
             label_path = st.join(label_path)
             # label_path = os.path.join(data_path, 'Annotations', image_ind + '.xml')
             root = ET.parse(label_path).getroot()
@@ -101,13 +103,13 @@ def convert_voc_annotation(data_path, data_type, anno_path, use_difficult_bbox=T
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data_path", default="E:/DataSets/KX_FOODSets_model_data/26classes_0920")
+    parser.add_argument("--data_path", default="E:/DataSets/KX_FOODSets_model_data/26classes_0920_padding")
     parser.add_argument("--train_annotation",
-                        default="E:/multi_food_detection/data/dataset/foodSets0920_layer_train26.txt")
+                        default="E:/kx_detection/multi_detection/data/dataset/foodSets0920_layer_pad_train26.txt")
     parser.add_argument("--test_annotation",
-                        default="E:/multi_food_detection/data/dataset/foodSets0920_layer_test26.txt")
+                        default="E:/kx_detection/multi_detection/data/dataset/foodSets0920_layer_pad_test26.txt")
     parser.add_argument("--val_annotation",
-                        default="E:/multi_food_detection/data/dataset/foodSets0920_layer_val26.txt")
+                        default="E:/kx_detection/multi_detection/data/dataset/foodSets0920_layer_pad_val26.txt")
     flags = parser.parse_args()
 
     if os.path.exists(flags.train_annotation): os.remove(flags.train_annotation)

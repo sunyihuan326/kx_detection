@@ -178,14 +178,23 @@
 #
 # if __name__ == "__main__":
 #     train_single()
+#
+# import cv2
+#
+# img_path = "C:/Users/sunyihuan/Desktop/test/3.jpg"
+#
+# im = cv2.imread(img_path)
+# print(im.shape)
+# print(im)
+# hsv = cv2.cvtColor(im, cv2.COLOR_RGB2HSV)
+# print(hsv.shape)
+# print(hsv)
+f = open("E:/DataSets/KX_FOODSets_model_data/26classes_0920_padding/ImageSets/Main/val.txt", "r")
 
-import cv2
-
-img_path = "C:/Users/sunyihuan/Desktop/test/3.jpg"
-
-im = cv2.imread(img_path)
-print(im.shape)
-print(im)
-hsv = cv2.cvtColor(im, cv2.COLOR_RGB2HSV)
-print(hsv.shape)
-print(hsv)
+all_txt_name = "E:/DataSets/KX_FOODSets_model_data/26classes_0920_padding/ImageSets/Main/val_pad.txt"
+file = open(all_txt_name, "w")
+txt_files = f.readlines()
+for txt_file_one in txt_files:
+    txt_file_one = str(txt_file_one.strip())
+    txt_file_one = txt_file_one + "_pad" + "\n"
+    file.write(txt_file_one)
