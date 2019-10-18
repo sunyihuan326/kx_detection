@@ -23,7 +23,7 @@ class YoloPredict(object):
         self.num_classes = 26  # 种类数
         self.score_threshold = 0.45
         self.iou_threshold = 0.5
-        self.weight_file = "E:/kx_detection/multi_detection/checkpoint/yolov3_train_loss=14.0175.ckpt-11"  # ckpt文件地址
+        self.weight_file =  "E:/ckpt_dirs/Food_detection/multi_food/20191015/yolov3_train_loss=4.5853.ckpt-300"  # ckpt文件地址
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
 
