@@ -5,6 +5,7 @@
 
 '''
 ckpt文件预测某一文件夹下所有图片结果
+并输出食材类别准确率结果
 '''
 
 import cv2
@@ -13,6 +14,37 @@ import tensorflow as tf
 import multi_detection.core.utils as utils
 import os
 import shutil
+
+
+def correct_result(bboxes_pr):
+    '''
+    将目标检测结果转为识别结果，类别为1类
+    :param bboxes_pr:
+    :return:
+    '''
+    pre_list = []
+    score_list = []
+    for bbox in bboxes_pr:
+        coor = np.array(bbox[:4], dtype=np.int32)
+        score = bbox[4]
+        class_ind = int(bbox[5])
+        score_list.append(score)
+        pre_list.append(class_ind)
+    pre_c = {}
+    # 对类别结果个数统计
+    for p in pre_list:
+        if p not in pre_c.keys():
+            pre_c[p] = 1
+        else:
+            pre_c[p] += 1
+    pre_cc = sorted(pre_c.items(), key=lambda x: x[1], reverse=True)  # 类别结果按个数排序
+    if len(pre_cc) == 1:
+        # 若输出种类排序最多的为1，则取最多的那类
+        pre = pre_cc[0][0]
+    else:
+        # 如果输种类排序最多的大于1个，返回score得分最高的类别
+        pre = pre_list[score_list.index(max(score_list))]
+    return pre
 
 
 class YoloTest(object):
@@ -94,11 +126,12 @@ class YoloTest(object):
                 layer_n) + ".jpg"  # 图片保存地址，烤层结果在命名中
             # cv2.imshow('Detection result', image)
             cv2.imwrite(save_dir + "/" + drawed_img_save_to_path, image)  # 保存图片
+        return bboxes_pr, layer_n
 
 
 if __name__ == '__main__':
-    img_dir = "C:/Users/sunyihuan/Desktop/0923detection/KX_data0923"  # 文件夹地址
-    save_dir = "C:/Users/sunyihuan/Desktop/0923detection/KX_0923detection"  # 预测结果标出保存地址
+    img_dir = "C:/Users/sunyihuan/Desktop/tt"  # 文件夹地址
+    save_dir = "C:/Users/sunyihuan/Desktop/tt/detection"  # 预测结果标出保存地址
     Y = YoloTest()  # 加载模型
     # Y.result(img_path, "E:/Joyoung_WLS_github/tf_yolov3")
     # for file in os.listdir(img_dir):
@@ -106,7 +139,13 @@ if __name__ == '__main__':
     #         image_path = img_dir + "/" + file
     #         print(image_path)
     #         Y.result(image_path, save_dir)  # 预测每一张结果并保存
-    classes = ["ChickenWings", "EggTart", "Peanuts", "PorkChops", "Toast"]
+    classes = ["To"]
+
+    classes_id = 13
+
+    error_noresults = 0  # 无任何结果统计
+    food_acc = 0  # 食材准确数统计
+    all_jpgs = 0  # 图片总数统计
     for c in classes:
         img_dirs = img_dir + "/" + c
         save_dirs = save_dir + "/" + c
@@ -114,6 +153,18 @@ if __name__ == '__main__':
         os.mkdir(save_dirs)
         for file in os.listdir(img_dirs):
             if file.endswith("jpg"):
+                all_jpgs += 1  # 统计总jpg图片数量
                 image_path = img_dirs + "/" + file
                 print(image_path)
-                Y.result(image_path, save_dirs)  # 预测每一张结果并保存
+                bboxes_pr, layer_n = Y.result(image_path, save_dirs)  # 预测每一张结果并保存
+                if len(bboxes_pr) == 0:  # 无任何结果返回，输出并统计+1
+                    print("no_result")
+                    error_noresults += 1
+                else:
+                    pre = correct_result(bboxes_pr)  # 矫正输出结果
+                    print("predictions::::::::::::::::::::")
+                    print(pre)
+                    if pre == classes_id:  # 若结果正确，食材正确数+1
+                        food_acc += 1
+    print("food accuracy:", round((food_acc / all_jpgs) * 100, 2))  # 输出食材正确数
+    print("no result:", error_noresults)  # 输出无任何结果总数

@@ -189,12 +189,79 @@
 # hsv = cv2.cvtColor(im, cv2.COLOR_RGB2HSV)
 # print(hsv.shape)
 # print(hsv)
-f = open("E:/DataSets/KX_FOODSets_model_data/26classes_0920_padding/ImageSets/Main/val.txt", "r")
+# f = open("E:/DataSets/KX_FOODSets_model_data/26classes_0920_padding/ImageSets/Main/val.txt", "r")
+#
+# all_txt_name = "E:/DataSets/KX_FOODSets_model_data/26classes_0920_padding/ImageSets/Main/val_pad.txt"
+# file = open(all_txt_name, "w")
+# txt_files = f.readlines()
+# for txt_file_one in txt_files:
+#     txt_file_one = str(txt_file_one.strip())
+#     txt_file_one = txt_file_one + "_pad" + "\n"
+#     file.write(txt_file_one)
+import cv2
+import numpy as np
+import tensorflow as tf
+import multi_detection.core.utils as utils
+import matplotlib.pyplot as plt
 
-all_txt_name = "E:/DataSets/KX_FOODSets_model_data/26classes_0920_padding/ImageSets/Main/val_pad.txt"
-file = open(all_txt_name, "w")
-txt_files = f.readlines()
-for txt_file_one in txt_files:
-    txt_file_one = str(txt_file_one.strip())
-    txt_file_one = txt_file_one + "_pad" + "\n"
-    file.write(txt_file_one)
+
+class YoloPredict(object):
+    '''
+    预测结果
+    '''
+
+    def __init__(self):
+        self.input_size = 416  # 输入图片尺寸（默认正方形）
+        self.num_classes = 26  # 种类数
+        self.score_threshold = 0.45
+        self.iou_threshold = 0.5
+        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food/20191015/yolov3_train_loss=4.5853.ckpt-300"  # ckpt文件地址
+        self.write_image = True  # 是否画图
+        self.show_label = True  # 是否显示标签
+
+        graph = tf.Graph()
+        with graph.as_default():
+            self.saver = tf.train.import_meta_graph("{}.meta".format(self.weight_file))
+            self.sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
+            self.saver.restore(self.sess, self.weight_file)
+
+            self.input = graph.get_tensor_by_name("define_input/input_data:0")
+            self.trainable = graph.get_tensor_by_name("define_input/training:0")
+
+            # self.conv56 = graph.get_tensor_by_name("define_loss/conv_mbbox/Relu:0")
+
+            self.conv56 = graph.get_tensor_by_name("define_loss/conv_mbbox/BiasAdd: 0")
+
+    def predict(self, image):
+        org_image = np.copy(image)
+        org_h, org_w, _ = org_image.shape
+
+        image_data = utils.image_preporcess(image, [self.input_size, self.input_size])
+        image_data = image_data[np.newaxis, ...]
+
+        conv56 = self.sess.run(
+            [self.conv56],
+            feed_dict={
+                self.input: image_data,
+                self.trainable: False
+            }
+        )
+
+        return conv56
+
+    def result(self, image_path):
+        image = cv2.imread(image_path)  # 图片读取
+        mbbox = self.predict(image)  # 预测结果
+        _, __, w, h, c = np.array(mbbox).shape
+        mbbox = np.reshape(mbbox, [w, h, c])
+        plt.figure(figsize=(6, 6), dpi=80)
+        for i in range(20):
+            plt.figure(i + 1)
+            plt.imshow(mbbox[:, :, i])
+        plt.show()
+
+
+if __name__ == '__main__':
+    img_path = "E:/kx_detection/multi_detection/docs/images/344_chickenwings.jpg"  # 图片地址
+    Y = YoloPredict()
+    Y.result(img_path)

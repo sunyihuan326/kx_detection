@@ -41,7 +41,7 @@ __C.TRAIN.INITIAL_WEIGHT        = "./checkpoint/yolov3_train_loss=12.6481.ckpt-5
 # TEST options
 __C.TEST                        = edict()
 
-__C.TEST.ANNOT_PATH             = "./data/dataset/foodSets0920_layer_pad_test26.txt"
+__C.TEST.ANNOT_PATH             = "./data/dataset/foodSets0920_layer_test26.txt"
 __C.TEST.BATCH_SIZE             = 8
 __C.TEST.INPUT_SIZE             = 416
 __C.TEST.DATA_AUG               = False
