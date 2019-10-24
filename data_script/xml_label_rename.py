@@ -10,7 +10,7 @@ import os
 import xml.etree.ElementTree as ET
 
 
-def changesku(inputpath, label_name='ChickenWings'):
+def changesku(inputpath, label_name='Potatom'):
     '''
 
     :param inputpath: xml文件夹地址
@@ -30,5 +30,5 @@ def changesku(inputpath, label_name='ChickenWings'):
 
 
 if __name__ == '__main__':
-    inputpath = 'E:/DataSets/KX_FOODSets/Annotations/ChickenWings'  # 这是xml文件的文件夹的绝对地址
+    inputpath = 'E:/已标数据备份/X/Potato/Annotations/Potatom'  # 这是xml文件的文件夹的绝对地址
     changesku(inputpath)

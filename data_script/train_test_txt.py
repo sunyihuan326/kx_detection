@@ -3,7 +3,7 @@
 # @Time    : 2019/7/22 
 # @Author  : sunyihuan
 '''
-某一文件夹按比例，分为train、test，并将文件名称写入到xxx_train.txt、xxx_test.txt文件中
+某一文件夹按比例，分为train、test，并将文件名称写入到xxx_train.txt、xxx_test.txt、val.txt文件中
 '''
 import os
 import random
@@ -23,7 +23,7 @@ root_path = "H:/Joyoung/WLS/KX_FOODSets_model_data"
 #              test.txt为所有的test集图片name（不含.jpg）
 #              train.txt为所有的train集图片name（不含.jpg）
 
-def split_data(clasees, train_percent):
+def split_data(clasees, train_percent, test_percent):
     '''
     按类别名称将每一类分为test、train
     :param clasees: 类别名称，格式为list
@@ -40,32 +40,49 @@ def split_data(clasees, train_percent):
         os.makedirs(txtsavepath)
 
     total_xml = os.listdir(xmlfilepath)
+    random.shuffle(total_xml)  # 打乱total_xml
     num = len(total_xml)
     list = range(num)
-    tr = int(num * train_percent)
-    train = random.sample(list, tr)
+    tr = int(num * train_percent)  # train集数量
+    train = total_xml[:tr]  # train集列表数据内容
+
+    te = int(num * test_percent)  # test集数量
+    test = total_xml[tr:tr + te]  # test集列表数据内容
+
+    val = num - tr - te  # val集数量
+    val_set = total_xml[tr + te:]  # val集列表数据内容
 
     print("train size:", tr)
+    print("test size:", te)
+    print("val size:", val)
     ftest = open(txtsavepath + '/{}_test.txt'.format(str(clasees).lower()), 'w')
     ftrain = open(txtsavepath + '/{}_train.txt'.format(str(clasees).lower()), 'w')
+    fval = open(txtsavepath + '/{}_val.txt'.format(str(clasees).lower()), 'w')
 
     for i in list:
         if str(total_xml[i]).endswith("xml"):
             name = total_xml[i][:-4] + '\n'
             if i in train:
                 ftrain.write(name)
-            else:
+            elif i in test:
                 ftest.write(name)
+            else:
+                fval.write(name)
 
     ftrain.close()
     ftest.close()
+    fval.close()
 
 
 if __name__ == "__main__":
-    clasees = ["BeefSteak", "CartoonCookies", "ChickenWings", "ChiffonCake", "Cookies",
-               "CranberryCookies", "CupCake", "EggTart", "nofood", "Peanuts",
-               "Pizza", "PorkChops", "PurpleSweetPotato", "RoastedChicken", "Toast"]
+    clasees = ["BeefSteak", "CartoonCookies", "ChickenWings", "ChiffonCake6", "ChiffonCake8",
+               "Cookies", "CranberryCookies", "CupCake", "EggTart", "EggTartBig",
+               "nofood", "Peanuts", "Pizzafour", "Pizzaone", "Pizzasix",
+               "Pizzatwo", "PorkChops", "PotatoCut", "Potatol", "Potatom",
+               "Potatos", "SweetPotatoCut", "SweetPotatol", "SweetPotatom", "SweetPotatos",
+               "RoastedChicken", "Toast"]
     print(len(clasees))
     train_percent = 0.8
+    test_percent = 0.1
     for c in clasees:
-        split_data(c, train_percent)
+        split_data(c, train_percent, test_percent)
