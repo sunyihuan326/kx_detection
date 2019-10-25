@@ -26,6 +26,6 @@ def check_xml(xml_dir, img_dir):
 
 
 if __name__ == "__main__":
-    xml_dir = "E:/DataSets/KX_FOODSets_model_data/15classes_0722/Annotations"
-    img_dir = "E:/DataSets/KX_FOODSets_model_data/15classes_0722/JPGImages"
+    xml_dir = "E:/DataSets/KX_FOODSets_model_data/X_27classes_1025/Annotations"
+    img_dir = "E:/DataSets/KX_FOODSets_model_data/X_27classes_1025/JPGImages"
     check_xml(xml_dir, img_dir)

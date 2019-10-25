@@ -8,7 +8,7 @@
 import os
 import random
 
-root_path = "H:/Joyoung/WLS/KX_FOODSets_model_data"
+root_path = "E:/DataSets/KX_FOODSets_model_data/X_27classes_1025"
 
 
 # 文件根本目录
@@ -59,12 +59,12 @@ def split_data(clasees, train_percent, test_percent):
     ftrain = open(txtsavepath + '/{}_train.txt'.format(str(clasees).lower()), 'w')
     fval = open(txtsavepath + '/{}_val.txt'.format(str(clasees).lower()), 'w')
 
-    for i in list:
-        if str(total_xml[i]).endswith("xml"):
-            name = total_xml[i][:-4] + '\n'
-            if i in train:
+    for x in total_xml:
+        if str(x).endswith("xml"):
+            name = x[:-4] + '\n'
+            if x in train:
                 ftrain.write(name)
-            elif i in test:
+            elif x in test:
                 ftest.write(name)
             else:
                 fval.write(name)

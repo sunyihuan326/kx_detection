@@ -10,8 +10,9 @@
 '''
 
 import os, shutil
+import random
 
-root_path = "E:/DataSets/KX_FOODSets_model_data/26classes_0821/ImageSets/Main"
+root_path = "E:/DataSets/KX_FOODSets_model_data/X_27classes_1025/ImageSets/Main"
 train_all_list = []
 
 
@@ -34,8 +35,9 @@ if __name__ == "__main__":
     all_txt_name = "val.txt"  # 写入到train文件中
     # all_txt_name = "test.txt"  # 写入到test文件中
     for txt_name in os.listdir(root_path):
-        if "val" in txt_name:
+        if "_val" in txt_name:
             train_all_list = train_all_txt(txt_name)
+    random.shuffle(train_all_list)
     print(len(train_all_list))
     all_txt_name = root_path + "/" + all_txt_name
     file = open(all_txt_name, "w")
