@@ -15,12 +15,17 @@ from sklearn.metrics import confusion_matrix
 gt_txt_root = "E:/kx_detection/multi_detection/mAP/ground-truth"
 pre_txt_root = "E:/kx_detection/multi_detection/mAP/predicted"
 
-CLASSES = ["beefsteak", "cartooncookies", "chickenwings", "chiffoncake", "cookies",
-           "cranberrycookies", "cupcake", "eggtart", "nofood", "peanuts",
-           "pizza", "porkchops", "purplesweetpotato", "roastedchicken", "toast",
-           "potatos", "potatom", "potatol", "sweetpotatos", "sweetpotatom", "sweetpotatol",
-           "potatocut", "sweetpotatocut", "pizzaone", "pizzatwo", "pizzafour", "pizzasix"]
-
+# CLASSES = ["beefsteak", "cartooncookies", "chickenwings", "chiffoncake", "cookies",
+#            "cranberrycookies", "cupcake", "eggtart", "nofood", "peanuts",
+#            "pizza", "porkchops", "purplesweetpotato", "roastedchicken", "toast",
+#            "potatos", "potatom", "potatol", "sweetpotatos", "sweetpotatom", "sweetpotatol",
+#            "potatocut", "sweetpotatocut", "pizzaone", "pizzatwo", "pizzafour", "pizzasix"]
+CLASSES = ["beefsteak", "cartooncookies", "chickenwings", "chiffoncake6", "chiffoncake8",
+               "cookies", "cranberrycookies", "cupcake", "eggtart", "eggtartbig",
+               "nofood", "peanuts", "pizzafour", "pizzaone", "pizzasix",
+               "pizzatwo", "porkchops", "potatocut", "potatol", "potatom",
+               "potatos", "sweetpotatocut", "sweetpotatol", "sweetpotatom", "sweetpotatos",
+               "roastedchicken", "toast"]  # 27分类
 
 def get_accuracy(error_write=True):
     '''

@@ -20,10 +20,10 @@ class YoloPredict(object):
 
     def __init__(self):
         self.input_size = 416  # 输入图片尺寸（默认正方形）
-        self.num_classes = 26  # 种类数
+        self.num_classes = 23  # 种类数
         self.score_threshold = 0.45
         self.iou_threshold = 0.5
-        self.weight_file =  "E:/ckpt_dirs/Food_detection/multi_food/20191015/yolov3_train_loss=4.5853.ckpt-300"  # ckpt文件地址
+        self.weight_file =  "E:/ckpt_dirs/Food_detection/tf_yolov3/20190822/yolov3_train_loss=8.9641.ckpt-88"  # ckpt文件地址
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
 
@@ -40,7 +40,7 @@ class YoloPredict(object):
             self.pred_mbbox = graph.get_tensor_by_name("define_loss/pred_mbbox/concat_2:0")
             self.pred_lbbox = graph.get_tensor_by_name("define_loss/pred_lbbox/concat_2:0")
 
-            self.layer_num = graph.get_tensor_by_name("define_loss/layer_classes:0")
+            # self.layer_num = graph.get_tensor_by_name("define_loss/layer_classes:0")
 
     def predict(self, image):
         org_image = np.copy(image)
@@ -49,8 +49,15 @@ class YoloPredict(object):
         image_data = utils.image_preporcess(image, [self.input_size, self.input_size])
         image_data = image_data[np.newaxis, ...]
 
-        pred_sbbox, pred_mbbox, pred_lbbox, layer_n = self.sess.run(
-            [self.pred_sbbox, self.pred_mbbox, self.pred_lbbox, self.layer_num],
+        # pred_sbbox, pred_mbbox, pred_lbbox, layer_n = self.sess.run(
+        #     [self.pred_sbbox, self.pred_mbbox, self.pred_lbbox, self.layer_num],
+        #     feed_dict={
+        #         self.input: image_data,
+        #         self.trainable: False
+        #     }
+        # )
+        pred_sbbox, pred_mbbox, pred_lbbox = self.sess.run(
+            [self.pred_sbbox, self.pred_mbbox, self.pred_lbbox],
             feed_dict={
                 self.input: image_data,
                 self.trainable: False
@@ -64,13 +71,12 @@ class YoloPredict(object):
         bboxes = utils.postprocess_boxes(pred_bbox, (org_h, org_w), self.input_size, self.score_threshold)
         bboxes = utils.nms(bboxes, self.iou_threshold)
 
-        return bboxes, layer_n
+        return bboxes
 
     def result(self, image_path):
         image = cv2.imread(image_path)  # 图片读取
-        bboxes_pr, layer_n = self.predict(image)  # 预测结果
+        bboxes_pr = self.predict(image)  # 预测结果
         print(bboxes_pr)
-        print(layer_n)
         if self.write_image:
             image = utils.draw_bbox(image, bboxes_pr, show_label=self.show_label)
             drawed_img_save_to_path = str(image_path).split("/")[-1]
@@ -78,6 +84,6 @@ class YoloPredict(object):
 
 
 if __name__ == '__main__':
-    img_path = "E:/kx_detection/multi_detection/docs/images/344_chickenwings.jpg"  # 图片地址
+    img_path = "C:/Users/sunyihuan/Desktop/e17677060b4d89f0.jpg"  # 图片地址
     Y = YoloPredict()
     Y.result(img_path)

@@ -12,9 +12,9 @@ import os
 import shutil
 
 # 创建layer_train、layer_test、layer_val文件夹
-layer_train_dir = "E:/layer_data/X_KX_data_27classes1025_train"
-layer_test_dir = "E:/layer_data/X_KX_data_27classes1025_test"
-layer_val_dir = "E:/layer_data/X_KX_data_27classes1025_val"
+layer_train_dir = "E:/已标数据备份/KX38I95FOODSETS_Annotation_0917/0917images_train"
+layer_test_dir = "E:/已标数据备份/KX38I95FOODSETS_Annotation_0917/0917images_test"
+layer_val_dir = "E:/已标数据备份/KX38I95FOODSETS_Annotation_0917/0917images_val"
 if os.path.exists(layer_train_dir): shutil.rmtree(layer_train_dir)  # 判断是否存在，存在则删除
 os.mkdir(layer_train_dir)  # 创建文件夹
 if os.path.exists(layer_test_dir): shutil.rmtree(layer_test_dir)
@@ -63,7 +63,7 @@ def layer_data_split(layer_root, txt_root):
 
 
 if __name__ == "__main__":
-    layer_root = "E:/layer_data/X_KX_data_27classes1025"  # layer数据根目录
-    txt_root = "E:/DataSets/KX_FOODSets_model_data/X_27classes_1025/ImageSets/Main"  # txt数据文件夹地址
+    layer_root = "E:/已标数据备份/KX38I95FOODSETS_Annotation_0917/layer_split"  # layer数据根目录
+    txt_root = "E:/已标数据备份/KX38I95FOODSETS_Annotation_0917/ImageSets/Main"  # txt数据文件夹地址
 
     layer_data_split(layer_root, txt_root)

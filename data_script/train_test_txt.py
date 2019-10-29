@@ -8,7 +8,7 @@
 import os
 import random
 
-root_path = "E:/DataSets/KX_FOODSets_model_data/X_27classes_1025"
+root_path = "E:/已标数据备份/KX38I95FOODSETS_Annotation_0917"
 
 
 # 文件根本目录
@@ -75,12 +75,13 @@ def split_data(clasees, train_percent, test_percent):
 
 
 if __name__ == "__main__":
-    clasees = ["BeefSteak", "CartoonCookies", "ChickenWings", "ChiffonCake6", "ChiffonCake8",
-               "Cookies", "CranberryCookies", "CupCake", "EggTart", "EggTartBig",
-               "nofood", "Peanuts", "Pizzafour", "Pizzaone", "Pizzasix",
-               "Pizzatwo", "PorkChops", "PotatoCut", "Potatol", "Potatom",
-               "Potatos", "SweetPotatoCut", "SweetPotatol", "SweetPotatom", "SweetPotatos",
-               "RoastedChicken", "Toast"]
+    # clasees = ["BeefSteak", "CartoonCookies", "ChickenWings", "ChiffonCake6", "ChiffonCake8",
+    #            "Cookies", "CranberryCookies", "CupCake", "EggTart", "EggTartBig",
+    #            "nofood", "Peanuts", "Pizzafour", "Pizzaone", "Pizzasix",
+    #            "Pizzatwo", "PorkChops", "PotatoCut", "Potatol", "Potatom",
+    #            "Potatos", "SweetPotatoCut", "SweetPotatol", "SweetPotatom", "SweetPotatos",
+    #            "RoastedChicken", "Toast"]
+    clasees = ["BeefSteak", "CartoonCookies", "Cookies", "toast"]
     print(len(clasees))
     train_percent = 0.8
     test_percent = 0.1
