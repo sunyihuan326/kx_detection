@@ -19,7 +19,7 @@ pre_txt_root = "E:/kx_detection/multi_detection/mAP/predicted"
 #            "cranberrycookies", "cupcake", "eggtart", "nofood", "peanuts",
 #            "pizza", "porkchops", "purplesweetpotato", "roastedchicken", "toast",
 #            "potatos", "potatom", "potatol", "sweetpotatos", "sweetpotatom", "sweetpotatol",
-#            "potatocut", "sweetpotatocut", "pizzaone", "pizzatwo", "pizzafour", "pizzasix"]
+#            "potatocut", "sweetpotatocut", "pizzaone", "pizzatwo", "pizzafour", "pizzasix"]  #26分类
 CLASSES = ["beefsteak", "cartooncookies", "chickenwings", "chiffoncake6", "chiffoncake8",
                "cookies", "cranberrycookies", "cupcake", "eggtart", "eggtartbig",
                "nofood", "peanuts", "pizzafour", "pizzaone", "pizzasix",

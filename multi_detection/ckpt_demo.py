@@ -50,10 +50,10 @@ def correct_result(bboxes_pr):
 class YoloTest(object):
     def __init__(self):
         self.input_size = 416  # 输入图片尺寸（默认正方形）
-        self.num_classes = 26  # 种类数
+        self.num_classes = 27  # 种类数
         self.score_threshold = 0.45
         self.iou_threshold = 0.5
-        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food/20190923/yolov3_train_loss=4.9217.ckpt-220"  # ckpt文件地址
+        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food/20191028/yolov3_train_loss=4.9485.ckpt-165"  # ckpt文件地址
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
 
@@ -130,8 +130,8 @@ class YoloTest(object):
 
 
 if __name__ == '__main__':
-    img_dir = "C:/Users/sunyihuan/Desktop/tt"  # 文件夹地址
-    save_dir = "C:/Users/sunyihuan/Desktop/tt/detection"  # 预测结果标出保存地址
+    img_dir = "C:/Users/sunyihuan/Desktop/tttttt"  # 文件夹地址
+    save_dir = "C:/Users/sunyihuan/Desktop/tttttt/detection"  # 预测结果标出保存地址
     Y = YoloTest()  # 加载模型
     # Y.result(img_path, "E:/Joyoung_WLS_github/tf_yolov3")
     # for file in os.listdir(img_dir):
@@ -139,9 +139,9 @@ if __name__ == '__main__':
     #         image_path = img_dir + "/" + file
     #         print(image_path)
     #         Y.result(image_path, save_dir)  # 预测每一张结果并保存
-    classes = ["To"]
+    classes = ["Cookies"]
 
-    classes_id = 13
+    classes_id = 5
 
     error_noresults = 0  # 无任何结果统计
     food_acc = 0  # 食材准确数统计
