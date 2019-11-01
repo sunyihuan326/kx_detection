@@ -39,11 +39,14 @@ def correct_result(bboxes_pr):
             pre_c[p] += 1
     pre_cc = sorted(pre_c.items(), key=lambda x: x[1], reverse=True)  # 类别结果按个数排序
     if len(pre_cc) == 1:
-        # 若输出种类排序最多的为1，则取最多的那类
+        # 若输出种类只有1类，直接取
         pre = pre_cc[0][0]
     else:
-        # 如果输种类排序最多的大于1个，返回score得分最高的类别
-        pre = pre_list[score_list.index(max(score_list))]
+        if pre_cc[0][1] != pre_cc[1][1]:  # 若输出种类排序最多的仅有1个，取第一个
+            pre = pre_cc[0][0]
+        else:
+            # 如果输种类排序最多的大于1个，返回score得分最高的类别
+            pre = pre_list[score_list.index(max(score_list))]
     return pre
 
 

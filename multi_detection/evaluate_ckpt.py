@@ -22,7 +22,7 @@ class YoloTest(object):
         self.iou_threshold = cfg.TEST.IOU_THRESHOLD
         self.moving_ave_decay = cfg.YOLO.MOVING_AVE_DECAY
         self.annotation_path = cfg.TEST.ANNOT_PATH
-        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food3/20191030/yolov3_train_loss=6.1716.ckpt-74"
+        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food/20191028/yolov3_train_loss=4.9485.ckpt-165"
         self.write_image = cfg.TEST.WRITE_IMAGE
         self.write_image_path = cfg.TEST.WRITE_IMAGE_PATH
         self.show_label = cfg.TEST.SHOW_LABEL

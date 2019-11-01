@@ -1,13 +1,11 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# @Time    : 2019/7/31 
-# @Author  : sunyihuan
-'''
-从ground-truth文件、predicted文件中查看标签的准确率
+# -*- encoding: utf-8 -*-
 
-并将标签判断错误的图片拷贝到error文件中
+"""
+@File    : check0.py
+@Time    : 2019/10/31 14:58
+@Author  : sunyihuan
+"""
 
-'''
 import os
 import shutil
 from sklearn.metrics import confusion_matrix
@@ -15,7 +13,6 @@ import numpy as np
 
 gt_txt_root = "E:/kx_detection/multi_detection/mAP/ground-truth"
 pre_txt_root = "E:/kx_detection/multi_detection/mAP/predicted"
-
 
 # CLASSES = ["beefsteak", "cartooncookies", "chickenwings", "chiffoncake", "cookies",
 #            "cranberrycookies", "cupcake", "eggtart", "nofood", "peanuts",
@@ -59,6 +56,8 @@ def get_accuracy(error_write=True):
     class_pre = []
     no_result = {}
 
+    correct_nums = 0  # 正确数
+    labels_2 = 0  # 标签不唯一数
     error_c = 0  # 输出标签种类错误的nums
     error_noresults = 0  # 输出无结果的nums
     for pre in pre_txt_list:
@@ -83,47 +82,39 @@ def get_accuracy(error_write=True):
                     pre_cc = sorted(pre_c.items(), key=lambda x: x[1], reverse=True)
                     print(pre_cc)
 
-                    if len(pre_cc) == 1:
-                        predict_c = pre_cc[0][0]  # 若输出种类为1
-                        if predict_c != true_cc:
-                            error_c += 1
-
-                            # 若排序最高的class为错误类别，写入到error
-                            shutil.copy(detection_dir + pre.split(".")[0] + ".jpg",
-                                        error_dir + pre.split(".")[0] + ".jpg")  # 拷贝错误图片到error
-
-                            shutil.copy(os.path.join(gt_txt_root, pre),
-                                        error_dir + pre.split(".")[0] + "_gt.txt")  # 拷贝ground_truth文件
-                            shutil.copy(os.path.join(pre_txt_root, pre),
-                                        error_dir + pre.split(".")[0] + "_pre.txt")  # 拷贝predicted文件
-                    else:
-                        if pre_cc[0][1] != pre_cc[1][1]:  # 如果输种类大于1个，最多的只有一类，取数量最多的一个
-                            predict_c = pre_cc[0][0]
+                    if len(pre_cc) == 1:  # 输出单一标签
+                        score_max = float(max(score_list))  # 找到score最高分
+                        if score_max >= 0.96:  # score加入阈值判断
+                            predict_c = pre_cc[0][0]  # 若输出种类为1
                             if predict_c != true_cc:
                                 error_c += 1
-                                # 若sort后种类大于1，且数量最多为1，写入到error2
+
+                                # 若排序最高的class为错误类别，写入到error
                                 shutil.copy(detection_dir + pre.split(".")[0] + ".jpg",
-                                            error_dir2 + pre.split(".")[0] + ".jpg")  # 拷贝错误图片到error2
+                                            error_dir + pre.split(".")[0] + ".jpg")  # 拷贝错误图片到error
+
+                                shutil.copy(os.path.join(gt_txt_root, pre),
+                                            error_dir + pre.split(".")[0] + "_gt.txt")  # 拷贝ground_truth文件
+                                shutil.copy(os.path.join(pre_txt_root, pre),
+                                            error_dir + pre.split(".")[0] + "_pre.txt")  # 拷贝predicted文件
+                            else:
+                                correct_nums += 1
+                                shutil.copy(detection_dir + pre.split(".")[0] + ".jpg",
+                                            error_dir2 + pre.split(".")[0] + ".jpg")  # 拷贝错误图片到error
 
                                 shutil.copy(os.path.join(gt_txt_root, pre),
                                             error_dir2 + pre.split(".")[0] + "_gt.txt")  # 拷贝ground_truth文件
                                 shutil.copy(os.path.join(pre_txt_root, pre),
                                             error_dir2 + pre.split(".")[0] + "_pre.txt")  # 拷贝predicted文件
-                        else:  # 若最多种类不唯一，取得分最高的
-                            predict_c = all_lines[score_list.index(max(score_list))].split(" ")[0]
-                            if predict_c != true_cc:
-                                error_c += 1
-                                # 若sort后种类大于1且score得分最高的class为错误类别，写入到error2
-                                shutil.copy(detection_dir + pre.split(".")[0] + ".jpg",
-                                            error_dir3 + pre.split(".")[0] + ".jpg")  # 拷贝错误图片到error3
+                    else:
+                        labels_2 += 1
+                        shutil.copy(detection_dir + pre.split(".")[0] + ".jpg",
+                                    error_dir3 + pre.split(".")[0] + ".jpg")  # 拷贝错误图片到error3
 
-                                shutil.copy(os.path.join(gt_txt_root, pre),
-                                            error_dir3 + pre.split(".")[0] + "_gt.txt")  # 拷贝ground_truth文件
-                                shutil.copy(os.path.join(pre_txt_root, pre),
-                                            error_dir3 + pre.split(".")[0] + "_pre.txt")  # 拷贝predicted文件
-
-                    class_true.append(CLASSES.index(true_cc))
-                    class_pre.append(CLASSES.index(predict_c))
+                        shutil.copy(os.path.join(gt_txt_root, pre),
+                                    error_dir3 + pre.split(".")[0] + "_gt.txt")  # 拷贝ground_truth文件
+                        shutil.copy(os.path.join(pre_txt_root, pre),
+                                    error_dir3 + pre.split(".")[0] + "_pre.txt")  # 拷贝predicted文件
                 else:  # 无任何结果，error_noresults统计
                     error_noresults += 1
 
@@ -135,10 +126,12 @@ def get_accuracy(error_write=True):
     matrix = confusion_matrix(y_pred=class_pre, y_true=class_true)
     print(matrix)
     print("no_result:", no_result)
-    return error_c, error_noresults
+    return error_c, correct_nums, labels_2, error_noresults
 
 
 if __name__ == "__main__":
-    error_c, error_noresults = get_accuracy()
+    error_c, correct_nums, labels_2, error_noresults = get_accuracy()
     print("标签错误数量：", error_c)
     print("无任何结果输出数量：", error_noresults)
+    print("correct_nums:", correct_nums)
+    print("labels_2:", labels_2)
