@@ -63,7 +63,6 @@ def convert_voc_annotation(data_path, data_type, anno_path, use_difficult_bbox=T
             image_path = (data_path, 'JPGImages', image_ind + '.jpg')  # 原图片
             # image_path = (data_path, 'JPGImages', image_ind + '_pad.jpg')   #padding图片
             image_path = st.join(image_path)
-            print("image_path::::::::", image_path)
 
             annotation = image_path
             if image_ind + ".jpg" in bottom:
@@ -72,8 +71,12 @@ def convert_voc_annotation(data_path, data_type, anno_path, use_difficult_bbox=T
                 layer_label = 1
             elif image_ind + ".jpg" in top:
                 layer_label = 2
-            else:
+            elif image_ind + ".jpg" in others:
                 layer_label = 3
+            else:
+                print(image_path)
+                print("error")
+
             annotation += ' ' + str(layer_label)  # annotation中写入烤层的标签
 
             label_path = (data_path, 'Annotations', image_ind + '.xml')  # 原数据
@@ -97,7 +100,6 @@ def convert_voc_annotation(data_path, data_type, anno_path, use_difficult_bbox=T
                 ymin = bbox.find('ymin').text.strip()
                 ymax = bbox.find('ymax').text.strip()
                 annotation += ' ' + ','.join([xmin, ymin, xmax, ymax, str(class_ind)])
-            print(annotation)
             f.write(annotation + "\n")
     return len(image_inds)
 

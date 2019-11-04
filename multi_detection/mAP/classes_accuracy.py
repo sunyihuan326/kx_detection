@@ -81,7 +81,6 @@ def get_accuracy(error_write=True):
                             pre_c[c] += 1
                         score_list.append(line.split(" ")[1])
                     pre_cc = sorted(pre_c.items(), key=lambda x: x[1], reverse=True)
-                    print(pre_cc)
 
                     if len(pre_cc) == 1:
                         predict_c = pre_cc[0][0]  # 若输出种类为1
@@ -96,6 +95,7 @@ def get_accuracy(error_write=True):
                                         error_dir + pre.split(".")[0] + "_gt.txt")  # 拷贝ground_truth文件
                             shutil.copy(os.path.join(pre_txt_root, pre),
                                         error_dir + pre.split(".")[0] + "_pre.txt")  # 拷贝predicted文件
+
                     else:
                         if pre_cc[0][1] != pre_cc[1][1]:  # 如果输种类大于1个，最多的只有一类，取数量最多的一个
                             predict_c = pre_cc[0][0]
