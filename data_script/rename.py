@@ -5,7 +5,7 @@ import os
 
 class ImageRename():
     def __init__(self, target):
-        self.path = 'C:/Users/sunyihuan/Desktop/X-补采/X-3/Pizzatwo'
+        self.path = 'C:/Users/sunyihuan/Desktop/X-补采/X-1/Pizzafour'
         self.target = target
 
     def rename(self):
@@ -24,12 +24,12 @@ class ImageRename():
                 #
                 if self.target not in filename:
                     dst = os.path.join(os.path.abspath(self.path),
-                                       filename + "_191104" + "X3_size12_" + self.target + '.jpg')
+                                       filename + "_191105" + "X1_size12_" + self.target + '.jpg')
                     os.rename(src, dst)
                     print('converting %s to %s ...' % (src, dst))
 
 
 if __name__ == '__main__':
-    target = "Pizzatwo"
+    target = "Pizzafour"
     newname = ImageRename(target)
     newname.rename()

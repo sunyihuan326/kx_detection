@@ -11,17 +11,16 @@ def get_layer(typ):
     :param typ:
     :return:
     '''
-    layer_name = ["buttom", "middle", "top", "others"]
-    bottom = os.listdir("E:/layer_data/X_KX_data_27classes1029_{}/bottom".format(typ))
+    bottom = os.listdir("E:/layer_data/XandOld_layer1105_{}/bottom".format(typ))
     bottom = [b for b in bottom if b.endswith(".jpg")]
 
-    middle = os.listdir("E:/layer_data/X_KX_data_27classes1029_{}/middle".format(typ))
+    middle = os.listdir("E:/layer_data/XandOld_layer1105_{}/middle".format(typ))
     middle = [b for b in middle if b.endswith(".jpg")]
 
-    top = os.listdir("E:/layer_data/X_KX_data_27classes1029_{}/top".format(typ))
+    top = os.listdir("E:/layer_data/XandOld_layer1105_{}/top".format(typ))
     top = [b for b in top if b.endswith(".jpg")]
 
-    others = os.listdir("E:/layer_data/X_KX_data_27classes1029_{}/others".format(typ))
+    others = os.listdir("E:/layer_data/XandOld_layer1105_{}/others".format(typ))
     others = [b for b in others if b.endswith(".jpg")]
     return bottom, middle, top, others
 
@@ -106,13 +105,13 @@ def convert_voc_annotation(data_path, data_type, anno_path, use_difficult_bbox=T
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data_path", default="E:/DataSets/KX_FOODSets_model_data/X_27classes_1029")
+    parser.add_argument("--data_path", default="E:/DataSets/KX_FOODSets_model_data/XandOldData1105")
     parser.add_argument("--train_annotation",
-                        default="E:/kx_detection/multi_detection/data/dataset/foodSets1029_layer_train27.txt")
+                        default="E:/kx_detection/multi_detection/data/dataset/foodSets1105_XandOld_train27.txt")
     parser.add_argument("--test_annotation",
-                        default="E:/kx_detection/multi_detection/data/dataset/foodSets1029_layer_test27.txt")
+                        default="E:/kx_detection/multi_detection/data/dataset/foodSets1105_XandOld_test27.txt")
     parser.add_argument("--val_annotation",
-                        default="E:/kx_detection/multi_detection/data/dataset/foodSets1029_layer_val27.txt")
+                        default="E:/kx_detection/multi_detection/data/dataset/foodSets1105_XandOld_val27.txt")
     flags = parser.parse_args()
 
     if os.path.exists(flags.train_annotation): os.remove(flags.train_annotation)
