@@ -56,7 +56,7 @@ class YoloTest(object):
         self.num_classes = 27  # 种类数
         self.score_threshold = 0.45
         self.iou_threshold = 0.5
-        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food2/20191104/yolov3_train_loss=9.9178.ckpt-171"  # ckpt文件地址
+        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food/20191106/yolov3_train_loss=8.5058.ckpt-28"  # ckpt文件地址
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
 
@@ -142,9 +142,9 @@ if __name__ == '__main__':
     #         image_path = img_dir + "/" + file
     #         print(image_path)
     #         Y.result(image_path, save_dir)  # 预测每一张结果并保存
-    classes = ["Pizzafour"]
+    classes = ["co"]
 
-    classes_id = 12
+    classes_id = 1
 
     error_noresults = 0  # 无任何结果统计
     food_acc = 0  # 食材准确数统计

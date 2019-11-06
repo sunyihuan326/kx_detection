@@ -83,7 +83,6 @@ def get_accuracy(error_write=True):
                     pre_cc = sorted(pre_c.items(), key=lambda x: x[1], reverse=True)
 
                     if len(pre_cc) == 1:
-                        predict_c = pre_cc[0][0]  # 若输出种类为1
                         if predict_c != true_cc:
                             error_c += 1
 

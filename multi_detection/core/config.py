@@ -48,7 +48,7 @@ __C.TEST.DATA_AUG               = False
 __C.TEST.WRITE_IMAGE            = True
 __C.TEST.WRITE_IMAGE_PATH       = "E:/kx_detection/multi_detection/data/detection"
 __C.TEST.WRITE_IMAGE_SHOW_LABEL = False
-__C.TEST.WEIGHT_FILE            = "E:/ckpt_dirs/Food_detection/tf_yolov3/20190823/yolov3_train_loss=9.3529.ckpt-51"
+__C.TEST.WEIGHT_FILE            = ""
 __C.TEST.SHOW_LABEL             = True
 __C.TEST.SCORE_THRESHOLD        = 0.45
 __C.TEST.IOU_THRESHOLD          = 0.5
