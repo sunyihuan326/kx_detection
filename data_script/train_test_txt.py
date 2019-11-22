@@ -8,7 +8,7 @@
 import os
 import random
 
-root_path = "E:/已标数据备份/KX38I95FOODSETS_Annotation_0917"
+root_path = "E:/已标数据备份/X补采"
 
 
 # 文件根本目录
@@ -81,9 +81,11 @@ if __name__ == "__main__":
     #            "Pizzatwo", "PorkChops", "PotatoCut", "Potatol", "Potatom",
     #            "Potatos", "SweetPotatoCut", "SweetPotatol", "SweetPotatom", "SweetPotatos",
     #            "RoastedChicken", "Toast"]
-    clasees = ["BeefSteak", "CartoonCookies", "Cookies", "toast"]
+    clasees = ["CartoonCookies", "Cookies", "CupCake", "Pizzafour", "Pizzaone",
+               "Pizzasix", "Pizzatwo", "SweetPotatoS", "Toast"]
     print(len(clasees))
     train_percent = 0.8
     test_percent = 0.1
     for c in clasees:
+        print(c)
         split_data(c, train_percent, test_percent)

@@ -1,14 +1,12 @@
 # -*- encoding: utf-8 -*-
 
 """
-test集、val集直接查看矫正后的结果
-@File    : ckpt_result_check.py
-@Time    : 2019/11/6 10:52
+@File    : ckpt_score_nums.py
+@Time    : 2019/11/9 9:12
 @Author  : sunyihuan
 """
 
 import cv2
-import os
 import shutil
 from tqdm import tqdm
 import numpy as np
@@ -16,6 +14,13 @@ import tensorflow as tf
 import multi_detection.core.utils as utils
 from multi_detection.core.config import cfg
 from sklearn.metrics import confusion_matrix
+
+import os
+
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+
+config = tf.ConfigProto()
+config.gpu_options.per_process_gpu_memory_fraction = 0.9  # 占用GPU的显存
 
 
 class YoloTest(object):
@@ -29,15 +34,17 @@ class YoloTest(object):
         self.iou_threshold = cfg.TEST.IOU_THRESHOLD
         self.moving_ave_decay = cfg.YOLO.MOVING_AVE_DECAY
         self.annotation_path = cfg.TEST.ANNOT_PATH
-        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food/20191108/yolov3_train_loss=5.2653.ckpt-93"
+        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food3/20191118/yolov3_train_loss=5.0565.ckpt-100"
         self.write_image = cfg.TEST.WRITE_IMAGE
         self.write_image_path = cfg.TEST.WRITE_IMAGE_PATH
         self.show_label = cfg.TEST.SHOW_LABEL
 
+        self.count_nums = 0
+
         graph = tf.Graph()
         with graph.as_default():
             self.saver = tf.train.import_meta_graph("{}.meta".format(self.weight_file))
-            self.sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
+            self.sess = tf.Session(config=config)
             self.saver.restore(self.sess, self.weight_file)
 
             self.input = graph.get_tensor_by_name("define_input/input_data:0")
@@ -75,7 +82,7 @@ class YoloTest(object):
                                     np.reshape(pred_lbbox, (-1, 5 + self.num_classes))], axis=0)
 
         bboxes = utils.postprocess_boxes(pred_bbox, (org_h, org_w), self.input_size, 0.45)
-        bboxes = utils.nms(bboxes, self.iou_threshold)
+        bboxes = utils.nms(bboxes, self.iou_threshold,method="nms")
         bboxes_pr = bboxes  # 检测框结果
         layer_n = layer_[0]  # 烤层结果
 
@@ -86,6 +93,8 @@ class YoloTest(object):
 
         # 检测到一个食材
         elif num_label == 1:
+            if bboxes_pr[0][4] < 0.9 and bboxes_pr[0][4] >= 0.45:
+                bboxes_pr[0][4] = 0.9
             return bboxes_pr, layer_n
 
         # 检测到多个食材
@@ -98,17 +107,18 @@ class YoloTest(object):
                     continue
                 else:
                     same_label = False
+
+            sumProb = 0.
             # 多个食材，同一标签
             if same_label:
-                sumProb = 0.
-                for i in range(num_label):
-                    sumProb += bboxes_pr[i][4]
-                avrProb = sumProb / num_label
-                bboxes_pr[0][4] = avrProb
+                # for i in range(num_label):
+                #    sumProb += bboxes_pr[i][4]
+                # avrProb = sumProb/num_label
+                # bboxes_pr[0][4] = avrProb
+                bboxes_pr[0][4] = 0.98
                 return bboxes_pr, layer_n
             # 多个食材，非同一标签
             else:
-                sumProb = 0.
                 problist = list(map(lambda x: x[4], bboxes_pr))
                 labellist = list(map(lambda x: x[5], bboxes_pr))
 
@@ -118,7 +128,7 @@ class YoloTest(object):
                     # 按同种食材label数量降序排列
                 s_labeldict = sorted(labeldict.items(), key=lambda x: x[1], reverse=True)
 
-                # n_name = len(s_labeldict)
+                n_name = len(s_labeldict)
                 name1 = s_labeldict[0][0]
                 num_name1 = s_labeldict[0][1]
 
@@ -128,38 +138,34 @@ class YoloTest(object):
                     for i in range(num_label):
                         if name1 == bboxes_pr[i][5]:
                             num_label0.append(bboxes_pr[i])
-                    for i in range(len(num_label0)):
-                        sumProb += num_label0[i][4]
-                    avrProb = sumProb / num_label
-                    num_label0[0][4] = avrProb
+                    num_label0[0][4] = 0.95
                     return num_label0, layer_n
 
                 # 按各个label的probability降序排序
                 else:
+                    # 计数
+                    self.count_nums += 1
                     bboxes_pr = sorted(bboxes_pr, key=lambda x: x[4], reverse=True)
+                    for i in range(len(bboxes_pr)):
+                        bboxes_pr[i][4] = bboxes_pr[i][4] * 0.9
                     return bboxes_pr, layer_n
 
     def evaluate(self):
-        # predicted_dir_path = './mAP/predicted'
-        # ground_truth_dir_path = './mAP/ground-truth'
         error_layer_dir = "./mAP/error_layer"  # 烤层错误图片地址
         food_name_dir = "./mAP/food_name_error"  # 食材名称错误图片地址
         noresult_dir = "./mAP/noresult"  # 食材名称错误图片地址
-        # flag3_error = "./mAP/flag3"  # flag=3文件拷贝地址
-        # if os.path.exists(predicted_dir_path): shutil.rmtree(predicted_dir_path)
-        # if os.path.exists(ground_truth_dir_path): shutil.rmtree(ground_truth_dir_path)
+        result_1dir = "./mAP/result1"  # 食材判断仅为1个框
+
         if os.path.exists(self.write_image_path): shutil.rmtree(self.write_image_path)
         if os.path.exists(error_layer_dir): shutil.rmtree(error_layer_dir)
         if os.path.exists(food_name_dir): shutil.rmtree(food_name_dir)
         if os.path.exists(noresult_dir): shutil.rmtree(noresult_dir)
-        # if os.path.exists(flag3_error): shutil.rmtree(flag3_error)
-        # os.mkdir(predicted_dir_path)
-        # os.mkdir(ground_truth_dir_path)
+        if os.path.exists(result_1dir): shutil.rmtree(result_1dir)
         os.mkdir(self.write_image_path)
         os.mkdir(error_layer_dir)
         os.mkdir(food_name_dir)
         os.mkdir(noresult_dir)
-        # os.mkdir(flag3_error)
+        os.mkdir(result_1dir)
 
         layer_pre = []
         layer_true = []
@@ -169,6 +175,9 @@ class YoloTest(object):
 
         error_noresults = 0  # 输出无结果的nums
         error_c = 0
+
+        all_data = {}
+        no_result = {}
 
         with open(self.annotation_path, 'r') as annotation_file:
             for line in tqdm(annotation_file):
@@ -180,31 +189,14 @@ class YoloTest(object):
 
                 image_name = image_path.split('/')[-1]
                 image = cv2.imread(image_path)
-                # image = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)   # RGB空间转为HSV空间
-                # bbox_data_gt = np.array([list(map(int, box.split(','))) for box in annotation[2:]])
-                #
-                # if len(bbox_data_gt) == 0:
-                #     bboxes_gt = []
-                #     classes_gt = []
-                # else:
-                #     bboxes_gt, classes_gt = bbox_data_gt[:, :4], bbox_data_gt[:, 4]
-                # ground_truth_path = os.path.join(ground_truth_dir_path, image_name.split(".")[0] + '.txt')
-                #
+
                 print('=> ground truth of %s:' % image_name)
-                # num_bbox_gt = len(bboxes_gt)
-                # with open(ground_truth_path, 'w') as f:
-                #     for i in range(num_bbox_gt):
-                #         class_name = self.classes[classes_gt[i]]
-                #         xmin, ymin, xmax, ymax = list(map(str, bboxes_gt[i]))
-                #         bbox_mess = ' '.join([class_name, xmin, ymin, xmax, ymax]) + '\n'
-                #         f.write(bbox_mess)
-                #         print('\t' + str(bbox_mess).strip())
-                # print('=> predict result of %s:' % image_name)
+
                 bboxes_pr, layer = self.predict(image)
 
                 layer_pre.append(layer)  # 预测layer写入到layer_pre
 
-                if self.write_image:
+                if self.write_image:  # 预测结果画图
                     image = utils.draw_bbox(image, bboxes_pr, show_label=self.show_label)
                     # drawed_img_save_to_path = os.path.join(self.write_image_path, image_name)
                     drawed_img_save_to_path = self.write_image_path + "/" + image_name
@@ -220,21 +212,13 @@ class YoloTest(object):
                 if len(bboxes_pr) == 0:  # 无任何结果输出
                     print("no result:::")
                     error_noresults += 1
-                    shutil.copy(image_path,
+                    shutil.copy(self.write_image_path + "/" + image_name,
                                 noresult_dir + "/" + image_name.split(".")[0] + ".jpg")
-                # elif result[1] == 1:  # flag==1,直接输出结果
-                #     img_food_name_true = int(str(annotation[2]).split(",")[-1])  # 获取标准food_name
-                #     food_name_true.append(int(img_food_name_true))  # 写入到food_name_true
-                #
-                #     img_food_name_pre = int(result[0])  # 食材类别结果
-                #     food_name_pre.append(img_food_name_pre)  # 预测结果写入到food_name_pre
-                #
-                #     if img_food_name_true != img_food_name_pre:  # 结果错误，图片拷贝至food_name_dir
-                #         flag1_error += 1  # 错误统计
-                #         shutil.copy(image_path,
-                #                     food_name_dir + "/" + image_name.split(".")[0] + "_" + str(
-                #                         img_food_name_pre) + ".jpg")
+
                 else:
+                    if len(bboxes_pr) == 1:
+                        shutil.copy(self.write_image_path + "/" + image_name,
+                                    result_1dir + "/" + image_name)
                     img_food_name_true = int(str(annotation[2]).split(",")[-1])  # 获取标准food_name
                     food_name_true.append(int(img_food_name_true))  # 写入到food_name_true
 
@@ -243,9 +227,32 @@ class YoloTest(object):
 
                     if img_food_name_true != img_food_name_pre:  # 结果错误，图片拷贝至food_name_dir
                         error_c += 1  # 错误统计
-                        shutil.copy(image_path,
-                                    food_name_dir + "/" + image_name.split(".")[0] + "_" + str(
-                                        img_food_name_pre) + ".jpg")
+                        shutil.copy(self.write_image_path + "/" + image_name,
+                                    food_name_dir + "/" + image_name)
+
+                    else:  # 预测结果正确
+                        nums = 0
+                        img_score = 0.0
+                        for b in bboxes_pr:
+                            if b[-1] == img_food_name_pre:  # 标签正确的，数量统计、score统计
+                                nums += 1
+                                img_score += b[-2]
+
+                        if img_food_name_pre not in all_data.keys():
+                            all_data[img_food_name_pre] = [nums, img_score]
+                        else:
+                            all_data[img_food_name_pre][0] += nums
+                            all_data[img_food_name_pre][1] += img_score
+                        # img_score = bboxes_pr[0][-2]
+                        # if img_food_name_pre not in all_data.keys():
+                        #     all_data[img_food_name_pre] = [1, img_score]
+                        # else:
+                        #     all_data[img_food_name_pre][0] += 1
+                        #     all_data[img_food_name_pre][1] += img_score
+        print(all_data)
+        for c in all_data.keys():
+            print(c, ":  ", all_data[c][0], round(all_data[c][1] / all_data[c][0], 2))
+
         print("无任何结果数量：", error_noresults)
         print("错误数量：", error_c)
 
@@ -268,3 +275,5 @@ if __name__ == '__main__':
     Y.evaluate()
     e = time.time()
     print("predict all time::::", e - s_l_time)
+
+    print(Y.count_nums)

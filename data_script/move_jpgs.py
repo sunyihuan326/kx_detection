@@ -10,12 +10,10 @@ import shutil
 import os
 from tqdm import tqdm
 
-clasees = ["BeefSteak", "CartoonCookies", "ChickenWings", "ChiffonCake6", "ChiffonCake8",
-           "Cookies", "CranberryCookies", "CupCake", "EggTart", "EggTartBig",
-           "nofood", "Peanuts", "Pizzafour", "Pizzaone", "Pizzasix",
-           "Pizzatwo", "PorkChops", "PotatoCut", "Potatol", "Potatom",
-           "Potatos", "SweetPotatoCut", "SweetPotatol", "SweetPotatom", "SweetPotatos",
-           "RoastedChicken", "Toast"]  # 类别
+clasees = ["CartoonCookies",
+           "Cookies", "CupCake",
+            "Pizzafour", "Pizzaone", "Pizzasix",
+           "Pizzatwo",  "SweetPotatos", "Toast"]  # 类别
 
 
 def move_JPGImages(img_root_path):
@@ -80,5 +78,5 @@ def move_layer_images(layer_root_path):
 if __name__ == "__main__":
     # img_root_path = "E:/DataSets/KX_FOODSets_model_data/X_27classes_1025/JPGImages"  #图片根目录地址
     # move_JPGImages(img_root_path)
-    layer_root_path = "E:/layer_data/X_KX_data"  # layer数据根目录地址
+    layer_root_path = "E:/已标数据备份/X补采/layer_data"  # layer数据根目录地址
     move_layer_images(layer_root_path)

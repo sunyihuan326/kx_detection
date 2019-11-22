@@ -14,6 +14,7 @@ import os
 import shutil
 import matplotlib.pyplot as plt
 from tqdm import tqdm
+import cv2
 
 
 class aug(object):
@@ -28,10 +29,15 @@ class aug(object):
         :param mode: 滤波方法
         :return:
         '''
+        img = Image.open(img)
         if mode == "BLUR":
             img = img.filter(ImageFilter.BLUR)
         elif mode == "EDGE_ENHANCE":
             img = img.filter(ImageFilter.EDGE_ENHANCE)
+        elif mode == "SHARPEN":
+            img = img.filter(ImageFilter.SHARPEN)
+        elif mode=="DETAIL":
+            img = img.filter(ImageFilter.DETAIL)
         else:
             print("Input filter method!!!")
 
@@ -44,6 +50,7 @@ class aug(object):
         :param factor: 对比度因子
         :return:
         '''
+        img = Image.open(img)
         enh_con = ImageEnhance.Contrast(img)
         img = enh_con.enhance(factor)
         return np.array(img)
@@ -55,6 +62,7 @@ class aug(object):
         :param factor: 亮度因子
         :return:
         '''
+        img = Image.open(img)
         tmp = ImageEnhance.Brightness(img)
         img = tmp.enhance(factor)
         return np.array(img)
@@ -66,8 +74,9 @@ class aug(object):
         :param mode: 噪声类别，   含：gaussian、salt、localvar、poisson、pepper、s&p、speckle
         :return:
         '''
+        img = Image.open(img)
         img = np.array(img)
-        img = util.random_noise(img, mode=mode)  # 加入高斯噪声
+        img = util.random_noise(img, mode="gaussian")  # 加入高斯噪声
         return img
 
 
@@ -82,23 +91,24 @@ def data_aug(img_dir, xml_dir, img_save_dir, xml_save_dir):
     '''
     au = aug()
     for img_file in tqdm(os.listdir(img_dir)):
-        img_path = img_dir + "/" + img_file
-        img = Image.open(img_path)
-        mode = "salt"
-        # img = au.aug_filter(img, mode=mode)  #滤波
-        # img = au.aug_noise(img, mode=mode)  # 加入噪声
-        img = au.aug_bright(img, 1.3)  # 亮度调整
-        img_name = str(img_file).split(".")[0] + "_" + mode + ".jpg"  # 图片名称
-        plt.imsave(img_save_dir + "/" + img_name, img.astype(np.uint8))  # 保存图片
-        xml_name = str(img_name).split(".")[0] + "_" + ".xml"  # xml文件名称
-        shutil.copy(xml_dir + "/" + str(img_file).split(".")[0] + ".xml", xml_save_dir + "/" + xml_name)  # 拷贝xml数据
+        if img_file.endswith("jpg"):
+            img = img_dir + "/" + img_file
+            mode = "DETAIL"
+            img = au.aug_filter(img, mode=mode)  # 滤波
+            # img = au.aug_noise(img, mode=mode)  # 加入噪声
+            # img = au.aug_bright(img, 0.9)  # 亮度调整
+            # img = au.aug_contrast(img, 1.2)  #对比度增强
+            img_name = str(img_file).split(".")[0] + "_" + mode + ".jpg"  # 图片名称
+            plt.imsave(img_save_dir + "/" + img_name, img.astype(np.uint8))  # 保存图片
+            xml_name = str(img_name).split(".")[0] + "_" + ".xml"  # xml文件名称
+            shutil.copy(xml_dir + "/" + str(img_file).split(".")[0] + ".xml", xml_save_dir + "/" + xml_name)  # 拷贝xml数据
 
 
 if __name__ == "__main__":
-    img_dir = "E:/DataSets/KX_FOODSets0802/JPGImages/SweetPotatoM"
-    xml_dir = "E:/DataSets/KX_FOODSets0802/Anotations/SweetPotatoM"
-    img_save_dir = "C:/Users/sunyihuan/Desktop/data/imgs"
-    xml_save_dir = "C:/Users/sunyihuan/Desktop/data/annotations"
+    img_dir = "E:/DataSets/KX_FOODSets_model_data/X_KX_data_27_1111_train"
+    xml_dir = "E:/DataSets/KX_FOODSets_model_data/X_KX_data_27_1111/Annotations"
+    img_save_dir = "C:/Users/sunyihuan/Desktop/data/DETAIL"
+    xml_save_dir = "C:/Users/sunyihuan/Desktop/data/DETAIL_annotations"
     if not os.path.exists(img_save_dir): os.mkdir(img_save_dir)
     if not os.path.exists(xml_save_dir): os.mkdir(xml_save_dir)
     data_aug(img_dir, xml_dir, img_save_dir, xml_save_dir)

@@ -1,11 +1,17 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# @Time    : 2019/7/24 
-# @Author  : sunyihuan
+# -*- encoding: utf-8 -*-
+
+"""
+@File    : check_dir.py
+@Time    : 2019/11/20 8:42
+@Author  : sunyihuan
+"""
 
 '''
-ckpt文件预测某一文件夹下所有图片结果
+
+ckpt文件预测文件夹下所有图片结果
 并输出食材类别准确率结果
+文件名为类别名称
+
 '''
 
 import cv2
@@ -15,6 +21,7 @@ import multi_detection.core.utils as utils
 import os
 import shutil
 from tqdm import tqdm
+from sklearn.metrics import confusion_matrix, accuracy_score
 
 
 def correct_bboxes(bboxes_pr, layer_n):
@@ -95,27 +102,44 @@ class YoloTest(object):
         self.score_threshold = 0.45
         self.iou_threshold = 0.5
         self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food3/20191118/yolov3_train_loss=5.0565.ckpt-100"  # ckpt文件地址
+        self.pb_file = "E:/ckpt_dirs/Food_detection/multi_food3/20191118/yolo_model.pb"
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
-
         graph = tf.Graph()
         with graph.as_default():
-            # 模型加载
-            self.saver = tf.train.import_meta_graph("{}.meta".format(self.weight_file))
+            output_graph_def = tf.GraphDef()
+            with open(self.pb_file, "rb") as f:
+                output_graph_def.ParseFromString(f.read())
+                _ = tf.import_graph_def(output_graph_def, name="")
+
             self.sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
-            self.saver.restore(self.sess, self.weight_file)
 
-            # 输入
-            self.input = graph.get_tensor_by_name("define_input/input_data:0")
-            self.trainable = graph.get_tensor_by_name("define_input/training:0")
+            self.input = self.sess.graph.get_tensor_by_name("define_input/input_data:0")
+            self.trainable = self.sess.graph.get_tensor_by_name("define_input/training:0")
 
-            # 输出检测结果
-            self.pred_sbbox = graph.get_tensor_by_name("define_loss/pred_sbbox/concat_2:0")
-            self.pred_mbbox = graph.get_tensor_by_name("define_loss/pred_mbbox/concat_2:0")
-            self.pred_lbbox = graph.get_tensor_by_name("define_loss/pred_lbbox/concat_2:0")
+            self.pred_sbbox = self.sess.graph.get_tensor_by_name("define_loss/pred_sbbox/concat_2:0")
+            self.pred_mbbox = self.sess.graph.get_tensor_by_name("define_loss/pred_mbbox/concat_2:0")
+            self.pred_lbbox = self.sess.graph.get_tensor_by_name("define_loss/pred_lbbox/concat_2:0")
 
-            # 输出烤层结果
             self.layer_num = graph.get_tensor_by_name("define_loss/layer_classes:0")
+        # graph = tf.Graph()
+        # with graph.as_default():
+        #     # 模型加载
+        #     self.saver = tf.train.import_meta_graph("{}.meta".format(self.weight_file))
+        #     self.sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
+        #     self.saver.restore(self.sess, self.weight_file)
+        #
+        #     # 输入
+        #     self.input = graph.get_tensor_by_name("define_input/input_data:0")
+        #     self.trainable = graph.get_tensor_by_name("define_input/training:0")
+        #
+        #     # 输出检测结果
+        #     self.pred_sbbox = graph.get_tensor_by_name("define_loss/pred_sbbox/concat_2:0")
+        #     self.pred_mbbox = graph.get_tensor_by_name("define_loss/pred_mbbox/concat_2:0")
+        #     self.pred_lbbox = graph.get_tensor_by_name("define_loss/pred_lbbox/concat_2:0")
+        #
+        #     # 输出烤层结果
+        #     self.layer_num = graph.get_tensor_by_name("define_loss/layer_classes:0")
 
     def predict(self, image):
         '''
@@ -171,8 +195,8 @@ class YoloTest(object):
 
 
 if __name__ == '__main__':
-    img_dir = "C:/Users/sunyihuan/Desktop/X4-peanuts"  # 文件夹地址
-    save_dir = "C:/Users/sunyihuan/Desktop/X4-peanuts/detection"  # 预测结果标出保存地址
+    img_dir = "C:/Users/sunyihuan/Desktop/test_results_jpg"  # 文件夹地址
+    save_dir = "C:/Users/sunyihuan/Desktop/test_results_jpg/detection"  # 预测结果标出保存地址
     Y = YoloTest()  # 加载模型
     # Y.result(img_path, "E:/Joyoung_WLS_github/tf_yolov3")
     # for file in os.listdir(img_dir):
@@ -187,16 +211,25 @@ if __name__ == '__main__':
     #            "RoastedChicken", "SweetPotatoCut", "SweetPotatol", "SweetPotatom",
     #            "Pizzatwo", "SweetPotatoS", "Toast"]
     # classes = ["potatol", "potatom", "sweetpotatom", "sweetpotatol"]
-    # classes = ["potatol", "potatom", "sweetpotatom"]
-    classes = ["bottom", "middle", "top"]
-    classes_id = {"bottom": 11, "middle": 11, "top": 11}
+    classes = ["roastedchicken"]
+    # classes = ["porkchops", "beefsteak", "cartooncookies", "chickenwings", "chiffoncake6",
+    #            "chiffoncake8", "cookies", "cranberrycookies", "cupcake", "eggtartl", "eggtarts",
+    #            "nofood", "peanuts", "roastedchicken", "toast",
+    #            "pizzaone", "pizzatwo", "pizzafour", "pizzasix",
+    #            "potatol", "potatom", "potatos", "potatocut",
+    #            "sweetpotatom", "sweetpotatol", "sweetpotatos", "sweetpotatocut"]
 
-    # classes_id = {"CartoonCookies": 1, "Cookies": 5, "CupCake": 7, "Beefsteak": 0, "ChickenWings": 2,
-    #               "ChiffonCake6": 3, "ChiffonCake8": 4, "CranberryCookies": 6, "EggTart": 8, "EggTartBig": 9,
-    #               "nofood": 10, "Peanuts": 11, "porkchops": 16, "PotatoCut": 17, "potatol": 18,
-    #               "potatom": 19, "Potatos": 20, "SweetPotatoCut": 21, "sweetpotatol": 22, "sweetpotatom": 23,
-    #               "Pizzafour": 12, "Pizzaone": 13, "Pizzasix": 14, "RoastedChicken": 25,
-    #               "Pizzatwo": 15, "SweetPotatoS": 24, "Toast": 26,"jpgs":19}
+    classes_id = {"cartooncookies": 1, "cookies": 5, "cupcake": 7, "beefsteak": 0, "chickenwings": 2,
+                  "chiffoncake6": 3, "chiffoncake8": 4, "cranberrycookies": 6, "eggtarts": 8, "eggtartl": 9,
+                  "nofood": 10, "peanuts": 11, "porkchops": 16, "potatocut": 17, "potatol": 18,
+                  "potatom": 19, "potatos": 20, "sweetpotatocut": 21, "sweetpotatol": 22, "sweetpotatom": 23,
+                  "pizzafour": 12, "pizzaone": 13, "pizzasix": 14, "roastedchicken": 25,
+                  "pizzatwo": 15, "sweetpotatos": 24, "toast": 26}
+    food_name_pre = []
+    food_name_true = []
+
+    food_name_dir = "E:/kx_detection/error_roastedchicken_results"
+    no_results_dir="E:/kx_detection/no_results"
 
     for c in classes:
         error_noresults = 0  # 无任何结果统计
@@ -217,13 +250,31 @@ if __name__ == '__main__':
                 #     pass
                 if len(bboxes_pr) == 0:  # 无任何结果返回，输出并统计+1
                     error_noresults += 1
+                    shutil.copy(image_path,
+                                no_results_dir + "/" + file)
                 else:
                     bboxes_pr, layer_n = correct_bboxes(bboxes_pr, layer_n)  # 矫正输出结果
                     pre = bboxes_pr[0][-1]
+                    food_name_true.append(classes_id[c])
+                    food_name_pre.append(pre)
                     if pre == classes_id[c]:  # 若结果正确，食材正确数+1
                         food_acc += 1
                     else:
-                        print(pre)
+                        drawed_img_save_to_path = str(file).split(".")[0] + "_" + str(
+                            layer_n) + ".jpg"
+                        shutil.copy(save_dirs + "/" + drawed_img_save_to_path,
+                                    food_name_dir + "/" + file)
+        if all_jpgs == 0:
+            all_jpgs = 20000000000
         print("food name:", c)
         print("food accuracy:", round((food_acc / all_jpgs) * 100, 2))  # 输出食材正确数
         print("no result:", error_noresults)  # 输出无任何结果总数
+
+    food_name_matrix = confusion_matrix(food_name_true, food_name_pre,
+                                        labels=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+                                                20, 21, 22, 23, 24, 25, 26])
+    print("食材检测混淆矩阵：")
+    print(food_name_matrix)
+
+    acc = accuracy_score(y_true=food_name_true, y_pred=food_name_pre)
+    print("准确率：", acc)

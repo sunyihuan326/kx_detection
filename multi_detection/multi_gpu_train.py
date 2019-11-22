@@ -1,5 +1,11 @@
-#! /usr/bin/env python
-# coding=utf-8
+# -*- encoding: utf-8 -*-
+
+"""
+多gpu训练，未完成！！！！！！！
+@File    : multi_gpu_train.py
+@Time    : 2019/11/7 14:39
+@Author  : sunyihuan
+"""
 
 import os
 import time
@@ -13,12 +19,21 @@ from multi_detection.core.dataset import Dataset
 from multi_detection.core.yolov3 import YOLOV3
 from multi_detection.core.config import cfg
 
-import os
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+def average_gradients(tower_grads):
+    average_grads = []
+    for grad_and_vars in zip(*tower_grads):
+        grads = []
+        for g, _ in grad_and_vars:
+            expend_g = tf.expand_dims(g, 0)
+            grads.append(expend_g)
+        grad = tf.concat(grads, 0)
+        grad = tf.reduce_mean(grad, 0)
+        v = grad_and_vars[0][1]
+        grad_and_var = (grad, v)
+        average_grads.append(grad_and_var)
+    return average_grads
 
-config = tf.ConfigProto()
-config.gpu_options.per_process_gpu_memory_fraction = 0.9  # 占用GPU的显存
 
 class YoloTrain(object):
     def __init__(self):
@@ -39,7 +54,8 @@ class YoloTrain(object):
         self.trainset = Dataset('train')
         self.testset = Dataset('test')
         self.steps_per_period = len(self.trainset)
-        self.sess = tf.Session(config=config)
+        self.sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
+        self.tower_grads = []
 
         with tf.name_scope('define_input'):
             self.input_data = tf.placeholder(dtype=tf.float32,
@@ -54,65 +70,45 @@ class YoloTrain(object):
             self.true_lbboxes = tf.placeholder(dtype=tf.float32, name='lbboxes')
             self.trainable = tf.placeholder(dtype=tf.bool, name='training')
 
-        with tf.name_scope("define_loss"):
-            self.model = YOLOV3(self.input_data, self.trainable)
-            self.net_var = tf.global_variables()
-            self.giou_loss, self.conf_loss, self.prob_loss, self.giou, self.bbox_loss_scale = self.model.compute_loss(
-                self.label_sbbox, self.label_mbbox, self.label_lbbox,
-                self.true_sbboxes, self.true_mbboxes, self.true_lbboxes)
-            self.layer_loss = self.model.layer_loss(self.layer_label)
-            print("layer_loss::::")
-            print(self.layer_loss)
-            self.layer_loss = tf.cond(self.layer_loss > 0.01, lambda: self.layer_loss, lambda: 0.0)
-            self.loss = self.giou_loss + self.conf_loss + 2 * self.prob_loss + 10 * self.layer_loss
-        self.layer_out = self.model.out
-
         with tf.name_scope('learn_rate'):
             self.global_step = tf.Variable(1.0, dtype=tf.float64, trainable=False, name='global_step')
-            # self.learn_rate = tf.train.exponential_decay(self.learn_rate_init, global_step=self.global_step,
-            #                                              decay_steps=1000, decay_rate=0.9)
-            # self.learn_rate = tf.maximum(self.learn_rate, self.learn_rate_end)
-            warmup_steps = tf.constant(self.warmup_periods * self.steps_per_period,
-                                       dtype=tf.float64, name='warmup_steps')
-            train_steps = tf.constant((self.first_stage_epochs + self.second_stage_epochs) * self.steps_per_period,
-                                      dtype=tf.float64, name='train_steps')
-            self.learn_rate = tf.cond(
-                pred=self.global_step < warmup_steps,
-                true_fn=lambda: self.global_step / warmup_steps * self.learn_rate_init,
-                false_fn=lambda: self.learn_rate_end + 0.5 * (self.learn_rate_init - self.learn_rate_end) *
-                                 (1 + tf.cos(
-                                     (self.global_step - warmup_steps) / (train_steps - warmup_steps) * np.pi))
-            )
+            self.learn_rate = tf.train.exponential_decay(self.learn_rate_init, global_step=self.global_step,
+                                                         decay_steps=1000, decay_rate=0.9)
+            self.learn_rate = tf.maximum(self.learn_rate, self.learn_rate_end)
             global_step_update = tf.assign_add(self.global_step, 1.0)
 
-        with tf.name_scope("define_weight_decay"):
-            moving_ave = tf.train.ExponentialMovingAverage(self.moving_ave_decay).apply(tf.trainable_variables())
+        with tf.variable_scope(tf.get_variable_scope(), reuse=tf.AUTO_REUSE):
+            self.opt = tf.train.GradientDescentOptimizer(self.learn_rate)
 
-        with tf.name_scope("define_first_stage_train"):
-            self.first_stage_trainable_var_list = []
-            for var in tf.trainable_variables():
-                var_name = var.op.name
-                var_name_mess = str(var_name).split('/')
-                if var_name_mess[0] in ['conv_sbbox', 'conv_mbbox', 'conv_lbbox']:
-                    self.first_stage_trainable_var_list.append(var)
+        with tf.name_scope("define_loss",tf.variable_scope("define_loss", reuse=tf.AUTO_REUSE)):
+            for i in range(4):
+                with tf.device('/gpu:{}'.format(i + 4)):
+                    self.input_data_i = self.input_data[i * cfg.TRAIN.BATCH_SIZE:(i + 1) * cfg.TRAIN.BATCH_SIZE]
+                    self.layer_label_i = self.layer_label[i * cfg.TRAIN.BATCH_SIZE:(i + 1) * cfg.TRAIN.BATCH_SIZE]
+                    self.label_sbbox_i = self.label_sbbox[i * cfg.TRAIN.BATCH_SIZE:(i + 1) * cfg.TRAIN.BATCH_SIZE]
+                    self.label_mbbox_i = self.label_mbbox[i * cfg.TRAIN.BATCH_SIZE:(i + 1) * cfg.TRAIN.BATCH_SIZE]
+                    self.label_lbbox_i = self.label_lbbox[i * cfg.TRAIN.BATCH_SIZE:(i + 1) * cfg.TRAIN.BATCH_SIZE]
+                    self.true_sbboxes_i = self.true_sbboxes[i * cfg.TRAIN.BATCH_SIZE:(i + 1) * cfg.TRAIN.BATCH_SIZE]
+                    self.true_mbboxes_i = self.true_mbboxes[i * cfg.TRAIN.BATCH_SIZE:(i + 1) * cfg.TRAIN.BATCH_SIZE]
+                    self.true_lbboxes_i = self.true_lbboxes[i * cfg.TRAIN.BATCH_SIZE:(i + 1) * cfg.TRAIN.BATCH_SIZE]
 
-            first_stage_optimizer = tf.train.AdamOptimizer(self.learn_rate).minimize(self.loss,
-                                                                                     var_list=self.first_stage_trainable_var_list)
-            # first_stage_optimizer = tf.train.AdamOptimizer(self.learn_rate).minimize(self.loss)
-            with tf.control_dependencies(tf.get_collection(tf.GraphKeys.UPDATE_OPS)):
-                with tf.control_dependencies([first_stage_optimizer, global_step_update]):
-                    with tf.control_dependencies([moving_ave]):
-                        self.train_op_with_frozen_variables = tf.no_op()
+                    self.model = YOLOV3(self.input_data_i, self.trainable)
+                    self.layer_out = self.model.out
+                    self.net_var = tf.global_variables()
+                    self.giou_loss, self.conf_loss, self.prob_loss, self.giou, self.bbox_loss_scale = self.model.compute_loss(
+                        self.label_sbbox_i, self.label_mbbox_i, self.label_lbbox_i,
+                        self.true_sbboxes_i, self.true_mbboxes_i, self.true_lbboxes_i)
 
-        with tf.name_scope("define_second_stage_train"):
-            second_stage_trainable_var_list = tf.trainable_variables()
-            second_stage_optimizer = tf.train.AdamOptimizer(self.learn_rate).minimize(self.loss,
-                                                                                      var_list=second_stage_trainable_var_list)
+                    # self.layer_loss = self.model.layer_loss(self.layer_label_i)
+                    # self.layer_loss = tf.cond(self.layer_loss > 0.01, lambda: self.layer_loss, lambda: 0.0)
+                    self.layer_loss=0
+                    self.loss = self.giou_loss + self.conf_loss + 2 * self.prob_loss + 10 * self.layer_loss
 
-            with tf.control_dependencies(tf.get_collection(tf.GraphKeys.UPDATE_OPS)):
-                with tf.control_dependencies([second_stage_optimizer, global_step_update]):
-                    with tf.control_dependencies([moving_ave]):
-                        self.train_op_with_all_variables = tf.no_op()
+                    tf.get_variable_scope().reuse_variables()
+                    grads = self.opt.compute_gradients(self.loss)
+                    self.tower_grads.append(grads)
+        grads = average_gradients(self.tower_grads)
+        self.train_op = self.opt.apply_gradients(grads)
 
         with tf.name_scope('loader_and_saver'):
             self.loader = tf.train.Saver(self.net_var)
@@ -151,19 +147,13 @@ class YoloTrain(object):
             print('=> %s does not exist !!!' % self.initial_weight)
             print('=> Now it starts to train YOLOV3 from scratch ...')
             self.first_stage_epochs = 0
-
         for epoch in range(1, 1 + self.first_stage_epochs + self.second_stage_epochs):
-            if epoch <= self.first_stage_epochs:
-                train_op = self.train_op_with_frozen_variables
-            else:
-                train_op = self.train_op_with_all_variables
-            # train_op = self._optimizer
             pbar = tqdm(self.trainset)
             train_epoch_loss, test_epoch_loss = [], []
 
             for train_data in pbar:
                 _, summary, train_step_loss, global_step_val, gi, bbo, layer_loss_v, layer_o = self.sess.run(
-                    [train_op, self.write_op, self.loss, self.global_step, self.giou, self.bbox_loss_scale,
+                    [self.train_op, self.write_op, self.loss, self.global_step, self.giou, self.bbox_loss_scale,
                      self.layer_loss, self.layer_out], feed_dict={
                         # _, summary, train_step_loss, global_step_val, gi, bbo, = self.sess.run(
                         #     [train_op, self.write_op, self.loss, self.global_step, self.giou, self.bbox_loss_scale,
@@ -178,13 +168,6 @@ class YoloTrain(object):
                         self.true_lbboxes: train_data[7],
                         self.trainable: True,
                     })
-                # print("layer_loss:::")
-                # print(layer_loss_v)
-                # print("true:::::")
-                # print(train_data[1])
-                # print("predict:::")
-                # print(layer_o)
-
                 train_epoch_loss.append(train_step_loss)
                 self.train_summary_writer.add_summary(summary, global_step_val)
                 pbar.set_description("train loss: %.2f" % train_step_loss)
@@ -199,12 +182,6 @@ class YoloTrain(object):
             constant_graph = graph_util.convert_variables_to_constants(self.sess, self.sess.graph_def, output)
             with tf.gfile.GFile('./model/yolo_model.pb', mode='wb') as f:
                 f.write(constant_graph.SerializeToString())
-
-            # 保存为pb用于tf_serving
-            # export_dir = "E:/Joyoung_WLS_github/tf_yolov3/pb"
-            # tf.saved_model.simple_save(self.sess, export_dir, inputs={"input": self.input_data},
-            #                            outputs={"pred_sbbox": self.pred_sbbox, "pred_mbbox": self.pred_mbbox,
-            #                                     "pre_lbbox": self.pred_lbbox})
 
             par_test = tqdm(self.testset)
             for test_data in par_test:
@@ -225,10 +202,6 @@ class YoloTrain(object):
                 test_epoch_loss.append(test_step_loss)
                 self.test_summary_writer.add_summary(test_summary)
                 par_test.set_description("test loss: %.2f" % test_step_loss)
-                # print("true:::::")
-                # print(test_data[1])
-                # print("test prediction")
-                # print(test_layer_o)
 
             train_epoch_loss, test_epoch_loss = np.mean(train_epoch_loss), np.mean(test_epoch_loss)
             ckpt_file = "./checkpoint/yolov3_test_loss=%.4f.ckpt" % test_epoch_loss

@@ -12,7 +12,7 @@
 import os, shutil
 import random
 
-root_path = "E:/已标数据备份/KX38I95FOODSETS_Annotation_0917/ImageSets/Main"
+root_path = "E:/已标数据备份/X补采/ImageSets/Main"
 train_all_list = []
 
 
@@ -32,10 +32,10 @@ def train_all_txt(txt_name):
 
 
 if __name__ == "__main__":
-    all_txt_name = "test.txt"  # 写入到train文件中
+    all_txt_name = "train.txt"  # 写入到train文件中
     # all_txt_name = "test.txt"  # 写入到test文件中
     for txt_name in os.listdir(root_path):
-        if "_test" in txt_name:
+        if "_train" in txt_name:
             train_all_list = train_all_txt(txt_name)
     random.shuffle(train_all_list)
     print(len(train_all_list))
