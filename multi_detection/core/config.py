@@ -25,8 +25,8 @@ __C.YOLO.DEMO_WEIGHT            = "./checkpoint/yolov3_coco_demo.ckpt"
 # Train options
 __C.TRAIN                       = edict()
 
-__C.TRAIN.ANNOT_PATH            = "./data/dataset/XandOld1111_train27.txt"
-__C.TRAIN.BATCH_SIZE            = 6
+__C.TRAIN.ANNOT_PATH            = "./data/dataset/X_KX_data_27_1111_flipx_train27.txt"
+__C.TRAIN.BATCH_SIZE            = 2
 __C.TRAIN.INPUT_SIZE            = 416
 __C.TRAIN.DATA_AUG              = False
 __C.TRAIN.LEARN_RATE_INIT       = 1e-4

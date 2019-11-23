@@ -60,7 +60,7 @@ def convert_voc_annotation(data_path, data_type, anno_path, use_difficult_bbox=T
             # print("image_path::::::::", image_path)
             st = "/"
             # image_path = (data_path, 'JPGImages', image_ind + '.jpg')  # 原图片
-            image_path = (data_path, 'JPGImages', image_ind + '_bright13.jpg')  # 增强图片
+            image_path = (data_path, 'JPGImages', image_ind + '_x.jpg')  # 增强图片
             image_path = st.join(image_path)
 
             annotation = image_path
@@ -79,7 +79,7 @@ def convert_voc_annotation(data_path, data_type, anno_path, use_difficult_bbox=T
             annotation += ' ' + str(layer_label)  # annotation中写入烤层的标签
 
             # label_path = (data_path, 'Annotations', image_ind + '.xml')  # 原数据
-            label_path = (data_path, 'Annotations', image_ind + '_bright13_.xml')  # 增强数据
+            label_path = (data_path, 'Annotations', image_ind + '_x.xml')  # 增强数据
             label_path = st.join(label_path)
             root = ET.parse(label_path).getroot()
             objects = root.findall('object')
@@ -104,9 +104,9 @@ def convert_voc_annotation(data_path, data_type, anno_path, use_difficult_bbox=T
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data_path", default="E:/DataSets/KX_FOODSets_model_data/X_KX_data_27_1111_train_aug/bright13")
+    parser.add_argument("--data_path", default="E:/DataSets/KX_FOODSets_model_data/X_KX_data_27_1111_train_aug/flip_x")
     parser.add_argument("--train_annotation",
-                        default="E:/kx_detection/multi_detection/data/dataset/X_KX_data_27_1111_bright13_train27.txt")
+                        default="E:/kx_detection/multi_detection/data/dataset/X_KX_data_27_1111_flipx_train27.txt")
     # parser.add_argument("--test_annotation",
     #                     default="E:/kx_detection/multi_detection/data/dataset/XandOld1111_test27.txt")
     # parser.add_argument("--val_annotation",

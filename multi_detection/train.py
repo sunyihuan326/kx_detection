@@ -15,8 +15,6 @@ from multi_detection.core.config import cfg
 
 import os
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-
 config = tf.ConfigProto()
 config.gpu_options.per_process_gpu_memory_fraction = 0.9  # 占用GPU的显存
 

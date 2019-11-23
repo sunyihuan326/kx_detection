@@ -94,7 +94,7 @@ class YoloTest(object):
         self.num_classes = 27  # 种类数
         self.score_threshold = 0.45
         self.iou_threshold = 0.5
-        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food3/20191118/yolov3_train_loss=5.0565.ckpt-100"  # ckpt文件地址
+        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food3/20191123/yolov3_train_loss=10.4322.ckpt-5"  # ckpt文件地址
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
 
@@ -171,8 +171,8 @@ class YoloTest(object):
 
 
 if __name__ == '__main__':
-    img_dir = "C:/Users/sunyihuan/Desktop/X4-peanuts"  # 文件夹地址
-    save_dir = "C:/Users/sunyihuan/Desktop/X4-peanuts/detection"  # 预测结果标出保存地址
+    img_dir = "C:/Users/sunyihuan/Desktop/test_results_jpg"  # 文件夹地址
+    save_dir = "C:/Users/sunyihuan/Desktop/test_results_jpg/detection"  # 预测结果标出保存地址
     Y = YoloTest()  # 加载模型
     # Y.result(img_path, "E:/Joyoung_WLS_github/tf_yolov3")
     # for file in os.listdir(img_dir):
@@ -188,8 +188,8 @@ if __name__ == '__main__':
     #            "Pizzatwo", "SweetPotatoS", "Toast"]
     # classes = ["potatol", "potatom", "sweetpotatom", "sweetpotatol"]
     # classes = ["potatol", "potatom", "sweetpotatom"]
-    classes = ["bottom", "middle", "top"]
-    classes_id = {"bottom": 11, "middle": 11, "top": 11}
+    classes = ["sweetpotatom"]
+    classes_id = {"sweetpotatom": 23, "middle": 11, "top": 11}
 
     # classes_id = {"CartoonCookies": 1, "Cookies": 5, "CupCake": 7, "Beefsteak": 0, "ChickenWings": 2,
     #               "ChiffonCake6": 3, "ChiffonCake8": 4, "CranberryCookies": 6, "EggTart": 8, "EggTartBig": 9,
