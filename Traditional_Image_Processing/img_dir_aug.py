@@ -36,7 +36,7 @@ class aug(object):
             img = img.filter(ImageFilter.EDGE_ENHANCE)
         elif mode == "SHARPEN":
             img = img.filter(ImageFilter.SHARPEN)
-        elif mode=="DETAIL":
+        elif mode == "DETAIL":
             img = img.filter(ImageFilter.DETAIL)
         else:
             print("Input filter method!!!")
@@ -76,8 +76,9 @@ class aug(object):
         '''
         img = Image.open(img)
         img = np.array(img)
-        img = util.random_noise(img, mode="gaussian")  # 加入高斯噪声
-        return img
+        img = util.random_noise(img, mode="gaussian")  # 加入高斯噪声,输出值为[0,1],需乘以255
+        img = img * 255
+        return img.astype(int)
 
 
 def data_aug(img_dir, xml_dir, img_save_dir, xml_save_dir):
@@ -93,22 +94,22 @@ def data_aug(img_dir, xml_dir, img_save_dir, xml_save_dir):
     for img_file in tqdm(os.listdir(img_dir)):
         if img_file.endswith("jpg"):
             img = img_dir + "/" + img_file
-            mode = "DETAIL"
-            img = au.aug_filter(img, mode=mode)  # 滤波
-            # img = au.aug_noise(img, mode=mode)  # 加入噪声
-            # img = au.aug_bright(img, 0.9)  # 亮度调整
+            mode = "gaussian"
+            # img = au.aug_filter(img, mode=mode)  # 滤波
+            img = au.aug_noise(img, mode=mode)  # 加入噪声
+            # img = au.aug_bright(img, 1.2)  # 亮度调整
             # img = au.aug_contrast(img, 1.2)  #对比度增强
             img_name = str(img_file).split(".")[0] + "_" + mode + ".jpg"  # 图片名称
             plt.imsave(img_save_dir + "/" + img_name, img.astype(np.uint8))  # 保存图片
-            xml_name = str(img_name).split(".")[0] + "_" + ".xml"  # xml文件名称
+            xml_name = str(img_name).split(".")[0] + ".xml"  # xml文件名称
             shutil.copy(xml_dir + "/" + str(img_file).split(".")[0] + ".xml", xml_save_dir + "/" + xml_name)  # 拷贝xml数据
 
 
 if __name__ == "__main__":
-    img_dir = "E:/DataSets/KX_FOODSets_model_data/X_KX_data_27_1111_train"
-    xml_dir = "E:/DataSets/KX_FOODSets_model_data/X_KX_data_27_1111/Annotations"
-    img_save_dir = "C:/Users/sunyihuan/Desktop/data/DETAIL"
-    xml_save_dir = "C:/Users/sunyihuan/Desktop/data/DETAIL_annotations"
+    img_dir = "C:/Users/sunyihuan/Desktop/peanuts_all/train/JPGImages"
+    xml_dir = "C:/Users/sunyihuan/Desktop/peanuts_all/train/Annotations"
+    img_save_dir = "C:/Users/sunyihuan/Desktop/peanuts_all/gaussian"
+    xml_save_dir = "C:/Users/sunyihuan/Desktop/peanuts_all/gaussian_annotations"
     if not os.path.exists(img_save_dir): os.mkdir(img_save_dir)
     if not os.path.exists(xml_save_dir): os.mkdir(xml_save_dir)
     data_aug(img_dir, xml_dir, img_save_dir, xml_save_dir)

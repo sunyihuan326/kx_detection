@@ -12,9 +12,9 @@ import os
 import shutil
 
 # 创建layer_train、layer_test、layer_val文件夹
-layer_train_dir = "E:/已标数据备份/X补采/1111images_train"
-layer_test_dir = "E:/已标数据备份/X补采/1111images_test"
-layer_val_dir = "E:/已标数据备份/X补采/1111images_val"
+layer_train_dir = "E:/已标数据备份/peanuts_layer/train"
+layer_test_dir = "E:/已标数据备份/peanuts_layer/test"
+layer_val_dir = "E:/已标数据备份/peanuts_layer/val"
 if os.path.exists(layer_train_dir): shutil.rmtree(layer_train_dir)  # 判断是否存在，存在则删除
 os.mkdir(layer_train_dir)  # 创建文件夹
 if os.path.exists(layer_test_dir): shutil.rmtree(layer_test_dir)
@@ -63,7 +63,7 @@ def layer_data_split(layer_root, txt_root):
 
 
 if __name__ == "__main__":
-    layer_root = "E:/已标数据备份/X补采/layer_data"  # layer数据根目录
-    txt_root = "E:/已标数据备份/X补采/ImageSets/Main"  # txt数据文件夹地址
+    layer_root = "E:/已标数据备份/peanuts_layer/JPGImages"  # layer数据根目录
+    txt_root = "E:/已标数据备份/peanuts_layer/ImageSets/Main"  # txt数据文件夹地址
 
     layer_data_split(layer_root, txt_root)

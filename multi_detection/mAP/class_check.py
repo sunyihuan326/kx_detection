@@ -171,10 +171,14 @@ def get_accuracy(error_write=True):
                                     #             error_dir3 + pre.split(".")[0] + "_gt.txt")  # 拷贝ground_truth文件
                                     # shutil.copy(os.path.join(pre_txt_root, pre),
                                     #             error_dir3 + pre.split(".")[0] + "_pre.txt")  # 拷贝predicted文件
-    return error_c,error_cc, need_check_nums
+                else:
+                    error_noresults += 1
+    return error_c, error_cc, need_check_nums,error_noresults
 
 
 if __name__ == "__main__":
-    error_c,error_cc, error_noresults = get_accuracy()
+    error_c, error_cc, need_check_nums,error_noresults = get_accuracy()
+    print(error_c)
     print("error_cc：", error_cc)
-    print("need_check_nums：", error_noresults)
+    print("need_check_nums：", need_check_nums)
+    print(error_noresults)

@@ -98,10 +98,10 @@ def img_dir_aug(img_dir, xml_dir, img_save_dir, xml_save_dir):
 
 
 if __name__ == "__main__":
-    img_dir = "E:/DataSets/KX_FOODSets_model_data/X_KX_data_27_1111_train"
-    xml_dir = "E:/DataSets/KX_FOODSets_model_data/X_KX_data_27_1111/Annotations"
-    img_save_dir = "C:/Users/sunyihuan/Desktop/data/cropy"
-    xml_save_dir = "C:/Users/sunyihuan/Desktop/data/cropy_annotations"
+    img_dir = "C:/Users/sunyihuan/Desktop/peanuts_all/train/JPGImages"
+    xml_dir = "C:/Users/sunyihuan/Desktop/peanuts_all/train/Annotations"
+    img_save_dir = "C:/Users/sunyihuan/Desktop/peanuts_all/cropy"
+    xml_save_dir = "C:/Users/sunyihuan/Desktop/peanuts_all/cropy_annotations"
 
     if not os.path.exists(img_save_dir): os.mkdir(img_save_dir)
     if not os.path.exists(xml_save_dir): os.mkdir(xml_save_dir)

@@ -3,6 +3,7 @@ import os
 import argparse
 import xml.etree.ElementTree as ET
 import random
+from tqdm import tqdm
 
 
 def get_layer(typ):
@@ -11,16 +12,16 @@ def get_layer(typ):
     :param typ:
     :return:
     '''
-    bottom = os.listdir("E:/layer_data/XandOld1111_{}/bottom".format(typ))
+    bottom = os.listdir("E:/layer_data/X_KX_data_27_1127_{}/bottom".format(typ))
     bottom = [b for b in bottom if b.endswith(".jpg")]
 
-    middle = os.listdir("E:/layer_data/XandOld1111_{}/middle".format(typ))
+    middle = os.listdir("E:/layer_data/X_KX_data_27_1127_{}/middle".format(typ))
     middle = [b for b in middle if b.endswith(".jpg")]
 
-    top = os.listdir("E:/layer_data/XandOld1111_{}/top".format(typ))
+    top = os.listdir("E:/layer_data/X_KX_data_27_1127_{}/top".format(typ))
     top = [b for b in top if b.endswith(".jpg")]
 
-    others = os.listdir("E:/layer_data/XandOld1111_{}/others".format(typ))
+    others = os.listdir("E:/layer_data/X_KX_data_27_1127_{}/others".format(typ))
     others = [b for b in others if b.endswith(".jpg")]
     return bottom, middle, top, others
 
@@ -55,12 +56,12 @@ def convert_voc_annotation(data_path, data_type, anno_path, use_difficult_bbox=T
     bottom, middle, top, others = get_layer(data_type)
 
     with open(anno_path, 'a') as f:
-        for image_ind in image_inds:
+        for image_ind in tqdm(image_inds):
             # image_path = os.path.join(data_path, 'JPEGImages', image_ind + '.jpg')
             # print("image_path::::::::", image_path)
             st = "/"
-            # image_path = (data_path, 'JPGImages', image_ind + '.jpg')  # 原图片
-            image_path = (data_path, 'JPGImages', image_ind + '_x.jpg')  # 增强图片
+            image_path = (data_path, 'JPGImages', image_ind + '.jpg')  # 原图片
+            # image_path = (data_path, 'JPGImages', image_ind + '_warm64.jpg')  # 增强图片
             image_path = st.join(image_path)
 
             annotation = image_path
@@ -75,11 +76,10 @@ def convert_voc_annotation(data_path, data_type, anno_path, use_difficult_bbox=T
             else:
                 print(image_path)
                 print("error")
-
             annotation += ' ' + str(layer_label)  # annotation中写入烤层的标签
 
-            # label_path = (data_path, 'Annotations', image_ind + '.xml')  # 原数据
-            label_path = (data_path, 'Annotations', image_ind + '_x.xml')  # 增强数据
+            label_path = (data_path, 'Annotations', image_ind + '.xml')  # 原数据
+            # label_path = (data_path, 'Annotations', image_ind + '_warm64.xml')  # 增强数据
             label_path = st.join(label_path)
             root = ET.parse(label_path).getroot()
             objects = root.findall('object')
@@ -104,19 +104,20 @@ def convert_voc_annotation(data_path, data_type, anno_path, use_difficult_bbox=T
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data_path", default="E:/DataSets/KX_FOODSets_model_data/X_KX_data_27_1111_train_aug/flip_x")
+    parser.add_argument("--data_path",
+                        default="E:/DataSets/KX_FOODSets_model_data/X_KX_data_27_1111_train_aug/peanuts/train")
     parser.add_argument("--train_annotation",
-                        default="E:/kx_detection/multi_detection/data/dataset/X_KX_data_27_1111_flipx_train27.txt")
+                        default="E:/kx_detection/multi_detection/data/dataset/peanuts/peanuts_train.txt")
     # parser.add_argument("--test_annotation",
-    #                     default="E:/kx_detection/multi_detection/data/dataset/XandOld1111_test27.txt")
+    #                     default="E:/kx_detection/multi_detection/data/dataset/X_KX_data_27_1127_test27.txt")
     # parser.add_argument("--val_annotation",
-    #                     default="E:/kx_detection/multi_detection/data/dataset/XandOld1111_val27.txt")
+    #                     default="E:/kx_detection/multi_detection/data/dataset/X_KX_data_27_1127_val27.txt")
     flags = parser.parse_args()
     #
     if os.path.exists(flags.train_annotation): os.remove(flags.train_annotation)
     # if os.path.exists(flags.test_annotation): os.remove(flags.test_annotation)
     # if os.path.exists(flags.val_annotation): os.remove(flags.val_annotation)
-    # #
+    # # #
     num1 = convert_voc_annotation(flags.data_path, 'train',
                                   flags.train_annotation, False)
     # num2 = convert_voc_annotation(flags.data_path, 'test',
@@ -126,5 +127,3 @@ if __name__ == '__main__':
     # print(
     #     '=> The number of image for train is: %d\tThe number of image for test is:%d\tThe number of image for val is:%d' % (
     #         num1, num2, num3))
-
-

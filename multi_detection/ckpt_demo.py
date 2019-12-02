@@ -94,7 +94,7 @@ class YoloTest(object):
         self.num_classes = 27  # 种类数
         self.score_threshold = 0.45
         self.iou_threshold = 0.5
-        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food3/20191123/yolov3_train_loss=10.4322.ckpt-5"  # ckpt文件地址
+        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food7/20191202/yolov3_train_loss=8.8523.ckpt-10"  # ckpt文件地址
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
 
@@ -188,8 +188,8 @@ if __name__ == '__main__':
     #            "Pizzatwo", "SweetPotatoS", "Toast"]
     # classes = ["potatol", "potatom", "sweetpotatom", "sweetpotatol"]
     # classes = ["potatol", "potatom", "sweetpotatom"]
-    classes = ["sweetpotatom"]
-    classes_id = {"sweetpotatom": 23, "middle": 11, "top": 11}
+    classes = ["peanuts"]
+    classes_id = {"peanuts": 11}
 
     # classes_id = {"CartoonCookies": 1, "Cookies": 5, "CupCake": 7, "Beefsteak": 0, "ChickenWings": 2,
     #               "ChiffonCake6": 3, "ChiffonCake8": 4, "CranberryCookies": 6, "EggTart": 8, "EggTartBig": 9,
@@ -222,8 +222,8 @@ if __name__ == '__main__':
                     pre = bboxes_pr[0][-1]
                     if pre == classes_id[c]:  # 若结果正确，食材正确数+1
                         food_acc += 1
-                    else:
-                        print(pre)
+                    # else:
+                    #     print(pre)
         print("food name:", c)
         print("food accuracy:", round((food_acc / all_jpgs) * 100, 2))  # 输出食材正确数
         print("no result:", error_noresults)  # 输出无任何结果总数

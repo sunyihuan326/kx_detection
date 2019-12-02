@@ -74,7 +74,7 @@ def img_dir_aug(img_dir, xml_dir, img_save_dir, xml_save_dir):
     '''
     for img_file in tqdm(os.listdir(img_dir)):
         if img_file.endswith("jpg"):
-            mode = "y"
+            mode = "x"
             img_path = img_dir + "/" + img_file
             img = img_flip(img_path, mode)  # 图片翻转处理
             img_name = str(img_file).split(".")[0] + "_" + mode + ".jpg"  # 图片名称
@@ -85,10 +85,10 @@ def img_dir_aug(img_dir, xml_dir, img_save_dir, xml_save_dir):
 
 
 if __name__ == "__main__":
-    img_dir = "E:/DataSets/KX_FOODSets_model_data/X_KX_data_27_1111_train"
-    xml_dir = "E:/DataSets/KX_FOODSets_model_data/X_KX_data_27_1111/Annotations"
-    img_save_dir = "C:/Users/sunyihuan/Desktop/data/flip_y"
-    xml_save_dir = "C:/Users/sunyihuan/Desktop/data/flip_y_annotations"
+    img_dir = "C:/Users/sunyihuan/Desktop/peanuts_all/train/JPGImages"
+    xml_dir = "C:/Users/sunyihuan/Desktop/peanuts_all/train/Annotations"
+    img_save_dir = "C:/Users/sunyihuan/Desktop/peanuts_all/flip_x"
+    xml_save_dir = "C:/Users/sunyihuan/Desktop/peanuts_all/flip_x_annotations"
 
     if not os.path.exists(img_save_dir): os.mkdir(img_save_dir)
     if not os.path.exists(xml_save_dir): os.mkdir(xml_save_dir)

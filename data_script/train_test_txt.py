@@ -8,7 +8,7 @@
 import os
 import random
 
-root_path = "E:/已标数据备份/X补采"
+root_path = "E:/已标数据备份/Peanuts"
 
 
 # 文件根本目录
@@ -81,8 +81,9 @@ if __name__ == "__main__":
     #            "Pizzatwo", "PorkChops", "PotatoCut", "Potatol", "Potatom",
     #            "Potatos", "SweetPotatoCut", "SweetPotatol", "SweetPotatom", "SweetPotatos",
     #            "RoastedChicken", "Toast"]
-    clasees = ["CartoonCookies", "Cookies", "CupCake", "Pizzafour", "Pizzaone",
-               "Pizzasix", "Pizzatwo", "SweetPotatoS", "Toast"]
+    # clasees = ["CartoonCookies", "Cookies", "CupCake", "Pizzafour", "Pizzaone",
+    #            "Pizzasix", "Pizzatwo", "SweetPotatoS", "Toast"]
+    clasees=["peanuts"]
     print(len(clasees))
     train_percent = 0.8
     test_percent = 0.1
