@@ -8,8 +8,6 @@
 import os
 import random
 
-root_path = "E:/已标数据备份/Peanuts"
-
 
 # 文件根本目录
 # 目录中含有的文件如下：JPGImages
@@ -33,13 +31,18 @@ def split_data(clasees, train_percent, test_percent):
     if not os.path.exists(root_path):
         print("cannot find such directory: " + root_path)
         exit()
-    xmlfilepath = root_path + '/Annotations' + "/{}".format(clasees)
+    # xmlfilepath = root_path + '/Annotations' + "/{}".format(clasees)
+    imgfilepath = root_path + '/JPGImages' + "/{}".format(clasees)
     txtsavepath = root_path + '/ImageSets/Main'
 
     if not os.path.exists(txtsavepath):
         os.makedirs(txtsavepath)
 
-    total_xml = os.listdir(xmlfilepath)
+    total_xml = []
+    for a in os.listdir(imgfilepath):
+        if a.endswith(".jpg"):
+            total_xml.append(a)
+
     random.shuffle(total_xml)  # 打乱total_xml
     num = len(total_xml)
     list = range(num)
@@ -60,7 +63,7 @@ def split_data(clasees, train_percent, test_percent):
     fval = open(txtsavepath + '/{}_val.txt'.format(str(clasees).lower()), 'w')
 
     for x in total_xml:
-        if str(x).endswith("xml"):
+        if str(x).endswith("jpg"):
             name = x[:-4] + '\n'
             if x in train:
                 ftrain.write(name)
@@ -75,6 +78,8 @@ def split_data(clasees, train_percent, test_percent):
 
 
 if __name__ == "__main__":
+    # root_path = "E:/已标数据备份/20191203数据清洗补充"
+    root_path = "C:/Users/sunyihuan/Desktop/20191205"
     # clasees = ["BeefSteak", "CartoonCookies", "ChickenWings", "ChiffonCake6", "ChiffonCake8",
     #            "Cookies", "CranberryCookies", "CupCake", "EggTart", "EggTartBig",
     #            "nofood", "Peanuts", "Pizzafour", "Pizzaone", "Pizzasix",
@@ -83,7 +88,10 @@ if __name__ == "__main__":
     #            "RoastedChicken", "Toast"]
     # clasees = ["CartoonCookies", "Cookies", "CupCake", "Pizzafour", "Pizzaone",
     #            "Pizzasix", "Pizzatwo", "SweetPotatoS", "Toast"]
-    clasees=["peanuts"]
+    # clasees = ["nofood", "pizza_four", "pizza_one", "pizza_six", "pizza_two",
+    #            "porkchops", "PotatoCut", "potatol", "potatom", "Potatos",
+    #            "SweetPotatoCut", "sweetpotatol", "sweetpotatom", "sweetpotatos", "toast", ]
+    clasees = ["nofood" ,"toast"]
     print(len(clasees))
     train_percent = 0.8
     test_percent = 0.1

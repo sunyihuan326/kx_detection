@@ -74,13 +74,13 @@ def img_dir_aug(img_dir, xml_dir, img_save_dir, xml_save_dir):
             img_name = str(img_file).split(".")[0] + "_hot" + ".jpg"  # 图片名称
             xml_name = str(img_name).split(".")[0] + ".xml"  # xml文件名称
             cv2.imwrite(img_save_dir + "/" + img_name, img)
-            shutil.copy(xml_dir + "/" + str(img_file).split(".")[0] + ".xml", xml_save_dir + "/" + xml_name)  # 拷贝xml数据
+            # shutil.copy(xml_dir + "/" + str(img_file).split(".")[0] + ".xml", xml_save_dir + "/" + xml_name)  # 拷贝xml数据
 
 
 if __name__ == "__main__":
-    img_dir = "C:/Users/sunyihuan/Desktop/peanuts_all/cropy/JPGImages"
+    img_dir = "E:/DataSets/KX_FOODSets_model_data/XandOld1206/JPGImages"
     xml_dir = "C:/Users/sunyihuan/Desktop/peanuts_all/cropy/Annotations"
-    img_save_dir = "C:/Users/sunyihuan/Desktop/peanuts_all/cropyHot"
+    img_save_dir = "E:/DataSets/KX_FOODSets_model_data/XandOld1206/JPGImages_hot"
     xml_save_dir = "C:/Users/sunyihuan/Desktop/peanuts_all/cropyHot_annotations"
     if not os.path.exists(img_save_dir): os.mkdir(img_save_dir)
     if not os.path.exists(xml_save_dir): os.mkdir(xml_save_dir)

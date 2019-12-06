@@ -26,6 +26,6 @@ def check_xml(xml_dir, img_dir):
 
 
 if __name__ == "__main__":
-    xml_dir = "E:/已标数据备份/X补采/Annotations/SweetPotatoS"
-    img_dir = "E:/已标数据备份/X补采/JPGImages/SweetPotatoS"
+    img_dir = "C:/Users/sunyihuan/Desktop/20191203新数据/JPGImages/sweetpotatos"
+    xml_dir = "C:/Users/sunyihuan/Desktop/20191203新数据/Annotations/sweetpotatos"
     check_xml(xml_dir, img_dir)

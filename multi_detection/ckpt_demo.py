@@ -15,6 +15,9 @@ import multi_detection.core.utils as utils
 import os
 import shutil
 from tqdm import tqdm
+import xlwt
+
+noresult_dir = "E:/kx_detection/multi_detection/noresult"
 
 
 def correct_bboxes(bboxes_pr, layer_n):
@@ -31,17 +34,32 @@ def correct_bboxes(bboxes_pr, layer_n):
 
     # 检测到一个食材
     elif num_label == 1:
-        if bboxes_pr[0][4] < 0.9 and bboxes_pr[0][4] >= 0.45:
-            bboxes_pr[0][4] = 0.9
+        if bboxes_pr[0][4] < 0.45:
+            if bboxes_pr[0][5] == 10:  # 低分nofood
+                bboxes_pr[0][4] = 0.85
+            elif bboxes_pr[0][5] == 11:  # 低分花生米
+                bboxes_pr[0][4] = 0.85
+            else:
+                del bboxes_pr[0]
+        # if bboxes_pr[0][4] < 0.9 and bboxes_pr[0][4] >= 0.45:
+        #     bboxes_pr[0][4] = 0.9
         return bboxes_pr, layer_n
 
     # 检测到多个食材
     else:
+        new_bboxes_pr = []
+        for i in range(len(bboxes_pr)):
+            if bboxes_pr[i][4] >= 0.45:
+                new_bboxes_pr.append(bboxes_pr[i])
+
+        new_num_label = len(new_bboxes_pr)
+        if new_num_label == 0:
+            return new_bboxes_pr, layer_n
         same_label = True
-        for i in range(num_label):
-            if i == (num_label - 1):
+        for i in range(new_num_label):
+            if i == (new_num_label - 1):
                 break
-            if bboxes_pr[i][5] == bboxes_pr[i + 1][5]:
+            if new_bboxes_pr[i][5] == new_bboxes_pr[i + 1][5]:
                 continue
             else:
                 same_label = False
@@ -49,16 +67,12 @@ def correct_bboxes(bboxes_pr, layer_n):
         sumProb = 0.
         # 多个食材，同一标签
         if same_label:
-            # for i in range(num_label):
-            #    sumProb += bboxes_pr[i][4]
-            # avrProb = sumProb/num_label
-            # bboxes_pr[0][4] = avrProb
-            bboxes_pr[0][4] = 0.98
-            return bboxes_pr, layer_n
+            new_bboxes_pr[0][4] = 0.98
+            return new_bboxes_pr, layer_n
         # 多个食材，非同一标签
         else:
-            problist = list(map(lambda x: x[4], bboxes_pr))
-            labellist = list(map(lambda x: x[5], bboxes_pr))
+            problist = list(map(lambda x: x[4], new_bboxes_pr))
+            labellist = list(map(lambda x: x[5], new_bboxes_pr))
 
             labeldict = {}
             for key in labellist:
@@ -71,30 +85,30 @@ def correct_bboxes(bboxes_pr, layer_n):
             num_name1 = s_labeldict[0][1]
 
             # 数量最多label对应的食材占比0.7以上
-            if num_name1 / num_label > 0.7:
-                num_label0 = []
-                for i in range(num_label):
-                    if name1 == bboxes_pr[i][5]:
-                        num_label0.append(bboxes_pr[i])
-                num_label0[0][4] = 0.95
-                return num_label0, layer_n
+            if num_name1 / new_num_label > 0.7:
+                name1_bboxes_pr = []
+                for i in range(new_num_label):
+                    if name1 == new_bboxes_pr[i][5]:
+                        name1_bboxes_pr.append(new_bboxes_pr[i])
+
+                name1_bboxes_pr[0][4] = 0.95
+                return name1_bboxes_pr, layer_n
 
             # 按各个label的probability降序排序
             else:
-                # 计数
-                bboxes_pr = sorted(bboxes_pr, key=lambda x: x[4], reverse=True)
-                for i in range(len(bboxes_pr)):
-                    bboxes_pr[i][4] = bboxes_pr[i][4] * 0.9
-                return bboxes_pr, layer_n
+                new_bboxes_pr = sorted(new_bboxes_pr, key=lambda x: x[4], reverse=True)
+                for i in range(len(new_bboxes_pr)):
+                    new_bboxes_pr[i][4] = new_bboxes_pr[i][4] * 0.9
+                return new_bboxes_pr, layer_n
 
 
 class YoloTest(object):
     def __init__(self):
         self.input_size = 416  # 输入图片尺寸（默认正方形）
         self.num_classes = 27  # 种类数
-        self.score_threshold = 0.45
+        self.score_threshold = 0.3
         self.iou_threshold = 0.5
-        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food7/20191202/yolov3_train_loss=8.8523.ckpt-10"  # ckpt文件地址
+        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food4/20191204/yolov3_train_loss=3.4134.ckpt-14"  # ckpt文件地址
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
 
@@ -172,7 +186,7 @@ class YoloTest(object):
 
 if __name__ == '__main__':
     img_dir = "C:/Users/sunyihuan/Desktop/test_results_jpg"  # 文件夹地址
-    save_dir = "C:/Users/sunyihuan/Desktop/test_results_jpg/detection"  # 预测结果标出保存地址
+    save_dir = "C:/Users/sunyihuan/Desktop/test_results_jpg/detectionaug4"  # 预测结果标出保存地址
     Y = YoloTest()  # 加载模型
     # Y.result(img_path, "E:/Joyoung_WLS_github/tf_yolov3")
     # for file in os.listdir(img_dir):
@@ -180,25 +194,37 @@ if __name__ == '__main__':
     #         image_path = img_dir + "/" + file
     #         print(image_path)
     #         Y.result(image_path, save_dir)  # 预测每一张结果并保存
-    # classes = ["Beefsteak", "CartoonCookies", "Cookies", "CupCake", "Pizzafour",
-    #            "Pizzaone", "Pizzasix", "ChickenWings", "ChiffonCake6", "ChiffonCake8",
-    #            "CranberryCookies", "EggTart", "EggTartBig", "nofood", "Peanuts",
-    #            "PorkChops", "PotatoCut", "Potatol", "Potatom", "Potatos",
-    #            "RoastedChicken", "SweetPotatoCut", "SweetPotatol", "SweetPotatom",
-    #            "Pizzatwo", "SweetPotatoS", "Toast"]
+    classes = ["Beefsteak", "CartoonCookies", "Cookies", "CupCake", "Pizzafour",
+               "Pizzaone", "Pizzasix", "ChickenWings", "ChiffonCake6", "ChiffonCake8",
+               "CranberryCookies", "eggtarts", "eggtartl", "nofood", "Peanuts",
+               "PorkChops", "PotatoCut", "Potatol", "Potatom", "Potatos",
+               "RoastedChicken", "SweetPotatoCut", "SweetPotatol", "SweetPotatom",
+               "Pizzatwo", "SweetPotatoS", "Toast"]
     # classes = ["potatol", "potatom", "sweetpotatom", "sweetpotatol"]
     # classes = ["potatol", "potatom", "sweetpotatom"]
-    classes = ["peanuts"]
-    classes_id = {"peanuts": 11}
+    # classes = ["roast_white"]
+    # classes_id = {"roast_white": 25}
 
-    # classes_id = {"CartoonCookies": 1, "Cookies": 5, "CupCake": 7, "Beefsteak": 0, "ChickenWings": 2,
-    #               "ChiffonCake6": 3, "ChiffonCake8": 4, "CranberryCookies": 6, "EggTart": 8, "EggTartBig": 9,
-    #               "nofood": 10, "Peanuts": 11, "porkchops": 16, "PotatoCut": 17, "potatol": 18,
-    #               "potatom": 19, "Potatos": 20, "SweetPotatoCut": 21, "sweetpotatol": 22, "sweetpotatom": 23,
-    #               "Pizzafour": 12, "Pizzaone": 13, "Pizzasix": 14, "RoastedChicken": 25,
-    #               "Pizzatwo": 15, "SweetPotatoS": 24, "Toast": 26,"jpgs":19}
+    classes_id = {"CartoonCookies": 1, "Cookies": 5, "CupCake": 7, "Beefsteak": 0, "ChickenWings": 2,
+                  "ChiffonCake6": 3, "ChiffonCake8": 4, "CranberryCookies": 6, "eggtarts": 8, "eggtartl": 9,
+                  "nofood": 10, "Peanuts": 11, "PorkChops": 16, "PotatoCut": 17, "Potatol": 18,
+                  "Potatom": 19, "Potatos": 20, "SweetPotatoCut": 21, "SweetPotatol": 22, "SweetPotatom": 23,
+                  "Pizzafour": 12, "Pizzaone": 13, "Pizzasix": 14, "RoastedChicken": 25,
+                  "Pizzatwo": 15, "SweetPotatoS": 24, "Toast": 26}
+    jpgs_count_all = 0
+    jpgs_acc = 0
+    all_noresults = 0
 
-    for c in classes:
+    workbook = xlwt.Workbook(encoding='utf-8')
+    sheet1 = workbook.add_sheet("multi_food")
+    sheet1.write(0, 0, "classes")
+    sheet1.write(0, 1, "food_acc")
+    sheet1.write(0, 2, "jpgs_all")
+    sheet1.write(0, 3, "acc")
+    sheet1.write(0, 4, "noresult")
+
+    for i in range(len(classes)):
+        c = classes[i]
         error_noresults = 0  # 无任何结果统计
         food_acc = 0  # 食材准确数统计
         all_jpgs = 0  # 图片总数统计
@@ -215,15 +241,36 @@ if __name__ == '__main__':
                 #     bboxes_pr, layer_n = Y.result(image_path, save_dirs)  # 预测每一张结果并保存
                 # except:
                 #     pass
+                bboxes_pr, layer_n = correct_bboxes(bboxes_pr, layer_n)  # 矫正输出结果
                 if len(bboxes_pr) == 0:  # 无任何结果返回，输出并统计+1
                     error_noresults += 1
+                    shutil.copy(image_path, noresult_dir + "/" + file)
                 else:
-                    bboxes_pr, layer_n = correct_bboxes(bboxes_pr, layer_n)  # 矫正输出结果
+                    # bboxes_pr, layer_n = correct_bboxes(bboxes_pr, layer_n)  # 矫正输出结果
                     pre = bboxes_pr[0][-1]
                     if pre == classes_id[c]:  # 若结果正确，食材正确数+1
                         food_acc += 1
                     # else:
                     #     print(pre)
+        sheet1.write(i + 1, 0, c)
+
+        sheet1.write(i + 1, 1, food_acc)
+        sheet1.write(i + 1, 2, all_jpgs)
+        sheet1.write(i + 1, 3, round((food_acc / all_jpgs) * 100, 2))
+        sheet1.write(i + 1, 4, error_noresults)
+
         print("food name:", c)
         print("food accuracy:", round((food_acc / all_jpgs) * 100, 2))  # 输出食材正确数
         print("no result:", error_noresults)  # 输出无任何结果总数
+        jpgs_count_all += all_jpgs
+        jpgs_acc += food_acc
+        all_noresults += error_noresults
+    print("all food accuracy:", round((jpgs_acc / jpgs_count_all) * 100, 2))  # 输出食材正确数
+    print("all no result:", all_noresults)  # 输出无任何结果总数
+
+    sheet1.write(35, 1, jpgs_acc)
+    sheet1.write(35, 2, jpgs_count_all)
+    sheet1.write(35, 3, round((jpgs_acc / jpgs_count_all) * 100, 2))
+    sheet1.write(35, 4, all_noresults)
+
+    workbook.save("C:/Users/sunyihuan/Desktop/test_results_jpg/multi_food_aug4.xls")

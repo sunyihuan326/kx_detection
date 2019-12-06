@@ -12,16 +12,16 @@ def get_layer(typ):
     :param typ:
     :return:
     '''
-    bottom = os.listdir("E:/layer_data/X_KX_data_27_1127_{}/bottom".format(typ))
+    bottom = os.listdir("E:/DataSets/KX_FOODSets_model_data/20191206data/layer_data/{}/bottom".format(typ))
     bottom = [b for b in bottom if b.endswith(".jpg")]
 
-    middle = os.listdir("E:/layer_data/X_KX_data_27_1127_{}/middle".format(typ))
+    middle = os.listdir("E:/DataSets/KX_FOODSets_model_data/20191206data/layer_data/{}/middle".format(typ))
     middle = [b for b in middle if b.endswith(".jpg")]
 
-    top = os.listdir("E:/layer_data/X_KX_data_27_1127_{}/top".format(typ))
+    top = os.listdir("E:/DataSets/KX_FOODSets_model_data/20191206data/layer_data/{}/top".format(typ))
     top = [b for b in top if b.endswith(".jpg")]
 
-    others = os.listdir("E:/layer_data/X_KX_data_27_1127_{}/others".format(typ))
+    others = os.listdir("E:/DataSets/KX_FOODSets_model_data/20191206data/layer_data/{}/others".format(typ))
     others = [b for b in others if b.endswith(".jpg")]
     return bottom, middle, top, others
 
@@ -39,12 +39,19 @@ def convert_voc_annotation(data_path, data_type, anno_path, use_difficult_bbox=T
     # classes = ["beefsteak", "cartooncookies", "chickenwings", "chiffoncake", "cookies",
     #            "cranberrycookies", "cupcake", "eggtart", "nofood", "peanuts",
     #            "pizza", "porkchops", "purplesweetpotato", "roastedchicken", "toast"]  # 15分类
+    # classes = ["beefsteak", "cartooncookies", "chickenwings", "chiffoncake6", "chiffoncake8",
+    #            "cookies", "cranberrycookies", "cupcake", "eggtart", "eggtartbig",
+    #            "nofood", "peanuts", "pizzafour", "pizzaone", "pizzasix",
+    #            "pizzatwo", "porkchops", "potatocut", "potatol", "potatom",
+    #            "potatos", "sweetpotatocut", "sweetpotatol", "sweetpotatom", "sweetpotatos",
+    #            "roastedchicken", "toast"]  # 27分类
     classes = ["beefsteak", "cartooncookies", "chickenwings", "chiffoncake6", "chiffoncake8",
                "cookies", "cranberrycookies", "cupcake", "eggtart", "eggtartbig",
                "nofood", "peanuts", "pizzafour", "pizzaone", "pizzasix",
                "pizzatwo", "porkchops", "potatocut", "potatol", "potatom",
                "potatos", "sweetpotatocut", "sweetpotatol", "sweetpotatom", "sweetpotatos",
-               "roastedchicken", "toast"]  # 27分类
+               "roastedchicken", "toast", "sweetpotato_others", "pizza_others",
+               "potato_others"]  # 30分类,加入了sweetpotato_others,pizza_others,potato_others
     # img_inds_file = os.path.join(data_path, 'ImageSets', 'Main', data_type + '.txt')
 
     img_inds_file = data_path + '/ImageSets' + '/Main/' + '{}.txt'.format(data_type)
@@ -54,6 +61,10 @@ def convert_voc_annotation(data_path, data_type, anno_path, use_difficult_bbox=T
     random.shuffle(image_inds)
 
     bottom, middle, top, others = get_layer(data_type)
+    print(len(bottom))
+    print(len(middle))
+    print(len(top))
+    print(len(others))
 
     with open(anno_path, 'a') as f:
         for image_ind in tqdm(image_inds):
@@ -76,6 +87,8 @@ def convert_voc_annotation(data_path, data_type, anno_path, use_difficult_bbox=T
             else:
                 print(image_path)
                 print("error")
+                continue
+
             annotation += ' ' + str(layer_label)  # annotation中写入烤层的标签
 
             label_path = (data_path, 'Annotations', image_ind + '.xml')  # 原数据
@@ -105,25 +118,25 @@ def convert_voc_annotation(data_path, data_type, anno_path, use_difficult_bbox=T
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--data_path",
-                        default="E:/DataSets/KX_FOODSets_model_data/X_KX_data_27_1111_train_aug/peanuts/train")
-    parser.add_argument("--train_annotation",
-                        default="E:/kx_detection/multi_detection/data/dataset/peanuts/peanuts_train.txt")
+                        default="E:/DataSets/KX_FOODSets_model_data/20191206data")
+    # parser.add_argument("--train_annotation",
+    #                     default="E:/kx_detection/multi_detection/data/dataset/20191206/train1206.txt")
     # parser.add_argument("--test_annotation",
-    #                     default="E:/kx_detection/multi_detection/data/dataset/X_KX_data_27_1127_test27.txt")
-    # parser.add_argument("--val_annotation",
-    #                     default="E:/kx_detection/multi_detection/data/dataset/X_KX_data_27_1127_val27.txt")
+    #                     default="E:/kx_detection/multi_detection/data/dataset/20191206/test1206.txt")
+    parser.add_argument("--val_annotation",
+                        default="E:/kx_detection/multi_detection/data/dataset/20191206/val1206.txt")
     flags = parser.parse_args()
     #
-    if os.path.exists(flags.train_annotation): os.remove(flags.train_annotation)
+    # if os.path.exists(flags.train_annotation): os.remove(flags.train_annotation)
     # if os.path.exists(flags.test_annotation): os.remove(flags.test_annotation)
-    # if os.path.exists(flags.val_annotation): os.remove(flags.val_annotation)
+    if os.path.exists(flags.val_annotation): os.remove(flags.val_annotation)
     # # #
-    num1 = convert_voc_annotation(flags.data_path, 'train',
-                                  flags.train_annotation, False)
+    # num1 = convert_voc_annotation(flags.data_path, 'train',
+    #                               flags.train_annotation, False)
     # num2 = convert_voc_annotation(flags.data_path, 'test',
     #                               flags.test_annotation, False)
-    # num3 = convert_voc_annotation(flags.data_path, 'val',
-    #                               flags.val_annotation, False)
+    num3 = convert_voc_annotation(flags.data_path, 'val',
+                                  flags.val_annotation, False)
     # print(
     #     '=> The number of image for train is: %d\tThe number of image for test is:%d\tThe number of image for val is:%d' % (
     #         num1, num2, num3))

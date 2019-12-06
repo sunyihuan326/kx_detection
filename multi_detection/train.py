@@ -18,6 +18,7 @@ import os
 config = tf.ConfigProto()
 config.gpu_options.per_process_gpu_memory_fraction = 0.9  # 占用GPU的显存
 
+
 class YoloTrain(object):
     def __init__(self):
         self.anchor_per_scale = cfg.YOLO.ANCHOR_PER_SCALE
@@ -61,8 +62,9 @@ class YoloTrain(object):
             self.layer_loss = self.model.layer_loss(self.layer_label)
             print("layer_loss::::")
             print(self.layer_loss)
+            self.l2_loss = tf.add_n([tf.nn.l2_loss(var) for var in tf.trainable_variables()])
             self.layer_loss = tf.cond(self.layer_loss > 0.01, lambda: self.layer_loss, lambda: 0.0)
-            self.loss = self.giou_loss + self.conf_loss + 2 * self.prob_loss + 10 * self.layer_loss
+            self.loss = self.giou_loss + self.conf_loss + 2 * self.prob_loss + 10 * self.layer_loss + 1e-5 * self.l2_loss
         self.layer_out = self.model.out
 
         with tf.name_scope('learn_rate'):
@@ -160,8 +162,9 @@ class YoloTrain(object):
             train_epoch_loss, test_epoch_loss = [], []
 
             for train_data in pbar:
-                _, summary, train_step_loss, global_step_val, gi, bbo, layer_loss_v, layer_o = self.sess.run(
-                    [train_op, self.write_op, self.loss, self.global_step, self.giou, self.bbox_loss_scale,
+                _, summary, train_step_loss, train_step_l2loss, global_step_val, gi, bbo, layer_loss_v, layer_o = self.sess.run(
+                    [train_op, self.write_op, self.loss, self.l2_loss, self.global_step, self.giou,
+                     self.bbox_loss_scale,
                      self.layer_loss, self.layer_out], feed_dict={
                         # _, summary, train_step_loss, global_step_val, gi, bbo, = self.sess.run(
                         #     [train_op, self.write_op, self.loss, self.global_step, self.giou, self.bbox_loss_scale,
@@ -176,7 +179,6 @@ class YoloTrain(object):
                         self.true_lbboxes: train_data[7],
                         self.trainable: True,
                     })
-                # print("layer_loss:::")
                 # print(layer_loss_v)
                 # print("true:::::")
                 # print(train_data[1])
