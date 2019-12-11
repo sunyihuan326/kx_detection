@@ -78,6 +78,6 @@ class YoloPredict(object):
 
 
 if __name__ == '__main__':
-    img_path ="C:/Users/sunyihuan/Desktop/test/1129_0.jpg"  # 图片地址
+    img_path ="C:/Users/sunyihuan/Desktop/test/20191207_012747992.jpg"  # 图片地址
     Y = YoloPredict()
     Y.result(img_path)

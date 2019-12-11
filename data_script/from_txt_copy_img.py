@@ -10,6 +10,7 @@
 import shutil
 
 txt_path = "E:/kx_detection/multi_detection/data/dataset/XandOld/test0926_oldAndX1206.txt"
+# txt_path = "E:/kx_detection/multi_detection/data/dataset/XandOld/test0926_oldAndX1206.txt"
 txt_file = open(txt_path, "r")
 txt_files = txt_file.readlines()
 print(len(txt_files))

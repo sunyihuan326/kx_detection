@@ -25,7 +25,7 @@ __C.YOLO.DEMO_WEIGHT            = "./checkpoint/yolov3_train_loss=227.3722.ckpt-
 # Train options
 __C.TRAIN                       = edict()
 
-__C.TRAIN.ANNOT_PATH            = "./data/dataset/XandOld/train0926_oldAndX1206h.txt"
+__C.TRAIN.ANNOT_PATH            = "./data/dataset/XandOld/train0926_oldAndX1211.txt"
 __C.TRAIN.BATCH_SIZE            = 2
 __C.TRAIN.INPUT_SIZE            = 416
 __C.TRAIN.DATA_AUG              = True
@@ -34,7 +34,7 @@ __C.TRAIN.LEARN_RATE_END        = 1e-6
 __C.TRAIN.WARMUP_EPOCHS         = 2
 __C.TRAIN.FISRT_STAGE_EPOCHS    = 30
 __C.TRAIN.SECOND_STAGE_EPOCHS   = 50
-__C.TRAIN.INITIAL_WEIGHT        = "./checkpoint/yolov3_train_loss=24.7460.ckpt-5"
+__C.TRAIN.INITIAL_WEIGHT        = "./checkpoint/yolov3_train_loss=5.1562.ckpt-49"
 
 
 

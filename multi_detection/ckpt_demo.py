@@ -16,8 +16,9 @@ import os
 import shutil
 from tqdm import tqdm
 import xlwt
+from sklearn.metrics import confusion_matrix
 
-noresult_dir = "E:/kx_detection/multi_detection/noresult"
+noresult_dir = "C:/Users/sunyihuan/Desktop/test_results_jpg/noresult"
 
 
 def correct_bboxes(bboxes_pr, layer_n):
@@ -105,10 +106,10 @@ def correct_bboxes(bboxes_pr, layer_n):
 class YoloTest(object):
     def __init__(self):
         self.input_size = 416  # 输入图片尺寸（默认正方形）
-        self.num_classes = 27  # 种类数
+        self.num_classes = 30  # 种类数
         self.score_threshold = 0.3
         self.iou_threshold = 0.5
-        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food4/20191204/yolov3_train_loss=3.4134.ckpt-14"  # ckpt文件地址
+        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food6/20191211/yolov3_train_loss=4.9168.ckpt-80"  # ckpt文件地址
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
 
@@ -185,8 +186,8 @@ class YoloTest(object):
 
 
 if __name__ == '__main__':
-    img_dir = "C:/Users/sunyihuan/Desktop/test_results_jpg"  # 文件夹地址
-    save_dir = "C:/Users/sunyihuan/Desktop/test_results_jpg/detectionaug4"  # 预测结果标出保存地址
+    img_dir = "C:/Users/sunyihuan/Desktop/test_jpg_check20191208/normal"  # 文件夹地址
+    save_dir = "C:/Users/sunyihuan/Desktop/test_jpg_check20191208/normal/detection6"  # 预测结果标出保存地址
     Y = YoloTest()  # 加载模型
     # Y.result(img_path, "E:/Joyoung_WLS_github/tf_yolov3")
     # for file in os.listdir(img_dir):
@@ -195,14 +196,19 @@ if __name__ == '__main__':
     #         print(image_path)
     #         Y.result(image_path, save_dir)  # 预测每一张结果并保存
     classes = ["Beefsteak", "CartoonCookies", "Cookies", "CupCake", "Pizzafour",
-               "Pizzaone", "Pizzasix", "ChickenWings", "ChiffonCake6", "ChiffonCake8",
-               "CranberryCookies", "eggtarts", "eggtartl", "nofood", "Peanuts",
-               "PorkChops", "PotatoCut", "Potatol", "Potatom", "Potatos",
-               "RoastedChicken", "SweetPotatoCut", "SweetPotatol", "SweetPotatom",
-               "Pizzatwo", "SweetPotatoS", "Toast"]
+               "Pizzatwo", "Pizzaone", "Pizzasix", "ChickenWings", "ChiffonCake6",
+               "ChiffonCake8", "CranberryCookies", "eggtarts", "eggtartl", "nofood",
+               "Peanuts", "PorkChops", "PotatoCut", "Potatol", "Potatom",
+               "Potatos", "RoastedChicken", "SweetPotatoCut", "SweetPotatol", "SweetPotatom",
+               "SweetPotatoS", "Toast"]
+    ab_classes = ["Pizzafour", "Pizzatwo", "Pizzaone", "Pizzasix",
+                  "PotatoCut", "Potatol", "Potatom",
+                  "RoastedChicken",
+                  "SweetPotatoCut", "SweetPotatol", "SweetPotatom", "SweetPotatoS",
+                  "Toast"]
     # classes = ["potatol", "potatom", "sweetpotatom", "sweetpotatol"]
     # classes = ["potatol", "potatom", "sweetpotatom"]
-    # classes = ["roast_white"]
+    # classes = ["JPGImages"]
     # classes_id = {"roast_white": 25}
 
     classes_id = {"CartoonCookies": 1, "Cookies": 5, "CupCake": 7, "Beefsteak": 0, "ChickenWings": 2,
@@ -223,6 +229,8 @@ if __name__ == '__main__':
     sheet1.write(0, 3, "acc")
     sheet1.write(0, 4, "noresult")
 
+    img_true = []
+    img_pre = []
     for i in range(len(classes)):
         c = classes[i]
         error_noresults = 0  # 无任何结果统计
@@ -248,6 +256,9 @@ if __name__ == '__main__':
                 else:
                     # bboxes_pr, layer_n = correct_bboxes(bboxes_pr, layer_n)  # 矫正输出结果
                     pre = bboxes_pr[0][-1]
+                    img_pre.append(pre)
+                    img_true.append(classes_id[c])
+
                     if pre == classes_id[c]:  # 若结果正确，食材正确数+1
                         food_acc += 1
                     # else:
@@ -268,9 +279,13 @@ if __name__ == '__main__':
     print("all food accuracy:", round((jpgs_acc / jpgs_count_all) * 100, 2))  # 输出食材正确数
     print("all no result:", all_noresults)  # 输出无任何结果总数
 
+    conf = confusion_matrix(y_pred=img_pre, y_true=img_true)
+
+    print(conf)
+    print(sum(sum(conf)))
     sheet1.write(35, 1, jpgs_acc)
     sheet1.write(35, 2, jpgs_count_all)
     sheet1.write(35, 3, round((jpgs_acc / jpgs_count_all) * 100, 2))
     sheet1.write(35, 4, all_noresults)
 
-    workbook.save("C:/Users/sunyihuan/Desktop/test_results_jpg/multi_food_aug4.xls")
+    workbook.save("C:/Users/sunyihuan/Desktop/test_jpg_check20191208/normal/multi_food6_normal.xls")

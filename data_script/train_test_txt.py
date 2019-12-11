@@ -79,7 +79,7 @@ def split_data(clasees, train_percent, test_percent):
 
 if __name__ == "__main__":
     # root_path = "E:/已标数据备份/20191203数据清洗补充"
-    root_path = "C:/Users/sunyihuan/Desktop/20191205"
+    root_path = "E:/已标数据备份/20191207已标注的数据集"
     # clasees = ["BeefSteak", "CartoonCookies", "ChickenWings", "ChiffonCake6", "ChiffonCake8",
     #            "Cookies", "CranberryCookies", "CupCake", "EggTart", "EggTartBig",
     #            "nofood", "Peanuts", "Pizzafour", "Pizzaone", "Pizzasix",
@@ -95,6 +95,7 @@ if __name__ == "__main__":
     print(len(clasees))
     train_percent = 0.8
     test_percent = 0.1
+
     for c in clasees:
         print(c)
         split_data(c, train_percent, test_percent)

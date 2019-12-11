@@ -30,5 +30,6 @@ def changesku(inputpath, label_name='Potatom'):
 
 
 if __name__ == '__main__':
-    inputpath = 'E:/已标数据备份/X/Potato/Annotations/Potatom'  # 这是xml文件的文件夹的绝对地址
-    changesku(inputpath)
+    inputpath = 'C:/Users/sunyihuan/Desktop/20191207已标注的数据集/X1X3X5kaoji20191207_annotations'  # 这是xml文件的文件夹的绝对地址
+    label_name = "roastedchicken"
+    changesku(inputpath,label_name)

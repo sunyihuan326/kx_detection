@@ -75,6 +75,9 @@ def img_dir_whiteBalance(img_dir, img_save_dir):
 
 
 if __name__ == "__main__":
-    img_dir = "C:/Users/sunyihuan/Desktop/rgb_test/PorkChops_new/top"
-    img_save_dir = "C:/Users/sunyihuan/Desktop/rgb_test/PorkChops_top_white"
-    img_dir_whiteBalance(img_dir, img_save_dir)
+    for c in ["pizzafour", "pizzaone", "pizzasix", "pizzatwo", "porkchops",
+              "roastedchicken"]:
+        img_dir = "C:/Users/sunyihuan/Desktop/test_results_jpg/supply/{}".format(c)
+        img_save_dir = "C:/Users/sunyihuan/Desktop/test_results_jpg/supply/{}_white".format(c)
+        if not os.path.exists(img_save_dir): os.mkdir(img_save_dir)
+        img_dir_whiteBalance(img_dir, img_save_dir)
