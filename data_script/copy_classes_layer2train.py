@@ -10,9 +10,9 @@ import shutil
 import os
 
 # 创建layer_train、layer_test、layer_val文件夹中的bottom
-layer_train_bottom_dir = "E:/DataSets/KX_FOODSets_model_data/20191205toast_nofood/layer_data/train/bottom"
-layer_test_bottom_dir = "E:/DataSets/KX_FOODSets_model_data/20191205toast_nofood/layer_data/test/bottom"
-layer_val_bottom_dir = "E:/DataSets/KX_FOODSets_model_data/20191205toast_nofood/layer_data/val/bottom"
+layer_train_bottom_dir = "E:/DataSets/KX_FOODSets_model_data/20191205toast_nofood/layer_data/train/top"
+layer_test_bottom_dir = "E:/DataSets/KX_FOODSets_model_data/20191205toast_nofood/layer_data/test/top"
+layer_val_bottom_dir = "E:/DataSets/KX_FOODSets_model_data/20191205toast_nofood/layer_data/val/top"
 if os.path.exists(layer_train_bottom_dir): shutil.rmtree(layer_train_bottom_dir)  # 判断是否存在，存在则删除
 os.mkdir(layer_train_bottom_dir)  # 创建文件夹
 if os.path.exists(layer_test_bottom_dir): shutil.rmtree(layer_test_bottom_dir)
@@ -43,7 +43,7 @@ def copy_img2train(layer_root, txt_root):
     #            "SweetPotatoCut", "sweetpotatol", "sweetpotatom", "sweetpotatos", "toast", ]
     clasees = ["nofood", "toast"]
     for c in clasees:
-        cl_dir = layer_root + "/" + c + "/bottom"
+        cl_dir = layer_root + "/" + c + "/top"
         try:
             for img_file in os.listdir(cl_dir):
                 if img_file.split(".")[0] in train_txt_files:

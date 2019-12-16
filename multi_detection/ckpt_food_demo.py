@@ -18,8 +18,6 @@ from tqdm import tqdm
 import xlwt
 from sklearn.metrics import confusion_matrix
 
-noresult_dir = "C:/Users/sunyihuan/Desktop/test_results_jpg/noresult"
-
 
 def correct_bboxes(bboxes_pr, layer_n):
     '''
@@ -107,9 +105,9 @@ class YoloTest(object):
     def __init__(self):
         self.input_size = 416  # 输入图片尺寸（默认正方形）
         self.num_classes = 30  # 种类数
-        self.score_threshold = 0.3
+        self.score_threshold = 0.35
         self.iou_threshold = 0.5
-        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food6/20191211/yolov3_train_loss=4.9168.ckpt-80"  # ckpt文件地址
+        self.weight_file = "./checkpoint/yolov3_train_loss=4.7698.ckpt-80"   # ckpt文件地址
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
 
@@ -187,14 +185,15 @@ class YoloTest(object):
 
 if __name__ == '__main__':
     img_dir = "C:/Users/sunyihuan/Desktop/test_jpg_check20191208/normal"  # 文件夹地址
-    save_dir = "C:/Users/sunyihuan/Desktop/test_jpg_check20191208/normal/detection6"  # 预测结果标出保存地址
+    save_dir = "C:/Users/sunyihuan/Desktop/test_jpg_check20191208/normal/detection_checkpoint_1216"  # 预测结果标出保存地址
     Y = YoloTest()  # 加载模型
-    # Y.result(img_path, "E:/Joyoung_WLS_github/tf_yolov3")
-    # for file in os.listdir(img_dir):
-    #     if file.endswith("jpg"):
-    #         image_path = img_dir + "/" + file
-    #         print(image_path)
-    #         Y.result(image_path, save_dir)  # 预测每一张结果并保存
+
+    food_error_dir = "C:/Users/sunyihuan/Desktop/test_jpg_check20191208/normal/fooderror_checkpoint_1216"  # 预测结果错误保存地址
+    if not os.path.exists(food_error_dir): os.mkdir(food_error_dir)
+
+    noresult_dir = "C:/Users/sunyihuan/Desktop/test_results_jpg/noresult_checkpoint_1216"
+    if not os.path.exists(noresult_dir): os.mkdir(noresult_dir)
+
     classes = ["Beefsteak", "CartoonCookies", "Cookies", "CupCake", "Pizzafour",
                "Pizzatwo", "Pizzaone", "Pizzasix", "ChickenWings", "ChiffonCake6",
                "ChiffonCake8", "CranberryCookies", "eggtarts", "eggtartl", "nofood",
@@ -240,6 +239,15 @@ if __name__ == '__main__':
         save_dirs = save_dir + "/" + c
         if os.path.exists(save_dirs): shutil.rmtree(save_dirs)
         os.mkdir(save_dirs)
+
+        fooderror_dirs = food_error_dir + "/" + c
+        if os.path.exists(fooderror_dirs): shutil.rmtree(fooderror_dirs)
+        os.mkdir(fooderror_dirs)
+
+        noresult_c_dirs = noresult_dir + "/" + c
+        if os.path.exists(noresult_c_dirs): shutil.rmtree(noresult_c_dirs)
+        os.mkdir(noresult_c_dirs)
+
         for file in tqdm(os.listdir(img_dirs)):
             if file.endswith("jpg"):
                 all_jpgs += 1  # 统计总jpg图片数量
@@ -252,7 +260,7 @@ if __name__ == '__main__':
                 bboxes_pr, layer_n = correct_bboxes(bboxes_pr, layer_n)  # 矫正输出结果
                 if len(bboxes_pr) == 0:  # 无任何结果返回，输出并统计+1
                     error_noresults += 1
-                    shutil.copy(image_path, noresult_dir + "/" + file)
+                    shutil.copy(image_path, noresult_c_dirs + "/" + file)
                 else:
                     # bboxes_pr, layer_n = correct_bboxes(bboxes_pr, layer_n)  # 矫正输出结果
                     pre = bboxes_pr[0][-1]
@@ -261,6 +269,18 @@ if __name__ == '__main__':
 
                     if pre == classes_id[c]:  # 若结果正确，食材正确数+1
                         food_acc += 1
+                    else:
+                        if pre in [8, 9] and classes_id[classes[i]] in [8, 9]:
+                            food_acc += 1
+                        if pre in [12, 14] and classes_id[classes[i]] in [12, 14]:
+                            food_acc += 1
+                        else:
+                            drawed_img_save_to_path = str(image_path).split("/")[-1]
+                            drawed_img_save_to_path = str(drawed_img_save_to_path).split(".")[0] + "_" + str(
+                                layer_n) + ".jpg"  # 图片保存地址，烤层结果在命名中
+                            shutil.copy(save_dirs + "/" + drawed_img_save_to_path,
+                                        fooderror_dirs + "/" + file.split(".jpg")[0] + "_" + str(layer_n) + ".jpg")
+
                     # else:
                     #     print(pre)
         sheet1.write(i + 1, 0, c)
@@ -288,4 +308,4 @@ if __name__ == '__main__':
     sheet1.write(35, 3, round((jpgs_acc / jpgs_count_all) * 100, 2))
     sheet1.write(35, 4, all_noresults)
 
-    workbook.save("C:/Users/sunyihuan/Desktop/test_jpg_check20191208/normal/multi_food6_normal.xls")
+    workbook.save("C:/Users/sunyihuan/Desktop/test_jpg_check20191208/normal/multi_he_checkpoint_normal_1216.xls")

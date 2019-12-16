@@ -3,7 +3,7 @@
 """
 预测一张图片结果
 @File    : ckpt_predict.py
-@Time    : 2019/8/19 15:45
+@Time    : 2019/12/16 15:45
 @Author  : sunyihuan
 """
 
@@ -11,6 +11,7 @@ import cv2
 import numpy as np
 import tensorflow as tf
 import multi_detection.core.utils as utils
+import os
 
 
 class YoloPredict(object):
@@ -66,18 +67,25 @@ class YoloPredict(object):
 
         return bboxes, layer_n
 
-    def result(self, image_path):
+    def result(self, image_path, save_dir="./img_detection"):
         image = cv2.imread(image_path)  # 图片读取
         bboxes_pr, layer_n = self.predict(image)  # 预测结果
         print(bboxes_pr)
         print(layer_n)
+        if not os.path.exists(save_dir):os.mkdir(save_dir)
         if self.write_image:
             image = utils.draw_bbox(image, bboxes_pr, show_label=self.show_label)
             drawed_img_save_to_path = str(image_path).split("/")[-1]
+            drawed_img_save_to_path = save_dir + "/" + drawed_img_save_to_path.split(".jpg")[0] + "_" + str(
+                layer_n[0]) + ".jpg"
+            print(drawed_img_save_to_path)
             cv2.imwrite(drawed_img_save_to_path, image)
 
 
 if __name__ == '__main__':
-    img_path = "C:/Users/sunyihuan/Desktop/85_new_cam/20191216_062507815.jpg"  # 图片地址
+    img_dir = "C:/Users/sunyihuan/Desktop/85_new_cam"  # 图片文件地址
     Y = YoloPredict()
-    Y.result(img_path)
+
+    for img in os.listdir(img_dir):
+        img_path = img_dir + "/" + img
+        Y.result(img_path)
