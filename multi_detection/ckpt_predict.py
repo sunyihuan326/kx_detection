@@ -23,7 +23,7 @@ class YoloPredict(object):
         self.num_classes = 30  # 种类数
         self.score_threshold = 0.3
         self.iou_threshold = 0.5
-        self.weight_file = "./checkpoint/yolov3_train_loss=4.7698.ckpt-80"  # ckpt文件地址
+        self.weight_file = "E:/ckpt_dirs/Food_detection/local/20191216/yolov3_train_loss=4.7698.ckpt-80"  # ckpt文件地址
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
 
@@ -78,6 +78,6 @@ class YoloPredict(object):
 
 
 if __name__ == '__main__':
-    img_path = "C:/Users/sunyihuan/Desktop/85_new_cam/20191216_062507815.jpg"  # 图片地址
+    img_path = "docs/images/404_cookies.jpg"  # 图片地址
     Y = YoloPredict()
     Y.result(img_path)

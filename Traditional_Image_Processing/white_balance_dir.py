@@ -45,18 +45,13 @@ def white_balance(img_path):
     imgR = imgR * KR
 
     # # 4将数组元素后处理
-    for i in range(0, height):
-        for j in range(0, width):
-            imgb = imgB[i, j]
-            imgg = imgG[i, j]
-            imgr = imgR[i, j]
-            if imgb > 255:
-                imgb = 255
-            if imgg > 255:
-                imgg = 255
-            if imgr > 255:
-                imgr = 255
-            dst[i, j] = (imgb, imgg, imgr)
+    imgB = np.clip(imgB, 0, 255)
+    imgG = np.clip(imgG, 0, 255)
+    imgR = np.clip(imgR, 0, 255)
+
+    dst[:, :, 0] = imgB
+    dst[:, :, 1] = imgG
+    dst[:, :, 2] = imgR
     return dst
 
 

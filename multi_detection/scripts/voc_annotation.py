@@ -12,16 +12,16 @@ def get_layer(typ):
     :param typ:
     :return:
     '''
-    bottom = os.listdir("E:/DataSets/KX_FOODSets_model_data/20191206data/layer_data/{}/bottom".format(typ))
+    bottom = os.listdir("E:/DataSets/KX_FOODSets_model_data/20191217_X3camera5/layer_data/{}/bottom".format(typ))
     bottom = [b for b in bottom if b.endswith(".jpg")]
 
-    middle = os.listdir("E:/DataSets/KX_FOODSets_model_data/20191206data/layer_data/{}/middle".format(typ))
+    middle = os.listdir("E:/DataSets/KX_FOODSets_model_data/20191217_X3camera5/layer_data/{}/middle".format(typ))
     middle = [b for b in middle if b.endswith(".jpg")]
 
-    top = os.listdir("E:/DataSets/KX_FOODSets_model_data/20191206data/layer_data/{}/top".format(typ))
+    top = os.listdir("E:/DataSets/KX_FOODSets_model_data/20191217_X3camera5/layer_data/{}/top".format(typ))
     top = [b for b in top if b.endswith(".jpg")]
 
-    others_path = "E:/DataSets/KX_FOODSets_model_data/20191206data/layer_data/{}/others".format(typ)
+    others_path = "E:/DataSets/KX_FOODSets_model_data/20191217_X3camera5/layer_data/{}/others".format(typ)
     if os.path.exists(others_path):
         others = os.listdir(others_path)
         others = [b for b in others if b.endswith(".jpg")]
@@ -122,25 +122,25 @@ def convert_voc_annotation(data_path, data_type, anno_path, use_difficult_bbox=T
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--data_path",
-                        default="E:/DataSets/KX_FOODSets_model_data/20191206data")
+                        default="E:/DataSets/KX_FOODSets_model_data/20191217_X3camera5")
     parser.add_argument("--train_annotation",
-                        default="E:/kx_detection/multi_detection/data/dataset/20191206/train1206.txt")
-    parser.add_argument("--test_annotation",
-                        default="E:/kx_detection/multi_detection/data/dataset/20191206/test1206.txt")
-    parser.add_argument("--val_annotation",
-                        default="E:/kx_detection/multi_detection/data/dataset/20191206/val1206.txt")
+                        default="E:/kx_detection/multi_detection/data/dataset/20191217_X3camera5/train1217.txt")
+    # parser.add_argument("--test_annotation",
+    #                     default="E:/kx_detection/multi_detection/data/dataset/20191206/test1206.txt")
+    # parser.add_argument("--val_annotation",
+    #                     default="E:/kx_detection/multi_detection/data/dataset/20191206/val1206.txt")
     flags = parser.parse_args()
     #
     if os.path.exists(flags.train_annotation): os.remove(flags.train_annotation)
-    if os.path.exists(flags.test_annotation): os.remove(flags.test_annotation)
-    if os.path.exists(flags.val_annotation): os.remove(flags.val_annotation)
+    # if os.path.exists(flags.test_annotation): os.remove(flags.test_annotation)
+    # if os.path.exists(flags.val_annotation): os.remove(flags.val_annotation)
     # # #
     num1 = convert_voc_annotation(flags.data_path, 'train',
                                   flags.train_annotation, False)
-    num2 = convert_voc_annotation(flags.data_path, 'test',
-                                  flags.test_annotation, False)
-    num3 = convert_voc_annotation(flags.data_path, 'val',
-                                  flags.val_annotation, False)
+    # num2 = convert_voc_annotation(flags.data_path, 'test',
+    #                               flags.test_annotation, False)
+    # num3 = convert_voc_annotation(flags.data_path, 'val',
+    #                               flags.val_annotation, False)
     # print(
     #     '=> The number of image for train is: %d\tThe number of image for test is:%d\tThe number of image for val is:%d' % (
     #         num1, num2, num3))

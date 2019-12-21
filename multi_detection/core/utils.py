@@ -199,4 +199,42 @@ def postprocess_boxes(pred_bbox, org_img_shape, input_size, score_threshold):
     return np.concatenate([coors, scores[:, np.newaxis], classes[:, np.newaxis]], axis=-1)
 
 
+def white_balance(img):
+    '''
+    图片自动白平衡
+    :param img: 图片
+    :return:
+    '''
+    dst = np.zeros(img.shape, img.dtype)
+
+    # 1.计算三通道灰度平均值
+    imgB, imgG, imgR = cv2.split(img)
+
+    bAve = cv2.mean(imgB)[0]
+    gAve = cv2.mean(imgG)[0]
+    rAve = cv2.mean(imgR)[0]
+
+    Ave = (bAve + gAve + rAve) / 3
+
+    # 2.通道值调整
+    KB = Ave / bAve
+    KG = Ave / gAve
+    KR = Ave / rAve
+
+    # 3使用增益系数
+    imgB = imgB * KB
+    imgG = imgG * KG
+    imgR = imgR * KR
+
+    # # 4将数组元素后处理
+    imgB = np.clip(imgB, 0, 255)
+    imgG = np.clip(imgG, 0, 255)
+    imgR = np.clip(imgR, 0, 255)
+
+    dst[:, :, 0] = imgB
+    dst[:, :, 1] = imgG
+    dst[:, :, 2] = imgR
+    return dst
+
+
 

@@ -107,7 +107,7 @@ class YoloTest(object):
         self.num_classes = 30  # 种类数
         self.score_threshold = 0.35
         self.iou_threshold = 0.5
-        self.weight_file = "./checkpoint/yolov3_train_loss=4.7698.ckpt-80"   # ckpt文件地址
+        self.weight_file ="E:/ckpt_dirs/Food_detection/multi_food5/20191216/yolov3_train_loss=5.1452.ckpt-79"   # ckpt文件地址
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
 
@@ -185,13 +185,14 @@ class YoloTest(object):
 
 if __name__ == '__main__':
     img_dir = "C:/Users/sunyihuan/Desktop/test_jpg_check20191208/normal"  # 文件夹地址
-    save_dir = "C:/Users/sunyihuan/Desktop/test_jpg_check20191208/normal/detection_checkpoint_1216"  # 预测结果标出保存地址
+    save_dir = "C:/Users/sunyihuan/Desktop/test_jpg_check20191208/normal/detection_multi5_1216"  # 预测结果标出保存地址
+    if not os.path.exists(save_dir): os.mkdir(save_dir)
     Y = YoloTest()  # 加载模型
 
-    food_error_dir = "C:/Users/sunyihuan/Desktop/test_jpg_check20191208/normal/fooderror_checkpoint_1216"  # 预测结果错误保存地址
+    food_error_dir = "C:/Users/sunyihuan/Desktop/test_jpg_check20191208/normal/fooderror_multi5_1216"  # 预测结果错误保存地址
     if not os.path.exists(food_error_dir): os.mkdir(food_error_dir)
 
-    noresult_dir = "C:/Users/sunyihuan/Desktop/test_results_jpg/noresult_checkpoint_1216"
+    noresult_dir = "C:/Users/sunyihuan/Desktop/test_results_jpg/noresult_multi5_1216"
     if not os.path.exists(noresult_dir): os.mkdir(noresult_dir)
 
     classes = ["Beefsteak", "CartoonCookies", "Cookies", "CupCake", "Pizzafour",
@@ -308,4 +309,4 @@ if __name__ == '__main__':
     sheet1.write(35, 3, round((jpgs_acc / jpgs_count_all) * 100, 2))
     sheet1.write(35, 4, all_noresults)
 
-    workbook.save("C:/Users/sunyihuan/Desktop/test_jpg_check20191208/normal/multi_he_checkpoint_normal_1216.xls")
+    workbook.save("C:/Users/sunyihuan/Desktop/test_jpg_check20191208/normal/multi_he_multi5_1216.xls")

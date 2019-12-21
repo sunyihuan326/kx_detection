@@ -22,9 +22,9 @@ class YoloPredict(object):
     def __init__(self):
         self.input_size = 416  # 输入图片尺寸（默认正方形）
         self.num_classes = 30  # 种类数
-        self.score_threshold = 0.3
+        self.score_threshold = 0.1
         self.iou_threshold = 0.5
-        self.weight_file = "./checkpoint/yolov3_train_loss=4.7698.ckpt-80"  # ckpt文件地址
+        self.weight_file = "E:/ckpt_dirs/Food_detection/local/20191217/yolov3_train_loss=5.2699.ckpt-37"  # ckpt文件地址
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
 
@@ -69,10 +69,11 @@ class YoloPredict(object):
 
     def result(self, image_path, save_dir="./img_detection"):
         image = cv2.imread(image_path)  # 图片读取
+        image = utils.white_balance(image)  # 图片白平衡处理
         bboxes_pr, layer_n = self.predict(image)  # 预测结果
         print(bboxes_pr)
         print(layer_n)
-        if not os.path.exists(save_dir):os.mkdir(save_dir)
+        if not os.path.exists(save_dir): os.mkdir(save_dir)
         if self.write_image:
             image = utils.draw_bbox(image, bboxes_pr, show_label=self.show_label)
             drawed_img_save_to_path = str(image_path).split("/")[-1]

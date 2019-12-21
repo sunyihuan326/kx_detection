@@ -1,8 +1,8 @@
 # -*- encoding: utf-8 -*-
 
 """
-@File    : ckpt_all_he.py
-@Time    : 2019/12/13 14:53
+@File    : ckpt_all_he_1218.py
+@Time    : 2019/12/18 14:39
 @Author  : sunyihuan
 """
 
@@ -12,6 +12,8 @@ ckpt文件预测某一文件夹下各类所有图片烤层结果、食材结果
 
 此结果合并大蛋挞、小蛋挞；四分之一披萨、六分之一披萨
 
+
+说明：correct_bboxes使用李志鹏12月17日修订版
 '''
 
 import cv2
@@ -22,6 +24,7 @@ import os
 import shutil
 from tqdm import tqdm
 import xlwt
+import time
 from sklearn.metrics import confusion_matrix
 
 
@@ -41,13 +44,18 @@ def correct_bboxes(bboxes_pr, layer_n):
     elif num_label == 1:
         if bboxes_pr[0][4] < 0.45:
             if bboxes_pr[0][5] == 10:  # 低分nofood
-                bboxes_pr[0][4] = 0.85
+                bboxes_pr[0][4] = 0.75
             elif bboxes_pr[0][5] == 11:  # 低分花生米
                 bboxes_pr[0][4] = 0.85
+            elif bboxes_pr[0][5] == 25:  # 低分整鸡
+                bboxes_pr[0][4] = 0.75
             else:
                 del bboxes_pr[0]
-        # if bboxes_pr[0][4] < 0.9 and bboxes_pr[0][4] >= 0.45:
-        #     bboxes_pr[0][4] = 0.9
+
+        # else:
+        #    if bboxes_pr[0][4] < 0.9 and bboxes_pr[0][4] >= 0.6:
+        #        bboxes_pr[0][4] = 0.9
+
         return bboxes_pr, layer_n
 
     # 检测到多个食材
@@ -88,6 +96,31 @@ def correct_bboxes(bboxes_pr, layer_n):
             n_name = len(s_labeldict)
             name1 = s_labeldict[0][0]
             num_name1 = s_labeldict[0][1]
+            name2 = s_labeldict[1][0]
+            num_name2 = s_labeldict[1][1]
+
+            # 优先处理食材特例
+            if n_name == 2:
+                # 如果鸡翅中检测到了排骨，默认单一食材为鸡翅
+                if (name1 == 2 and name2 == 16) or (name1 == 16 and name2 == 2):
+                    for i in range(new_num_label):
+                        new_bboxes_pr[i][5] = 2
+                    return new_bboxes_pr, layer_n
+                # 如果对切土豆中检测到了大土豆，默认单一食材为对切土豆
+                if (name1 == 17 and name2 == 18) or (name1 == 18 and name2 == 17):
+                    for i in range(new_num_label):
+                        new_bboxes_pr[i][5] = 17
+                    return new_bboxes_pr, layer_n
+                # 如果对切红薯中检测到了大红薯，默认单一食材为对切红薯
+                if (name1 == 21 and name2 == 22) or (name1 == 22 and name2 == 21):
+                    for i in range(new_num_label):
+                        new_bboxes_pr[i][5] = 21
+                    return new_bboxes_pr, layer_n
+                # 如果对切红薯中检测到了中红薯，默认单一食材为对切红薯
+                if (name1 == 21 and name2 == 23) or (name1 == 23 and name2 == 21):
+                    for i in range(new_num_label):
+                        new_bboxes_pr[i][5] = 21
+                    return new_bboxes_pr, layer_n
 
             # 数量最多label对应的食材占比0.7以上
             if num_name1 / new_num_label > 0.7:
@@ -113,7 +146,8 @@ class YoloTest(object):
         self.num_classes = 30  # 种类数
         self.score_threshold = 0.1
         self.iou_threshold = 0.5
-        self.weight_file = "E:/ckpt_dirs/Food_detection/local/20191216/yolov3_train_loss=4.7698.ckpt-80"   # ckpt文件地址
+        # self.weight_file = "E:/ckpt_dirs/Food_detection/local/20191216/yolov3_train_loss=4.7698.ckpt-80"  # ckpt文件地址
+        self.weight_file = "./checkpoint/yolov3_train_loss=6.2933.ckpt-36"
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
 
@@ -176,7 +210,7 @@ class YoloTest(object):
         :return:
         '''
         image = cv2.imread(image_path)  # 图片读取
-        image = utils.white_balance(image)  # 图片白平衡处理
+        # image = utils.white_balance(image)  # 图片白平衡处理
         bboxes_pr, layer_n = self.predict(image)  # 预测结果
         # print(bboxes_pr)
         # print(layer_n)
@@ -193,19 +227,22 @@ class YoloTest(object):
 
 if __name__ == '__main__':
     img_dir = "E:/test_from_ye/JPGImages"  # 文件夹地址
-    save_dir = "E:/test_from_ye/detection_local_1216_old"  # 图片保存地址
+    save_dir = "E:/test_from_ye/detection_local_1221_no_bai"  # 图片保存地址
     if not os.path.exists(save_dir): os.mkdir(save_dir)
 
-    layer_error_dir = "E:/test_from_ye/layer_error_local_1216_old"  # 预测结果错误保存地址
+    layer_error_dir = "E:/test_from_ye/layer_error_local_1221_no_bai"  # 预测结果错误保存地址
     if not os.path.exists(layer_error_dir): os.mkdir(layer_error_dir)
 
-    fooderror_dir = "E:/test_from_ye/food_error_local_1216_old"  # 食材预测结果错误保存地址
+    fooderror_dir = "E:/test_from_ye/food_error_local_1221_no_bai"  # 食材预测结果错误保存地址
     if not os.path.exists(fooderror_dir): os.mkdir(fooderror_dir)
 
-    no_result_dir = "E:/test_from_ye/no_result_local_1216_old"  # 无任何输出结果保存地址
+    no_result_dir = "E:/test_from_ye/no_result_local_1221_no_bai"  # 无任何输出结果保存地址
     if not os.path.exists(no_result_dir): os.mkdir(no_result_dir)
 
+    start_time = time.time()
     Y = YoloTest()  # 加载模型
+    end0_time = time.time()
+    print("model loading time:", end0_time - start_time)
 
     classes = ["Beefsteak", "CartoonCookies", "Cookies", "CupCake", "Pizzafour",
                "Pizzatwo", "Pizzaone", "Pizzasix", "ChickenWings", "ChiffonCake6",
@@ -246,6 +283,7 @@ if __name__ == '__main__':
     sheet1.write(1, 9, "jpgs_all")
     sheet1.write(1, 10, "layer_acc")
     sheet1.write(1, 11, "food_acc")
+    sheet1.write(1, 12, "no_result_nums")
 
     layer_img_true = []
     layer_img_pre = []
@@ -328,7 +366,9 @@ if __name__ == '__main__':
                             drawed_img_save_to_path = str(drawed_img_save_to_path).split(".")[0] + "_" + str(
                                 layer_n) + ".jpg"  # 图片保存地址，烤层结果在命名中
                             shutil.copy(save_c_dir + "/" + drawed_img_save_to_path,
-                                        fooderror_dirs + "/" + file.split(".jpg")[0] + "_" + str(layer_n) + ".jpg")
+                                        fooderror_dirs + "/" + file.split(".jpg")[0] + "_" + str(layer_n) + "_" + str(
+                                            pre) + ".jpg")
+                            shutil.copy(image_path, fooderror_dirs + "/" + file)
 
         if len(os.listdir(img_dirs + "/bottom")) == 0:  # 判断是否有值
             layer_bottom_acc = 0
@@ -379,7 +419,9 @@ if __name__ == '__main__':
                             drawed_img_save_to_path = str(drawed_img_save_to_path).split(".")[0] + "_" + str(
                                 layer_n) + ".jpg"  # 图片保存地址，烤层结果在命名中
                             shutil.copy(save_c_dir + "/" + drawed_img_save_to_path,
-                                        fooderror_dirs + "/" + file.split(".jpg")[0] + "_" + str(layer_n) + ".jpg")
+                                        fooderror_dirs + "/" + file.split(".jpg")[0] + "_" + str(layer_n) + "_" + str(
+                                            pre) + ".jpg")
+                            shutil.copy(image_path, fooderror_dirs + "/" + file)
 
         if len(os.listdir(img_dirs + "/middle")) == 0:  # 判断是否有值
             layer_middle_acc = 0
@@ -430,7 +472,9 @@ if __name__ == '__main__':
                             drawed_img_save_to_path = str(drawed_img_save_to_path).split(".")[0] + "_" + str(
                                 layer_n) + ".jpg"  # 图片保存地址，烤层结果在命名中
                             shutil.copy(save_c_dir + "/" + drawed_img_save_to_path,
-                                        fooderror_dirs + "/" + file.split(".jpg")[0] + "_" + str(layer_n) + ".jpg")
+                                        fooderror_dirs + "/" + file.split(".jpg")[0] + "_" + str(layer_n) + "_" + str(
+                                            pre) + ".jpg")
+                            shutil.copy(image_path, fooderror_dirs + "/" + file)
 
         if len(os.listdir(img_dirs + "/top")) == 0:  # 判断是否有值
             layer_top_acc = 0
@@ -481,7 +525,9 @@ if __name__ == '__main__':
                             drawed_img_save_to_path = str(drawed_img_save_to_path).split(".")[0] + "_" + str(
                                 layer_n) + ".jpg"  # 图片保存地址，烤层结果在命名中
                             shutil.copy(save_c_dir + "/" + drawed_img_save_to_path,
-                                        fooderror_dirs + "/" + file.split(".jpg")[0] + "_" + str(layer_n) + ".jpg")
+                                        fooderror_dirs + "/" + file.split(".jpg")[0] + "_" + str(layer_n) + "_" + str(
+                                            pre) + ".jpg")
+                            shutil.copy(image_path, fooderror_dirs + "/" + file)
 
         if len(os.listdir(img_dirs + "/others")) == 0:  # 判断是否有值
             layer_others_acc = 0
@@ -497,6 +543,8 @@ if __name__ == '__main__':
         sheet1.write(i + 2, 9, all_jpgs)
         sheet1.write(i + 2, 10, round((layer_acc / all_jpgs) * 100, 2))
         sheet1.write(i + 2, 11, round((food_acc / all_jpgs) * 100, 2))
+
+        sheet1.write(i + 2, 12, error_noresults)
 
         print("food name:", c)
         print("layer accuracy:", round((layer_acc / all_jpgs) * 100, 2))  # 输出烤层正确数
@@ -520,4 +568,7 @@ if __name__ == '__main__':
     sheet1.write(35, 4, round((layer_jpgs_acc / jpgs_count_all) * 100, 2))
     sheet1.write(35, 5, round((food_jpgs_acc / jpgs_count_all) * 100, 2))
 
-    workbook.save("E:/test_from_ye/all_he_local_1216_old.xls")
+    workbook.save("E:/test_from_ye/all_he_local_1221_no_bai.xls")
+
+    end_time = time.time()
+    print("all jpgs time:", end_time - end0_time)

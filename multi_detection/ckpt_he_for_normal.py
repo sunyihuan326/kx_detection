@@ -41,13 +41,18 @@ def correct_bboxes(bboxes_pr, layer_n):
     elif num_label == 1:
         if bboxes_pr[0][4] < 0.45:
             if bboxes_pr[0][5] == 10:  # 低分nofood
-                bboxes_pr[0][4] = 0.85
+                bboxes_pr[0][4] = 0.75
             elif bboxes_pr[0][5] == 11:  # 低分花生米
                 bboxes_pr[0][4] = 0.85
+            elif bboxes_pr[0][5] == 25:  # 低分整鸡
+                bboxes_pr[0][4] = 0.75
             else:
                 del bboxes_pr[0]
-        # if bboxes_pr[0][4] < 0.9 and bboxes_pr[0][4] >= 0.45:
-        #     bboxes_pr[0][4] = 0.9
+
+        # else:
+        #    if bboxes_pr[0][4] < 0.9 and bboxes_pr[0][4] >= 0.6:
+        #        bboxes_pr[0][4] = 0.9
+
         return bboxes_pr, layer_n
 
     # 检测到多个食材
@@ -88,6 +93,31 @@ def correct_bboxes(bboxes_pr, layer_n):
             n_name = len(s_labeldict)
             name1 = s_labeldict[0][0]
             num_name1 = s_labeldict[0][1]
+            name2 = s_labeldict[1][0]
+            num_name2 = s_labeldict[1][1]
+
+            # 优先处理食材特例
+            if n_name == 2:
+                # 如果鸡翅中检测到了排骨，默认单一食材为鸡翅
+                if (name1 == 2 and name2 == 16) or (name1 == 16 and name2 == 2):
+                    for i in range(new_num_label):
+                        new_bboxes_pr[i][5] = 2
+                    return new_bboxes_pr, layer_n
+                # 如果对切土豆中检测到了大土豆，默认单一食材为对切土豆
+                if (name1 == 17 and name2 == 18) or (name1 == 18 and name2 == 17):
+                    for i in range(new_num_label):
+                        new_bboxes_pr[i][5] = 17
+                    return new_bboxes_pr, layer_n
+                # 如果对切红薯中检测到了大红薯，默认单一食材为对切红薯
+                if (name1 == 21 and name2 == 22) or (name1 == 22 and name2 == 21):
+                    for i in range(new_num_label):
+                        new_bboxes_pr[i][5] = 21
+                    return new_bboxes_pr, layer_n
+                # 如果对切红薯中检测到了中红薯，默认单一食材为对切红薯
+                if (name1 == 21 and name2 == 23) or (name1 == 23 and name2 == 21):
+                    for i in range(new_num_label):
+                        new_bboxes_pr[i][5] = 21
+                    return new_bboxes_pr, layer_n
 
             # 数量最多label对应的食材占比0.7以上
             if num_name1 / new_num_label > 0.7:
@@ -113,7 +143,7 @@ class YoloTest(object):
         self.num_classes = 30  # 种类数
         self.score_threshold = 0.1
         self.iou_threshold = 0.5
-        self.weight_file = "./checkpoint/yolov3_train_loss=4.7698.ckpt-80"  # ckpt文件地址
+        self.weight_file = "E:/ckpt_dirs/Food_detection/local/20191216/yolov3_train_loss=4.7698.ckpt-80"  # ckpt文件地址
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
 
@@ -190,14 +220,15 @@ class YoloTest(object):
 
 
 if __name__ == '__main__':
-    img_dir = "C:/Users/sunyihuan/Desktop/test_jpg_check20191208/normal"  # 文件夹地址
-    save_dir = "C:/Users/sunyihuan/Desktop/test_jpg_check20191208/normal/detection_checkpoint_1216"  # 预测结果标出保存地址
+    img_dir = "E:/test_from_ye/JPGImages_abnormal"  # 文件夹地址
+    save_dir = "E:/test_from_ye/detection_local_abnormal1216"  # 预测结果标出保存地址
+    if not os.path.exists(save_dir): os.mkdir(save_dir)
     Y = YoloTest()  # 加载模型
 
-    food_error_dir = "C:/Users/sunyihuan/Desktop/test_jpg_check20191208/normal/fooderror_checkpoint_1216"  # 预测结果错误保存地址
+    food_error_dir = "E:/test_from_ye/fooderror_local_abnormal1216"  # 预测结果错误保存地址
     if not os.path.exists(food_error_dir): os.mkdir(food_error_dir)
 
-    noresult_dir = "C:/Users/sunyihuan/Desktop/test_jpg_check20191208/normal/noresult_checkpoint_1216"
+    noresult_dir = "E:/test_from_ye/noresult_local_abnormal1216"
     if not os.path.exists(noresult_dir): os.mkdir(noresult_dir)
 
     classes = ["Beefsteak", "CartoonCookies", "Cookies", "CupCake", "Pizzafour",
@@ -236,8 +267,8 @@ if __name__ == '__main__':
 
     img_true = []
     img_pre = []
-    for i in range(len(classes)):
-        c = classes[i]
+    for i in range(len(ab_classes)):
+        c = ab_classes[i]
         error_noresults = 0  # 无任何结果统计
         food_acc = 0  # 食材准确数统计
         all_jpgs = 0  # 图片总数统计
@@ -264,9 +295,14 @@ if __name__ == '__main__':
                 # except:
                 #     pass
                 bboxes_pr, layer_n = correct_bboxes(bboxes_pr, layer_n)  # 矫正输出结果
+
+                drawed_img_save_to_path = str(image_path).split("/")[-1]
+                drawed_img_save_to_path = str(drawed_img_save_to_path).split(".")[0] + "_" + str(
+                    layer_n) + ".jpg"  # 图片保存地址，烤层结果在命名中
+
                 if len(bboxes_pr) == 0:  # 无任何结果返回，输出并统计+1
                     error_noresults += 1
-                    shutil.copy(image_path, noresult_c_dirs + "/" + file)
+                    shutil.copy(save_dirs + "/" + drawed_img_save_to_path, noresult_c_dirs + "/" + file)
                 else:
                     # bboxes_pr, layer_n = correct_bboxes(bboxes_pr, layer_n)  # 矫正输出结果
                     pre = bboxes_pr[0][-1]
@@ -281,9 +317,7 @@ if __name__ == '__main__':
                         if pre in [12, 14] and classes_id[classes[i]] in [12, 14]:
                             food_acc += 1
                         else:
-                            drawed_img_save_to_path = str(image_path).split("/")[-1]
-                            drawed_img_save_to_path = str(drawed_img_save_to_path).split(".")[0] + "_" + str(
-                                layer_n) + ".jpg"  # 图片保存地址，烤层结果在命名中
+
                             shutil.copy(save_dirs + "/" + drawed_img_save_to_path,
                                         fooderror_dirs + "/" + file.split(".jpg")[0] + "_" + str(layer_n) + ".jpg")
                     # else:
@@ -313,4 +347,4 @@ if __name__ == '__main__':
     sheet1.write(35, 3, round((jpgs_acc / jpgs_count_all) * 100, 2))
     sheet1.write(35, 4, all_noresults)
 
-    workbook.save("C:/Users/sunyihuan/Desktop/test_jpg_check20191208/normal/multi_he_checkpoint_normal_1216.xls")
+    workbook.save("E:/test_from_ye/multi_he_local_abnormal1216.xls")
