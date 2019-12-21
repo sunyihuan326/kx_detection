@@ -22,7 +22,7 @@ class YoloPredic(object):
         self.num_classes = 30  # 种类数
         self.score_threshold = 0.45
         self.iou_threshold = 0.5
-        self.pb_file = "E:/kx_detection/multi_detection/yolov3_coco.pb"  # pb文件地址
+        self.pb_file = "E:/kx_detection/multi_detection/yolov3.pb"  # pb文件地址
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
 

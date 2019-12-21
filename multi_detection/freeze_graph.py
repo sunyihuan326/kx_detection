@@ -1,6 +1,10 @@
-#! /usr/bin/env python
-# coding=utf-8
+# -*- encoding: utf-8 -*-
 
+"""
+@File    : freeze_graph_0.py
+@Time    : 2019/12/21 11:43
+@Author  : sunyihuan
+"""
 
 import tensorflow as tf
 from multi_detection.core.yolov3 import YOLOV3
@@ -13,14 +17,9 @@ output = ["define_loss/pred_sbbox/concat_2", "define_loss/pred_mbbox/concat_2",
 with tf.name_scope('define_input'):
     input_data = tf.placeholder(dtype=tf.float32, shape=(None, 416, 416, 3), name='input_data')
     trainable = tf.placeholder(dtype=tf.bool, name='training')
-# with tf.name_scope('input'):
-#     input_data = tf.placeholder(dtype=tf.float32, name='input_data')
 
 with tf.name_scope("define_loss"):
     model = YOLOV3(input_data, trainable=trainable)
-# model = YOLOV3(input_data, trainable=False)
-layer_out = model.out
-print(model.pred_sbbox, model.pred_mbbox, model.pred_lbbox)
 
 sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
 saver = tf.train.Saver()
