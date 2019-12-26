@@ -4,6 +4,7 @@
 
 import os
 import cv2
+from PIL import Image, ImageEnhance, ImageFilter
 import random
 import numpy as np
 import tensorflow as tf
@@ -152,7 +153,20 @@ class Dataset(object):
 
         if not os.path.exists(image_path):
             raise KeyError("%s does not exist ... " % image_path)
-        image = np.array(cv2.imread(image_path))
+        # image = np.array(cv2.imread(image_path))
+        image = Image.open(image_path)
+        if self.data_aug:
+            if random.random() < 0.5:
+                image = ImageEnhance.Contrast(image)  # 对比度增强
+                image = image.enhance(random.uniform(0.6, 1.2))  # 增强系数[0.6, 1.2]
+            if random.random() < 0.5:
+                image = ImageEnhance.Brightness(image)  # 亮度调整
+                image = image.enhance(random.uniform(0.7, 1.2))  # 亮度调整系数[0.7, 1.2]
+            image = np.array(image)
+
+        else:
+            image = np.array(image)
+
         # image = np.array(cv2.cvtColor(cv2.imread(image_path), cv2.COLOR_RGB2HSV))  # RGB空间转为HSV空间
         layer_label = int(line[1])
 

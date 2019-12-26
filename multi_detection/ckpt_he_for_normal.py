@@ -143,7 +143,7 @@ class YoloTest(object):
         self.num_classes = 30  # 种类数
         self.score_threshold = 0.1
         self.iou_threshold = 0.5
-        self.weight_file = "E:/ckpt_dirs/Food_detection/local/20191216/yolov3_train_loss=4.7698.ckpt-80"  # ckpt文件地址
+        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food6/20191226/yolov3_train_loss=4.3397.ckpt-150"   # ckpt文件地址
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
 
@@ -220,15 +220,15 @@ class YoloTest(object):
 
 
 if __name__ == '__main__':
-    img_dir = "E:/test_from_ye/JPGImages_abnormal"  # 文件夹地址
-    save_dir = "E:/test_from_ye/detection_local_abnormal1216"  # 预测结果标出保存地址
+    img_dir = "E:/test_from_ye/JPGImages_normal"  # 文件夹地址
+    save_dir = "E:/test_from_ye/detection_multi6_normal1226"  # 预测结果标出保存地址
     if not os.path.exists(save_dir): os.mkdir(save_dir)
     Y = YoloTest()  # 加载模型
 
-    food_error_dir = "E:/test_from_ye/fooderror_local_abnormal1216"  # 预测结果错误保存地址
+    food_error_dir = "E:/test_from_ye/fooderror_multi6_normal1226"  # 预测结果错误保存地址
     if not os.path.exists(food_error_dir): os.mkdir(food_error_dir)
 
-    noresult_dir = "E:/test_from_ye/noresult_local_abnormal1216"
+    noresult_dir = "E:/test_from_ye/noresult_multi6_normal1226"
     if not os.path.exists(noresult_dir): os.mkdir(noresult_dir)
 
     classes = ["Beefsteak", "CartoonCookies", "Cookies", "CupCake", "Pizzafour",
@@ -267,8 +267,8 @@ if __name__ == '__main__':
 
     img_true = []
     img_pre = []
-    for i in range(len(ab_classes)):
-        c = ab_classes[i]
+    for i in range(len(classes)):
+        c = classes[i]
         error_noresults = 0  # 无任何结果统计
         food_acc = 0  # 食材准确数统计
         all_jpgs = 0  # 图片总数统计
@@ -347,4 +347,4 @@ if __name__ == '__main__':
     sheet1.write(35, 3, round((jpgs_acc / jpgs_count_all) * 100, 2))
     sheet1.write(35, 4, all_noresults)
 
-    workbook.save("E:/test_from_ye/multi_he_local_abnormal1216.xls")
+    workbook.save("E:/test_from_ye/multi_he_multi6_normal1226.xls")

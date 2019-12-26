@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 
 """
-@File    : freeze_graph_0.py
+@File    : freeze_graph.py
 @Time    : 2019/12/21 11:43
 @Author  : sunyihuan
 """
