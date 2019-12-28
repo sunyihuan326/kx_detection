@@ -99,10 +99,10 @@ class YoloTest(object):
     def __init__(self):
         self.input_size = 416  # 输入图片尺寸（默认正方形）
         self.num_classes = 27  # 种类数
-        self.score_threshold = 0.45
+        self.score_threshold = 0.1
         self.iou_threshold = 0.5
-        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food3/20191118/yolov3_train_loss=5.0565.ckpt-100"  # ckpt文件地址
-        self.pb_file = "E:/ckpt_dirs/Food_detection/multi_food3/20191118/yolo_model.pb"
+        # self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food3/20191118/yolov3_train_loss=5.0565.ckpt-100"  # ckpt文件地址
+        self.pb_file = "E:/ckpt_dirs/Food_detection/local/20191216/yolo_model.pb"
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
         graph = tf.Graph()

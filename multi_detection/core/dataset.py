@@ -5,6 +5,7 @@
 import os
 import cv2
 from PIL import Image, ImageEnhance, ImageFilter
+from skimage import util
 import random
 import numpy as np
 import tensorflow as tf
@@ -162,6 +163,9 @@ class Dataset(object):
             if random.random() < 0.5:
                 image = ImageEnhance.Brightness(image)  # 亮度调整
                 image = image.enhance(random.uniform(0.7, 1.2))  # 亮度调整系数[0.7, 1.2]
+            if random.random() < 0.5:
+                image = util.random_noise(np.array(image), mode="gaussian")  # 加入高斯噪声,输出值为[0,1],需乘以255
+                image = image * 255
             image = np.array(image)
 
         else:

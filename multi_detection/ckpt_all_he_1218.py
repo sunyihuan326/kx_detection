@@ -27,6 +27,10 @@ import xlwt
 import time
 from sklearn.metrics import confusion_matrix
 
+# gpu限制
+gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.8)
+config = tf.ConfigProto(gpu_options=gpu_options)
+
 
 def correct_bboxes(bboxes_pr, layer_n):
     '''
@@ -146,8 +150,8 @@ class YoloTest(object):
         self.num_classes = 30  # 种类数
         self.score_threshold = 0.1
         self.iou_threshold = 0.5
-        # self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food6/20191226/yolov3_train_loss=4.3397.ckpt-150"  # ckpt文件地址
-        self.weight_file = "./checkpoint/yolov3_train_loss=5.7866.ckpt-46"
+        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food/20191227/yolov3_train_loss=5.0584.ckpt-100"  # ckpt文件地址
+        # self.weight_file = "./checkpoint/yolov3_train_loss=5.7866.ckpt-46"
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
 
@@ -155,7 +159,7 @@ class YoloTest(object):
         with graph.as_default():
             # 模型加载
             self.saver = tf.train.import_meta_graph("{}.meta".format(self.weight_file))
-            self.sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
+            self.sess = tf.Session(config=config)
             self.saver.restore(self.sess, self.weight_file)
 
             # 输入
@@ -228,16 +232,16 @@ class YoloTest(object):
 if __name__ == '__main__':
     tag = ""
     img_dir = "E:/test_from_ye/JPGImages"  # 文件夹地址
-    save_dir = "E:/test_from_ye/detection_local_1226{}".format(tag)  # 图片保存地址
+    save_dir = "E:/test_from_ye/detection_multi1_1227{}".format(tag)  # 图片保存地址
     if not os.path.exists(save_dir): os.mkdir(save_dir)
 
-    layer_error_dir = "E:/test_from_ye/layer_error_local_1226{}".format(tag)  # 预测结果错误保存地址
+    layer_error_dir = "E:/test_from_ye/layer_error_multi1_1227{}".format(tag)  # 预测结果错误保存地址
     if not os.path.exists(layer_error_dir): os.mkdir(layer_error_dir)
 
-    fooderror_dir = "E:/test_from_ye/food_error_local_1226{}".format(tag)  # 食材预测结果错误保存地址
+    fooderror_dir = "E:/test_from_ye/food_error_multi1_1227{}".format(tag)  # 食材预测结果错误保存地址
     if not os.path.exists(fooderror_dir): os.mkdir(fooderror_dir)
 
-    no_result_dir = "E:/test_from_ye/no_result_local_1226{}".format(tag)  # 无任何输出结果保存地址
+    no_result_dir = "E:/test_from_ye/no_result_multi1_1227{}".format(tag)  # 无任何输出结果保存地址
     if not os.path.exists(no_result_dir): os.mkdir(no_result_dir)
 
     start_time = time.time()
@@ -263,8 +267,8 @@ if __name__ == '__main__':
                   "nofood": 10, "Peanuts": 11, "PorkChops": 16, "PotatoCut": 17, "Potatol": 18,
                   "Potatom": 19, "Potatos": 20, "SweetPotatoCut": 21, "SweetPotatol": 22, "SweetPotatom": 23,
                   "Pizzafour": 12, "Pizzaone": 13, "Pizzasix": 14, "RoastedChicken": 25,
-                  "Pizzatwo": 15, "SweetPotatoS": 24, "Toast": 26,"sweetpotato_others":27,"pizza_others":28,
-                  "potato_others":29,}
+                  "Pizzatwo": 15, "SweetPotatoS": 24, "Toast": 26, "sweetpotato_others": 27, "pizza_others": 28,
+                  "potato_others": 29, }
     new_classes = {v: k for k, v in classes_id.items()}
 
     jpgs_count_all = 0
@@ -576,7 +580,7 @@ if __name__ == '__main__':
     sheet1.write(35, 4, round((layer_jpgs_acc / jpgs_count_all) * 100, 2))
     sheet1.write(35, 5, round((food_jpgs_acc / jpgs_count_all) * 100, 2))
 
-    workbook.save("E:/test_from_ye/all_he_local_1226{}.xls".format(tag))
+    workbook.save("E:/test_from_ye/all_he_multi1_1227{}.xls".format(tag))
 
     end_time = time.time()
     print("all jpgs time:", end_time - end0_time)
