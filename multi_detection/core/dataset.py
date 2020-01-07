@@ -164,6 +164,9 @@ class Dataset(object):
                 image = ImageEnhance.Brightness(image)  # 亮度调整
                 image = image.enhance(random.uniform(0.7, 1.2))  # 亮度调整系数[0.7, 1.2]
             if random.random() < 0.5:
+                image = ImageEnhance.Sharpness(image)  # 锐度增强
+                image = image.enhance(random.uniform(0.8, 1.3))  # 亮度调整系数[0.5, 2]
+            if random.random() < 0.5:
                 image = util.random_noise(np.array(image), mode="gaussian")  # 加入高斯噪声,输出值为[0,1],需乘以255
                 image = image * 255
             image = np.array(image)
@@ -180,7 +183,6 @@ class Dataset(object):
             image, bboxes = self.random_horizontal_flip(np.copy(image), np.copy(bboxes))
             image, bboxes = self.random_crop(np.copy(image), np.copy(bboxes))
             image, bboxes = self.random_translate(np.copy(image), np.copy(bboxes))
-
         image, bboxes = utils.image_preporcess(np.copy(image), [self.train_input_size, self.train_input_size],
                                                np.copy(bboxes))
         return image, layer_label, bboxes

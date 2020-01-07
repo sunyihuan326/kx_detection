@@ -150,8 +150,8 @@ class YoloTest(object):
         self.num_classes = 30  # 种类数
         self.score_threshold = 0.1
         self.iou_threshold = 0.5
-        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food/20191227/yolov3_train_loss=5.0584.ckpt-100"  # ckpt文件地址
-        # self.weight_file = "./checkpoint/yolov3_train_loss=5.7866.ckpt-46"
+        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food7/20200106/yolov3_train_loss=4.6878.ckpt-100"  # ckpt文件地址
+        # self.weight_file = "./checkpoint/yolov3_train_loss=4.9602.ckpt-78"
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
 
@@ -214,7 +214,7 @@ class YoloTest(object):
         :return:
         '''
         image = cv2.imread(image_path)  # 图片读取
-        # image = utils.white_balance(image)  # 图片白平衡处理
+        image = utils.white_balance(image)  # 图片白平衡处理
         bboxes_pr, layer_n = self.predict(image)  # 预测结果
         # print(bboxes_pr)
         # print(layer_n)
@@ -230,18 +230,19 @@ class YoloTest(object):
 
 
 if __name__ == '__main__':
-    tag = ""
+    mode="multi7_0106"
+    tag = "_bai"
     img_dir = "E:/test_from_ye/JPGImages"  # 文件夹地址
-    save_dir = "E:/test_from_ye/detection_multi1_1227{}".format(tag)  # 图片保存地址
+    save_dir = "E:/test_from_ye/detection_{0}{1}".format(mode,tag)  # 图片保存地址
     if not os.path.exists(save_dir): os.mkdir(save_dir)
 
-    layer_error_dir = "E:/test_from_ye/layer_error_multi1_1227{}".format(tag)  # 预测结果错误保存地址
+    layer_error_dir = "E:/test_from_ye/layer_error_{0}{1}".format(mode,tag)  # 预测结果错误保存地址
     if not os.path.exists(layer_error_dir): os.mkdir(layer_error_dir)
 
-    fooderror_dir = "E:/test_from_ye/food_error_multi1_1227{}".format(tag)  # 食材预测结果错误保存地址
+    fooderror_dir = "E:/test_from_ye/food_error_{0}{1}".format(mode,tag) # 食材预测结果错误保存地址
     if not os.path.exists(fooderror_dir): os.mkdir(fooderror_dir)
 
-    no_result_dir = "E:/test_from_ye/no_result_multi1_1227{}".format(tag)  # 无任何输出结果保存地址
+    no_result_dir = "E:/test_from_ye/no_result_{0}{1}".format(mode,tag)  # 无任何输出结果保存地址
     if not os.path.exists(no_result_dir): os.mkdir(no_result_dir)
 
     start_time = time.time()
@@ -580,7 +581,7 @@ if __name__ == '__main__':
     sheet1.write(35, 4, round((layer_jpgs_acc / jpgs_count_all) * 100, 2))
     sheet1.write(35, 5, round((food_jpgs_acc / jpgs_count_all) * 100, 2))
 
-    workbook.save("E:/test_from_ye/all_he_multi1_1227{}.xls".format(tag))
+    workbook.save("E:/test_from_ye/all_he_{0}{1}.xls".format(mode,tag))
 
     end_time = time.time()
     print("all jpgs time:", end_time - end0_time)
