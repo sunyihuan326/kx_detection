@@ -122,24 +122,6 @@ class YoloTest(object):
             self.pred_lbbox = self.sess.graph.get_tensor_by_name("define_loss/pred_lbbox/concat_2:0")
 
             self.layer_num = graph.get_tensor_by_name("define_loss/layer_classes:0")
-        # graph = tf.Graph()
-        # with graph.as_default():
-        #     # 模型加载
-        #     self.saver = tf.train.import_meta_graph("{}.meta".format(self.weight_file))
-        #     self.sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
-        #     self.saver.restore(self.sess, self.weight_file)
-        #
-        #     # 输入
-        #     self.input = graph.get_tensor_by_name("define_input/input_data:0")
-        #     self.trainable = graph.get_tensor_by_name("define_input/training:0")
-        #
-        #     # 输出检测结果
-        #     self.pred_sbbox = graph.get_tensor_by_name("define_loss/pred_sbbox/concat_2:0")
-        #     self.pred_mbbox = graph.get_tensor_by_name("define_loss/pred_mbbox/concat_2:0")
-        #     self.pred_lbbox = graph.get_tensor_by_name("define_loss/pred_lbbox/concat_2:0")
-        #
-        #     # 输出烤层结果
-        #     self.layer_num = graph.get_tensor_by_name("define_loss/layer_classes:0")
 
     def predict(self, image):
         '''

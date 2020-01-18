@@ -1,7 +1,10 @@
-#! /usr/bin/env python
-# coding=utf-8
-# ================================================================
+# -*- encoding: utf-8 -*-
 
+"""
+@File    : yolov3_gaussian.py
+@Time    : 2020/1/15 10:53
+@Author  : sunyihuan
+"""
 
 import numpy as np
 import tensorflow as tf
@@ -50,14 +53,10 @@ class YOLOV3(object):
         # out = tf.layers.dense(out, 400, activation=tf.nn.relu)
         out = tf.layers.dense(out, self.layer_nums)  # layer 输出
 
-        # input_data = common.convolutional(input_data, (1, 1, 1024, 512), self.trainable, 'conv52')
-        # input_data = common.convolutional(input_data, (3, 3, 512, 1024), self.trainable, 'conv53')
-        # input_data = common.convolutional(input_data, (1, 1, 1024, 512), self.trainable, 'conv54')
-        # input_data = common.convolutional(input_data, (3, 3, 512, 1024), self.trainable, 'conv55')
         input_data = common.convolutional(input_data, (1, 1, 1024, 512), self.trainable, 'conv56')
 
         conv_lobj_branch = common.convolutional(input_data, (3, 3, 512, 1024), self.trainable, name='conv_lobj_branch')
-        conv_lbbox = common.convolutional(conv_lobj_branch, (1, 1, 1024, 3 * (self.num_class + 5)),
+        conv_lbbox = common.convolutional(conv_lobj_branch, (1, 1, 1024, 3 * (self.num_class + 9)),
                                           trainable=self.trainable, name='conv_lbbox', activate=False, bn=False)
 
         input_data = common.convolutional(input_data, (1, 1, 512, 256), self.trainable, 'conv57')
@@ -67,13 +66,9 @@ class YOLOV3(object):
             input_data = tf.concat([input_data, route_2], axis=-1)
 
         input_data = common.convolutional(input_data, (1, 1, 768, 256), self.trainable, 'conv58')
-        # input_data = common.convolutional(input_data, (3, 3, 256, 512), self.trainable, 'conv59')
-        # input_data = common.convolutional(input_data, (1, 1, 512, 256), self.trainable, 'conv60')
-        # input_data = common.convolutional(input_data, (3, 3, 256, 512), self.trainable, 'conv61')
-        # input_data = common.convolutional(input_data, (1, 1, 512, 256), self.trainable, 'conv62')
 
         conv_mobj_branch = common.convolutional(input_data, (3, 3, 256, 512), self.trainable, name='conv_mobj_branch')
-        conv_mbbox = common.convolutional(conv_mobj_branch, (1, 1, 512, 3 * (self.num_class + 5)),
+        conv_mbbox = common.convolutional(conv_mobj_branch, (1, 1, 512, 3 * (self.num_class + 9)),
                                           trainable=self.trainable, name='conv_mbbox', activate=False, bn=False)
 
         input_data = common.convolutional(input_data, (1, 1, 256, 128), self.trainable, 'conv63')
@@ -83,15 +78,27 @@ class YOLOV3(object):
             input_data = tf.concat([input_data, route_1], axis=-1)
 
         input_data = common.convolutional(input_data, (1, 1, 384, 128), self.trainable, 'conv64')
-        # input_data = common.convolutional(input_data, (3, 3, 128, 256), self.trainable, 'conv65')
-        # input_data = common.convolutional(input_data, (1, 1, 256, 128), self.trainable, 'conv66')
-        # input_data = common.convolutional(input_data, (3, 3, 128, 256), self.trainable, 'conv67')
-        # input_data = common.convolutional(input_data, (1, 1, 256, 128), self.trainable, 'conv68')
 
         conv_sobj_branch = common.convolutional(input_data, (3, 3, 128, 256), self.trainable, name='conv_sobj_branch')
-        conv_sbbox = common.convolutional(conv_sobj_branch, (1, 1, 256, 3 * (self.num_class + 5)),
+        conv_sbbox = common.convolutional(conv_sobj_branch, (1, 1, 256, 3 * (self.num_class + 9)),
                                           trainable=self.trainable, name='conv_sbbox', activate=False, bn=False)
         return conv_lbbox, conv_mbbox, conv_sbbox, out
+
+    def nll_loss(self, x, mu, sigma, sigma_const=0.3):
+        '''
+        计算nll_loss
+        :param x: y_true
+        :param mu:y_pred_mu
+        :param sigma:y_pred_sigma
+        :param sigma_const:sigma常量
+        :return:nll_loss值
+        '''
+
+        pi = tf.constant(np.pi)
+        Z = (2 * pi * (sigma + sigma_const) ** 2) ** 0.5
+        probability_density = tf.exp(-0.5 * (x - mu) ** 2 / ((sigma + sigma_const) ** 2)) / Z
+        nll = -tf.log(probability_density + 1e-7)
+        return nll
 
     def decode(self, conv_output, anchors, stride):
         """
@@ -105,12 +112,13 @@ class YOLOV3(object):
         anchor_per_scale = len(anchors)
 
         conv_output = tf.reshape(conv_output,
-                                 (batch_size, output_size, output_size, anchor_per_scale, 5 + self.num_class))
+                                 (batch_size, output_size, output_size, anchor_per_scale, 9 + self.num_class))
 
         conv_raw_dxdy = conv_output[:, :, :, :, 0:2]
         conv_raw_dwdh = conv_output[:, :, :, :, 2:4]
-        conv_raw_conf = conv_output[:, :, :, :, 4:5]
-        conv_raw_prob = conv_output[:, :, :, :, 5:]
+        conv_raw_sigma = conv_output[:, :, :, :, 4:8]  # sigma数据读取
+        conv_raw_conf = conv_output[:, :, :, :, 8:9]
+        conv_raw_prob = conv_output[:, :, :, :, 9:]
 
         y = tf.tile(tf.range(output_size, dtype=tf.int32)[:, tf.newaxis], [1, output_size])
         x = tf.tile(tf.range(output_size, dtype=tf.int32)[tf.newaxis, :], [output_size, 1])
@@ -121,47 +129,17 @@ class YOLOV3(object):
 
         pred_xy = (tf.sigmoid(conv_raw_dxdy) + xy_grid) * stride
         pred_wh = (tf.exp(conv_raw_dwdh) * anchors) * stride
-        pred_xywh = tf.concat([pred_xy, pred_wh], axis=-1)
+        pred_xywh = tf.concat([pred_xy, pred_wh], axis=-1)  # 坐标数据
 
-        pred_conf = tf.sigmoid(conv_raw_conf)
-        pred_prob = tf.sigmoid(conv_raw_prob)
+        pred_sigma = tf.sigmoid(conv_raw_sigma)  # sigma数据
+        pred_conf = tf.sigmoid(conv_raw_conf)  # 置信度
+        pred_prob = tf.sigmoid(conv_raw_prob)  # 类别
 
-        return tf.concat([pred_xywh, pred_conf, pred_prob], axis=-1)
+        return tf.concat([pred_xywh, pred_sigma, pred_conf, pred_prob], axis=-1)
 
     def focal(self, target, actual, alpha=1, gamma=2):
         focal_loss = alpha * tf.pow(tf.abs(target - actual), gamma)
         return focal_loss
-
-    def bbox_giou(self, boxes1, boxes2):
-
-        boxes1 = tf.concat([boxes1[..., :2] - boxes1[..., 2:] * 0.5,
-                            boxes1[..., :2] + boxes1[..., 2:] * 0.5], axis=-1)
-        boxes2 = tf.concat([boxes2[..., :2] - boxes2[..., 2:] * 0.5,
-                            boxes2[..., :2] + boxes2[..., 2:] * 0.5], axis=-1)
-
-        boxes1 = tf.concat([tf.minimum(boxes1[..., :2], boxes1[..., 2:]),
-                            tf.maximum(boxes1[..., :2], boxes1[..., 2:])], axis=-1)
-        boxes2 = tf.concat([tf.minimum(boxes2[..., :2], boxes2[..., 2:]),
-                            tf.maximum(boxes2[..., :2], boxes2[..., 2:])], axis=-1)
-
-        boxes1_area = (boxes1[..., 2] - boxes1[..., 0]) * (boxes1[..., 3] - boxes1[..., 1])
-        boxes2_area = (boxes2[..., 2] - boxes2[..., 0]) * (boxes2[..., 3] - boxes2[..., 1])
-
-        left_up = tf.maximum(boxes1[..., :2], boxes2[..., :2])
-        right_down = tf.minimum(boxes1[..., 2:], boxes2[..., 2:])
-
-        inter_section = tf.maximum(right_down - left_up, 0.0)
-        inter_area = inter_section[..., 0] * inter_section[..., 1]
-        union_area = tf.maximum(boxes1_area + boxes2_area - inter_area, 1e-5)
-        iou = inter_area / union_area
-
-        enclose_left_up = tf.minimum(boxes1[..., :2], boxes2[..., :2])
-        enclose_right_down = tf.maximum(boxes1[..., 2:], boxes2[..., 2:])
-        enclose = tf.maximum(enclose_right_down - enclose_left_up, 0.0)
-        enclose_area = tf.maximum(enclose[..., 0] * enclose[..., 1], 1e-5)
-        giou = iou - 1.0 * (enclose_area - union_area) / enclose_area
-
-        return giou
 
     def bbox_iou(self, boxes1, boxes2):
 
@@ -190,23 +168,30 @@ class YOLOV3(object):
         output_size = conv_shape[1]
         input_size = stride * output_size
         conv = tf.reshape(conv, (batch_size, output_size, output_size,
-                                 self.anchor_per_scale, 5 + self.num_class))
-        conv_raw_conf = conv[:, :, :, :, 4:5]
-        conv_raw_prob = conv[:, :, :, :, 5:]
+                                 self.anchor_per_scale, 9 + self.num_class))
+        conv_raw_conf = conv[:, :, :, :, 8:9]
+        conv_raw_prob = conv[:, :, :, :, 9:]
 
         pred_xywh = pred[:, :, :, :, 0:4]
-        pred_conf = pred[:, :, :, :, 4:5]
+        pred_sigma = pred[:, :, :, :, 4:8]
+        pred_conf = pred[:, :, :, :, 8:9]
 
         label_xywh = label[:, :, :, :, 0:4]
         respond_bbox = label[:, :, :, :, 4:5]
         label_prob = label[:, :, :, :, 5:]
 
-        self.giou = tf.expand_dims(self.bbox_giou(pred_xywh, label_xywh), axis=-1)
         input_size = tf.cast(input_size, tf.float32)
 
         self.bbox_loss_scale = 2.0 - 1.0 * label_xywh[:, :, :, :, 2:3] * label_xywh[:, :, :, :, 3:4] / (input_size ** 2)
 
-        giou_loss = respond_bbox * self.bbox_loss_scale * (1 - self.giou)
+        x_loss = self.nll_loss(label_xywh[..., 0:1], pred_xywh[..., 0:1], pred_sigma[..., 0:1])
+        x_loss = respond_bbox * self.bbox_loss_scale * x_loss
+        y_loss = self.nll_loss(label_xywh[..., 1:2], pred_xywh[..., 1:2], pred_sigma[..., 1:2])
+        y_loss = respond_bbox * self.bbox_loss_scale * y_loss
+        w_loss = self.nll_loss(label_xywh[..., 2:3], pred_xywh[..., 2:3], pred_sigma[..., 2:3])
+        w_loss = respond_bbox * self.bbox_loss_scale * w_loss
+        h_loss = self.nll_loss(label_xywh[..., 3:4], pred_xywh[..., 3:4], pred_sigma[..., 3:4])
+        h_loss = respond_bbox * self.bbox_loss_scale * h_loss
 
         iou = self.bbox_iou(pred_xywh[:, :, :, :, np.newaxis, :], bboxes[:, np.newaxis, np.newaxis, np.newaxis, :, :])
         max_iou = tf.expand_dims(tf.reduce_max(iou, axis=-1), axis=-1)
@@ -223,13 +208,12 @@ class YOLOV3(object):
 
         prob_loss = respond_bbox * tf.nn.sigmoid_cross_entropy_with_logits(labels=label_prob, logits=conv_raw_prob)
 
-        giou_loss = tf.reduce_mean(tf.reduce_sum(giou_loss, axis=[1, 2, 3, 4]))
+        xywh_loss = tf.reduce_mean(tf.reduce_sum(x_loss + y_loss + w_loss + h_loss, axis=[1, 2, 3, 4]))
         # giou_loss = tf.reduce_mean(tf.reduce_sum(bbox_loss_scale, axis=[1, 2, 3, 4]))
         conf_loss = tf.reduce_mean(tf.reduce_sum(conf_loss, axis=[1, 2, 3, 4]))
         prob_loss = tf.reduce_mean(tf.reduce_sum(prob_loss, axis=[1, 2, 3, 4]))
 
-        return giou_loss, conf_loss, prob_loss, tf.reduce_sum(self.giou, axis=[1, 2, 3, 4]), tf.reduce_sum(
-            self.bbox_loss_scale)
+        return xywh_loss, conf_loss, prob_loss
 
     def compute_loss(self, label_sbbox, label_mbbox, label_lbbox, true_sbbox, true_mbbox, true_lbbox):
 
@@ -254,14 +238,14 @@ class YOLOV3(object):
         with tf.name_scope('prob_loss'):
             prob_loss = loss_sbbox[2] + loss_mbbox[2] + loss_lbbox[2]
 
-        with tf.name_scope('giou'):
-            giou = loss_sbbox[3]
-        with tf.name_scope('bbox_loss_scale'):
-            bbox_loss_scale = loss_sbbox[4]
-
-        return giou_loss, conf_loss, prob_loss, giou, bbox_loss_scale
+        return giou_loss, conf_loss, prob_loss
 
     def layer_loss(self, layer_label):
+        '''
+        烤层识别loss
+        :param layer_label:
+        :return:
+        '''
         layer_label = tf.cast(layer_label, tf.int32)
         # Y = tf.one_hot(layer_label, depth=self.layer_nums, axis=1, dtype=tf.float32)
         cost = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=layer_label, logits=self.out),

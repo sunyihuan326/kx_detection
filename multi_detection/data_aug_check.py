@@ -30,7 +30,9 @@ def data_aug(image_path):
     # image = image.enhance(1.2)  # 亮度调整系数[0.7, 1.2]
     # image = ImageEnhance.Sharpness(image)  # 锐度增强
     # image = image.enhance(2)  # 亮度调整系数[0.5, 2]
-    image = ImageOps.autocontrast(image, 5)
+    image = ImageEnhance.Color(image)  # 颜色增强
+    image = image.enhance(2)
+    # image = ImageOps.autocontrast(image, 5)
     # image = util.random_noise(np.array(image), mode="gaussian")  # 加入高斯噪声,输出值为[0,1],需乘以255
     # image = image * 255
 

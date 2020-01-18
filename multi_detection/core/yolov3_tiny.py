@@ -27,7 +27,7 @@ class YOLOV3(object):
         self.layer_nums = cfg.YOLO.LAYER_NUMS
 
         try:
-            self.conv_lbbox, self.conv_mbbox, self.conv_sbbox, self.out = self.__build_nework(input_data)
+            self.conv_lbbox, self.conv_mbbox, self.out = self.__build_nework(input_data)
         except:
             raise NotImplementedError("Can not build up yolov3 network!")
         print(self.out)
@@ -35,13 +35,10 @@ class YOLOV3(object):
         print("layer_nums::", self.predict_op)
 
         with tf.variable_scope('pred_sbbox'):
-            self.pred_sbbox = self.decode(self.conv_sbbox, self.anchors[0], self.strides[0])
+            self.pred_lbbox = self.decode(self.conv_lbbox, self.anchors[0], self.strides[0])
 
         with tf.variable_scope('pred_mbbox'):
             self.pred_mbbox = self.decode(self.conv_mbbox, self.anchors[1], self.strides[1])
-
-        with tf.variable_scope('pred_lbbox'):
-            self.pred_lbbox = self.decode(self.conv_lbbox, self.anchors[2], self.strides[2])
 
     def __build_nework(self, input_data):
 
@@ -76,22 +73,7 @@ class YOLOV3(object):
         conv_mbbox = common.convolutional(conv_mobj_branch, (1, 1, 512, 3 * (self.num_class + 5)),
                                           trainable=self.trainable, name='conv_mbbox', activate=False, bn=False)
 
-        input_data = common.convolutional(input_data, (1, 1, 256, 128), self.trainable, 'conv63')
-        input_data = common.upsample(input_data, name='upsample1', method=self.upsample_method)
-
-        with tf.variable_scope('route_2'):
-            input_data = tf.concat([input_data, route_1], axis=-1)
-
-        input_data = common.convolutional(input_data, (1, 1, 384, 128), self.trainable, 'conv64')
-        # input_data = common.convolutional(input_data, (3, 3, 128, 256), self.trainable, 'conv65')
-        # input_data = common.convolutional(input_data, (1, 1, 256, 128), self.trainable, 'conv66')
-        # input_data = common.convolutional(input_data, (3, 3, 128, 256), self.trainable, 'conv67')
-        # input_data = common.convolutional(input_data, (1, 1, 256, 128), self.trainable, 'conv68')
-
-        conv_sobj_branch = common.convolutional(input_data, (3, 3, 128, 256), self.trainable, name='conv_sobj_branch')
-        conv_sbbox = common.convolutional(conv_sobj_branch, (1, 1, 256, 3 * (self.num_class + 5)),
-                                          trainable=self.trainable, name='conv_sbbox', activate=False, bn=False)
-        return conv_lbbox, conv_mbbox, conv_sbbox, out
+        return conv_lbbox, conv_mbbox, out
 
     def decode(self, conv_output, anchors, stride):
         """
@@ -231,11 +213,7 @@ class YOLOV3(object):
         return giou_loss, conf_loss, prob_loss, tf.reduce_sum(self.giou, axis=[1, 2, 3, 4]), tf.reduce_sum(
             self.bbox_loss_scale)
 
-    def compute_loss(self, label_sbbox, label_mbbox, label_lbbox, true_sbbox, true_mbbox, true_lbbox):
-
-        with tf.name_scope('smaller_box_loss'):
-            loss_sbbox = self.loss_layer(self.conv_sbbox, self.pred_sbbox, label_sbbox, true_sbbox,
-                                         anchors=self.anchors[0], stride=self.strides[0])
+    def compute_loss(self,label_mbbox, label_lbbox, true_mbbox, true_lbbox):
 
         with tf.name_scope('medium_box_loss'):
             loss_mbbox = self.loss_layer(self.conv_mbbox, self.pred_mbbox, label_mbbox, true_mbbox,
@@ -246,20 +224,15 @@ class YOLOV3(object):
                                          anchors=self.anchors[2], stride=self.strides[2])
 
         with tf.name_scope('giou_loss'):
-            giou_loss = loss_sbbox[0] + loss_mbbox[0] + loss_lbbox[0]
+            giou_loss = loss_mbbox[0] + loss_lbbox[0]
 
         with tf.name_scope('conf_loss'):
-            conf_loss = loss_sbbox[1] + loss_mbbox[1] + loss_lbbox[1]
+            conf_loss = loss_mbbox[1] + loss_lbbox[1]
 
         with tf.name_scope('prob_loss'):
-            prob_loss = loss_sbbox[2] + loss_mbbox[2] + loss_lbbox[2]
+            prob_loss =loss_mbbox[2] + loss_lbbox[2]
 
-        with tf.name_scope('giou'):
-            giou = loss_sbbox[3]
-        with tf.name_scope('bbox_loss_scale'):
-            bbox_loss_scale = loss_sbbox[4]
-
-        return giou_loss, conf_loss, prob_loss, giou, bbox_loss_scale
+        return giou_loss, conf_loss, prob_loss
 
     def layer_loss(self, layer_label):
         layer_label = tf.cast(layer_label, tf.int32)

@@ -1,5 +1,10 @@
-#! /usr/bin/env python
-# coding=utf-8
+# -*- encoding: utf-8 -*-
+
+"""
+@File    : utils_gaussain.py
+@Time    : 2020/1/15 16:36
+@Author  : sunyihuan
+"""
 
 import cv2
 import random
@@ -158,8 +163,9 @@ def postprocess_boxes(pred_bbox, org_img_shape, input_size, score_threshold):
     pred_bbox = np.array(pred_bbox)
 
     pred_xywh = pred_bbox[:, 0:4]
-    pred_conf = pred_bbox[:, 4]
-    pred_prob = pred_bbox[:, 5:]
+    pred_sigma = pred_bbox[:, 4:8]
+    pred_conf = pred_bbox[:, 8:9]
+    pred_prob = pred_bbox[:, 9:]
 
     # # (1) (x, y, w, h) --> (xmin, ymin, xmax, ymax)
     pred_coor = np.concatenate([pred_xywh[:, :2] - pred_xywh[:, 2:] * 0.5,
@@ -186,7 +192,9 @@ def postprocess_boxes(pred_bbox, org_img_shape, input_size, score_threshold):
 
     # # (5) discard some boxes with low scores
     classes = np.argmax(pred_prob, axis=-1)
-    scores = pred_conf * pred_prob[np.arange(len(pred_coor)), classes]
+    scores = pred_conf * pred_prob[np.arange(len(pred_coor)), classes] * (
+                1 - tf.reduce_mean(pred_sigma, axis=-1, keep_dims=True))  # sigma加入score系数中
+    print(scores)
     score_mask = scores > score_threshold
     mask = np.logical_and(scale_mask, score_mask)
     coors, scores, classes = pred_coor[mask], scores[mask], classes[mask]

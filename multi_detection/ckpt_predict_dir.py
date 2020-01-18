@@ -95,7 +95,7 @@ class YoloPredict(object):
 
 if __name__ == '__main__':
     start_time = time.time()
-    img_dir = "C:/Users/sunyihuan/Desktop/85_new_cam"  # 图片文件地址
+    img_dir = "C:/Users/sunyihuan/Desktop/chicken"  # 图片文件地址
     Y = YoloPredict()
     end_time0 = time.time()
     print("model loading time:", end_time0 - start_time)

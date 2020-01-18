@@ -167,6 +167,9 @@ class Dataset(object):
                 image = ImageEnhance.Sharpness(image)  # 锐度增强
                 image = image.enhance(random.uniform(0.8, 1.3))  # 亮度调整系数[0.5, 2]
             if random.random() < 0.5:
+                image = ImageEnhance.Color(image)  # 颜色增强
+                image = image.enhance(random.uniform(0.3, 3))  # 颜色调整系数[0.3, 3]
+            if random.random() < 0.5:
                 image = util.random_noise(np.array(image), mode="gaussian")  # 加入高斯噪声,输出值为[0,1],需乘以255
                 image = image * 255
             image = np.array(image)

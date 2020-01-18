@@ -10,7 +10,7 @@ from tensorflow.python.framework import graph_util
 import multi_detection.core.utils as utils
 from tqdm import tqdm
 from multi_detection.core.dataset import Dataset
-from multi_detection.core.yolov3 import YOLOV3
+from multi_detection.core.yolov3_tiny import YOLOV3
 from multi_detection.core.config import cfg
 
 import os
@@ -56,9 +56,9 @@ class YoloTrain(object):
         with tf.name_scope("define_loss"):
             self.model = YOLOV3(self.input_data, self.trainable)
             self.net_var = tf.global_variables()
-            self.giou_loss, self.conf_loss, self.prob_loss, self.giou, self.bbox_loss_scale = self.model.compute_loss(
-                self.label_sbbox, self.label_mbbox, self.label_lbbox,
-                self.true_sbboxes, self.true_mbboxes, self.true_lbboxes)
+            self.giou_loss, self.conf_loss, self.prob_loss= self.model.compute_loss(
+                self.label_mbbox, self.label_lbbox,
+                self.true_mbboxes, self.true_lbboxes)
             self.layer_loss = self.model.layer_loss(self.layer_label)
             print("layer_loss::::")
             print(self.layer_loss)
@@ -162,9 +162,8 @@ class YoloTrain(object):
             train_epoch_loss, test_epoch_loss = [], []
 
             for train_data in pbar:
-                _, summary, train_step_loss, train_step_l2loss, global_step_val, gi, bbo, layer_loss_v, layer_o = self.sess.run(
-                    [train_op, self.write_op, self.loss, self.l2_loss, self.global_step, self.giou,
-                     self.bbox_loss_scale,
+                _, summary, train_step_loss, train_step_l2loss, global_step_val, layer_loss_v, layer_o = self.sess.run(
+                    [train_op, self.write_op, self.loss, self.l2_loss, self.global_step,
                      self.layer_loss, self.layer_out], feed_dict={
                         # _, summary, train_step_loss, global_step_val, gi, bbo, = self.sess.run(
                         #     [train_op, self.write_op, self.loss, self.global_step, self.giou, self.bbox_loss_scale,
@@ -214,12 +213,10 @@ class YoloTrain(object):
             # open("./model/converted_model.tflite", "wb").write(tflite_model)
 
             # 保存为pb用于tf_serving
-            export_dir = "./pb"
-            tf.saved_model.simple_save(self.sess, export_dir,
-                                       inputs={"input": self.input_data, "trainable": self.trainable},
-                                       outputs={"pred_sbbox": self.model.pred_sbbox,
-                                                "pred_mbbox": self.model.pred_mbbox,
-                                                "pre_lbbox": self.model.pred_lbbox})
+            # export_dir = "E:/Joyoung_WLS_github/tf_yolov3/pb"
+            # tf.saved_model.simple_save(self.sess, export_dir, inputs={"input": self.input_data},
+            #                            outputs={"pred_sbbox": self.pred_sbbox, "pred_mbbox": self.pred_mbbox,
+            #                                     "pre_lbbox": self.pred_lbbox})
 
             par_test = tqdm(self.testset)
             for test_data in par_test:

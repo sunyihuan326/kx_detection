@@ -13,7 +13,7 @@ __C.YOLO                        = edict()
 # Set the class name
 __C.YOLO.LAYER_NUMS             = 4
 __C.YOLO.CLASSES                = "./data/classes/food30.names"
-__C.YOLO.ANCHORS                = "./data/anchors/basline_anchors.txt"
+__C.YOLO.ANCHORS                = "./data/anchors/food_anchors.txt"
 __C.YOLO.MOVING_AVE_DECAY       = 0.9995
 __C.YOLO.STRIDES                = [8, 16, 32]
 __C.YOLO.ANCHOR_PER_SCALE       = 3
@@ -25,16 +25,16 @@ __C.YOLO.DEMO_WEIGHT            = "./checkpoint/yolov3_train_loss=227.3722.ckpt-
 # Train options
 __C.TRAIN                       = edict()
 
-__C.TRAIN.ANNOT_PATH            = "./data/dataset/XandOld/train0926_oldAndX1217_cut_pizzatwo_roasted.txt"
+__C.TRAIN.ANNOT_PATH            = "./data/dataset/XandOld/111111111.txt"
 __C.TRAIN.BATCH_SIZE            = 2
 __C.TRAIN.INPUT_SIZE            = 416
 __C.TRAIN.DATA_AUG              = True
-__C.TRAIN.LEARN_RATE_INIT       = 1e-4
+__C.TRAIN.LEARN_RATE_INIT       = 1e-3
 __C.TRAIN.LEARN_RATE_END        = 1e-6
 __C.TRAIN.WARMUP_EPOCHS         = 2
 __C.TRAIN.FISRT_STAGE_EPOCHS    = 30
 __C.TRAIN.SECOND_STAGE_EPOCHS   = 50
-__C.TRAIN.INITIAL_WEIGHT        = "./checkpoint/yolov3_train_loss=5.7589.ckpt-50"
+__C.TRAIN.INITIAL_WEIGHT        = "./checkpoint/yolov3_train_loss=197.7998.ckpt-16"
 
 
 
@@ -42,7 +42,7 @@ __C.TRAIN.INITIAL_WEIGHT        = "./checkpoint/yolov3_train_loss=5.7589.ckpt-50
 __C.TEST                        = edict()
 
 # __C.TEST.ANNOT_PATH             = "./data/dataset/foodSets1105_XandOld_test27.txt"
-__C.TEST.ANNOT_PATH             = "./data/dataset/XandOld/test0926_oldAndX1206.txt"
+__C.TEST.ANNOT_PATH             = "./data/dataset/XandOld/111111111.txt"
 __C.TEST.BATCH_SIZE             = 2
 __C.TEST.INPUT_SIZE             = 416
 __C.TEST.DATA_AUG               = False
