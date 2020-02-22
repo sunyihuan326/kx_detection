@@ -194,8 +194,9 @@ class YoloTrain(object):
             ckpt_file = "./checkpoint/yolov3_train_loss=%.4f.ckpt" % train_epoch_loss
             self.saver.save(self.sess, ckpt_file, global_step=epoch)
 
-            output = ["define_loss/pred_sbbox/concat_2", "define_loss/pred_mbbox/concat_2",
-                      "define_loss/pred_lbbox/concat_2", "define_loss/layer_classes"]
+            # output = ["define_loss/pred_sbbox/concat_2", "define_loss/pred_mbbox/concat_2",
+            #           "define_loss/pred_lbbox/concat_2", "define_loss/layer_classes"]
+            output = ["define_loss/pred_sbbox/concat_2", "define_loss/pred_mbbox/concat_2", "define_loss/layer_classes"]
             constant_graph = graph_util.convert_variables_to_constants(self.sess, self.sess.graph_def, output)
             with tf.gfile.GFile('./model/yolo_model.pb', mode='wb') as f:
                 f.write(constant_graph.SerializeToString())
@@ -214,12 +215,12 @@ class YoloTrain(object):
             # open("./model/converted_model.tflite", "wb").write(tflite_model)
 
             # 保存为pb用于tf_serving
-            export_dir = "./pb"
-            tf.saved_model.simple_save(self.sess, export_dir,
-                                       inputs={"input": self.input_data, "trainable": self.trainable},
-                                       outputs={"pred_sbbox": self.model.pred_sbbox,
-                                                "pred_mbbox": self.model.pred_mbbox,
-                                                "pre_lbbox": self.model.pred_lbbox})
+            # export_dir = "./pb_model"
+            # tf.saved_model.simple_save(self.sess, export_dir,
+            #                            inputs={"input": self.input_data, "trainable": self.trainable},
+            #                            outputs={"pred_sbbox": self.model.pred_sbbox,
+            #                                     "pred_mbbox": self.model.pred_mbbox, })
+            # "pre_lbbox": self.model.pred_lbbox})
 
             par_test = tqdm(self.testset)
             for test_data in par_test:
