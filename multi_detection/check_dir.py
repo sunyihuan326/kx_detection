@@ -22,77 +22,7 @@ import os
 import shutil
 from tqdm import tqdm
 from sklearn.metrics import confusion_matrix, accuracy_score
-
-
-def correct_bboxes(bboxes_pr, layer_n):
-    '''
-    bboxes_pr结果矫正
-    :param bboxes_pr: 模型预测结果，格式为[x_min, y_min, x_max, y_max, probability, cls_id]
-    :param layer_n:
-    :return:
-    '''
-    num_label = len(bboxes_pr)
-    # 未检测食材
-    if num_label == 0:
-        return bboxes_pr, layer_n
-
-    # 检测到一个食材
-    elif num_label == 1:
-        if bboxes_pr[0][4] < 0.9 and bboxes_pr[0][4] >= 0.45:
-            bboxes_pr[0][4] = 0.9
-        return bboxes_pr, layer_n
-
-    # 检测到多个食材
-    else:
-        same_label = True
-        for i in range(num_label):
-            if i == (num_label - 1):
-                break
-            if bboxes_pr[i][5] == bboxes_pr[i + 1][5]:
-                continue
-            else:
-                same_label = False
-
-        sumProb = 0.
-        # 多个食材，同一标签
-        if same_label:
-            # for i in range(num_label):
-            #    sumProb += bboxes_pr[i][4]
-            # avrProb = sumProb/num_label
-            # bboxes_pr[0][4] = avrProb
-            bboxes_pr[0][4] = 0.98
-            return bboxes_pr, layer_n
-        # 多个食材，非同一标签
-        else:
-            problist = list(map(lambda x: x[4], bboxes_pr))
-            labellist = list(map(lambda x: x[5], bboxes_pr))
-
-            labeldict = {}
-            for key in labellist:
-                labeldict[key] = labeldict.get(key, 0) + 1
-                # 按同种食材label数量降序排列
-            s_labeldict = sorted(labeldict.items(), key=lambda x: x[1], reverse=True)
-
-            n_name = len(s_labeldict)
-            name1 = s_labeldict[0][0]
-            num_name1 = s_labeldict[0][1]
-
-            # 数量最多label对应的食材占比0.7以上
-            if num_name1 / num_label > 0.7:
-                num_label0 = []
-                for i in range(num_label):
-                    if name1 == bboxes_pr[i][5]:
-                        num_label0.append(bboxes_pr[i])
-                num_label0[0][4] = 0.95
-                return num_label0, layer_n
-
-            # 按各个label的probability降序排序
-            else:
-                # 计数
-                bboxes_pr = sorted(bboxes_pr, key=lambda x: x[4], reverse=True)
-                for i in range(len(bboxes_pr)):
-                    bboxes_pr[i][4] = bboxes_pr[i][4] * 0.9
-                return bboxes_pr, layer_n
+from multi_detection.food_correct_utils import *
 
 
 class YoloTest(object):
@@ -211,7 +141,7 @@ if __name__ == '__main__':
     food_name_true = []
 
     food_name_dir = "E:/kx_detection/error_roastedchicken_results"
-    no_results_dir="E:/kx_detection/no_results"
+    no_results_dir = "E:/kx_detection/no_results"
 
     for c in classes:
         error_noresults = 0  # 无任何结果统计

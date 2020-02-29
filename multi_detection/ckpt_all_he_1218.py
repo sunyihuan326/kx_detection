@@ -169,7 +169,7 @@ class YoloTest(object):
         self.num_classes = 30  # 种类数
         self.score_threshold = 0.1
         self.iou_threshold = 0.5
-        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food5/20200116/yolov3_train_loss=2.9260.ckpt-65"  # ckpt文件地址
+        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food/20200227/yolov3_train_loss=5.2137.ckpt-152"  # ckpt文件地址
         # self.weight_file = "./checkpoint/yolov3_train_loss=6.2933.ckpt-36"
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
@@ -202,7 +202,6 @@ class YoloTest(object):
             layer_n[0]：烤层检测结果，0：最下层、1：中间层、2：最上层、3：其他
         '''
         org_image = np.copy(image)
-
         org_h, org_w, _ = org_image.shape
 
         image_data = utils.image_preporcess(image, [self.input_size, self.input_size])
@@ -233,7 +232,7 @@ class YoloTest(object):
         :return:
         '''
         image = cv2.imread(image_path)  # 图片读取
-        # image = utils.white_balance(image)  # 图片白平衡处理
+        image = utils.white_balance(image)  # 图片白平衡处理
         bboxes_pr, layer_n = self.predict(image)  # 预测结果
         # print(bboxes_pr)
         # print(layer_n)
@@ -249,8 +248,8 @@ class YoloTest(object):
 
 
 if __name__ == '__main__':
-    mode = "multi5_0116"
-    tag = ""
+    mode = "multi_0227"
+    tag = "_bai"
     img_dir = "E:/test_from_ye_new20200113/JPGImages"  # 文件夹地址
     save_dir = "E:/test_from_ye_new20200113/detection_{0}{1}".format(mode, tag)  # 图片保存地址
     if not os.path.exists(save_dir): os.mkdir(save_dir)
