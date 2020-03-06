@@ -15,7 +15,6 @@ import os
 import shutil
 import matplotlib.pyplot as plt
 from tqdm import tqdm
-import cv2
 
 
 class aug(object):

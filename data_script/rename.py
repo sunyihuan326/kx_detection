@@ -4,32 +4,63 @@ import os
 
 
 class ImageRename():
-    def __init__(self, target):
-        self.path = "E:/test_from_ye/JPGImages_he/pizzasix/bottom"
+    def __init__(self, root_path, target):
+        self.root_path = root_path
         self.target = target
 
-    def rename(self):
-        filelist = os.listdir(self.path)
-        total_num = len(filelist)
-
-        for i, item in enumerate(filelist):
-            if item.endswith('.jpg'):
-                src = os.path.join(os.path.abspath(self.path), item)
-                # filename = str(i + 1)
-                filename = str(item).split(".")[0]
-                print(filename)
-                dst = os.path.join(os.path.abspath(self.path),
-                                   filename + '_s.jpg')
-                os.rename(src, dst)
+    def rename0(self):
+        for i, item in enumerate(os.listdir(self.root_path)):
+            if item.endswith('.xml'):
+                src = os.path.join(os.path.abspath(self.root_path), item)
+                filename = str(i + 1)
+                # filename = str(item).split(".")[0]
+                # print(filename)
+                # dst = os.path.join(os.path.abspath(self.path),
+                #                    filename + '_s.jpg')
+                # os.rename(src, dst)
                 # #
-                # if self.target not in filename:
-                #     dst = os.path.join(os.path.abspath(self.path),
-                #                        filename + "_191217" + "_X5_" + self.target + '.jpg')
-                #     os.rename(src, dst)
-                #     print('converting %s to %s ...' % (src, dst))
+                try:
+                    dst = os.path.join(os.path.abspath(self.root_path),
+                                       filename + "_200306" + "_X5_" + self.target + '.xml')
+                    os.rename(src, dst)
+                    print('converting %s to %s ...' % (src, dst))
+                except:
+                    pass
+
+    def rename(self):
+        for k in ["kaojia", "kaojia(bupuxizhi)", "kaopan", "kaopan(budaixizhi)"]:
+            path_dir = self.root_path + "/" + k
+            for b in ["shang", "xia", "zhong"]:
+                path_name = path_dir + "/" + b
+                filelist = os.listdir(path_name)
+                total_num = len(filelist)
+
+                for i, item in enumerate(filelist):
+                    if item.endswith('.jpg'):
+                        src = os.path.join(os.path.abspath(path_name), item)
+                        filename = str(i + 1)
+                        # filename = str(item).split(".")[0]
+                        # print(filename)
+                        # dst = os.path.join(os.path.abspath(self.path),
+                        #                    filename + '_s.jpg')
+                        # os.rename(src, dst)
+                        # #
+                        try:
+                            dst = os.path.join(os.path.abspath(path_name),
+                                               filename + "_200304" + "_X5_" + "zl_{}".format(k) + "_{}_".format(
+                                                   b) + self.target + '.jpg')
+                            os.rename(src, dst)
+                            print('converting %s to %s ...' % (src, dst))
+                        except:
+                            pass
+                        # if self.target not in filename:
+
+
 #
 
 if __name__ == '__main__':
-    target = "sweetpotato"
-    newname = ImageRename(target)
-    newname.rename()
+    path = "C:/Users/sunyihuan/Desktop/mantou"
+    target = "steamedBread"
+
+    newname = ImageRename(path, target)
+    newname.rename0()

@@ -5,13 +5,9 @@
 @Time    : 2019/11/22 10:05
 @Author  : sunyihuan
 """
-import numpy as np
-from PIL import Image
-import matplotlib.pyplot as plt
 import xml.etree.ElementTree as ET
 from tqdm import tqdm
 import os
-import shutil
 import cv2
 
 

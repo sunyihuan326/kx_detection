@@ -9,6 +9,7 @@ import multi_detection.core.utils as utils
 import multi_detection.core.common as common
 import multi_detection.core.backbone as backbone
 from multi_detection.core.config import cfg
+import math
 
 
 class YOLOV3(object):
@@ -173,7 +174,6 @@ class YOLOV3(object):
         exchange = False
         if boxes1.shape[0] > boxes2.shape[0]:
             boxes1, boxes2 = boxes2, boxes1
-            # dious = tf.zeros((cols, rows))
             exchange = True
         # #xmin,ymin,xmax,ymax->[:,0],[:,1],[:,2],[:,3]
         w1 = boxes1[..., 2] - boxes1[..., 0]
@@ -206,7 +206,63 @@ class YOLOV3(object):
             dious = dious.T
         return dious
 
+    def bbox_ciou(self, boxes1, boxes2):
+        '''
+        计算两个框的ciou
+        :param boxes1:
+        :param boxes2:
+        :return:
+        '''
+        exchange = False
+        if boxes1.shape[0] > boxes2.shape[0]:
+            boxes1, boxes2 = boxes2, boxes1
+            exchange = True
+
+        w1 = boxes1[..., 2] - boxes1[..., 0]
+        h1 = boxes1[..., 3] - boxes1[..., 1]
+        w2 = boxes2[..., 2] - boxes2[..., 0]
+        h2 = boxes2[..., 3] - boxes2[..., 1]
+
+        area1 = w1 * h1
+        area2 = w2 * h2
+
+        center_x1 = (boxes1[..., 2] + boxes1[..., 0]) / 2  # （x1max +x1min）/2
+        center_y1 = (boxes1[..., 3] + boxes1[..., 1]) / 2  # (y1max+y1min)/2
+        center_x2 = (boxes2[..., 2] + boxes2[..., 0]) / 2
+        center_y2 = (boxes2[..., 3] + boxes2[..., 1]) / 2
+
+        inter_max_xy = tf.minimum(boxes1[..., 2:], boxes2[..., 2:])  # min((x1max,y1max ),(x2max,y2max)) ->返回较小一组
+        inter_min_xy = tf.maximum(boxes1[..., :2], boxes2[..., :2])  # max((x1min,y1min ),(x2min,y2min))->返回较大的一组
+        out_max_xy = tf.maximum(boxes1[..., 2:], boxes2[..., 2:])
+        out_min_xy = tf.minimum(boxes1[..., :2], boxes2[..., :2])
+
+        inter = tf.clip_by_value((inter_max_xy - inter_min_xy), clip_value_min=1e-5, clip_value_max=10000)
+        inter_area = inter[..., 0] * inter[..., 1]
+        inter_diag = (center_x2 - center_x1) ** 2 + (center_y2 - center_y1) ** 2
+        outer = tf.clip_by_value((out_max_xy - out_min_xy), clip_value_min=1e-5, clip_value_max=10000)
+        outer_diag = tf.maximum((outer[..., 0] ** 2) + (outer[..., 1] ** 2), 1e-5)
+        union = tf.maximum(area1 + area2 - inter_area, 1e-5)
+        u = (inter_diag) / outer_diag
+        iou = inter_area / union
+        arctan = tf.atan(w2 / tf.maximum(h2, 1e-5)) - tf.atan(w1 / tf.maximum(h1, 1e-5))
+        v = (4 / (math.pi ** 2)) * tf.pow(tf.atan(w2 / tf.maximum(h2, 1e-5)) - tf.atan(tf.maximum(h1, 1e-5)), 2)
+        alpha = v / tf.maximum((1 - iou + v), 1e-5)
+        # w_temp = 2 * w1
+        # ar = (8 / (math.pi ** 2)) * arctan * ((w1 - w_temp) * h1)
+        cious = iou - u
+        cious = iou - u - alpha * v
+        cious = tf.clip_by_value(cious, clip_value_min=-1.0, clip_value_max=1.0)
+        if exchange:
+            cious = cious.T
+        return cious
+
     def bbox_iou(self, boxes1, boxes2):
+        '''
+        计算两个框的iou
+        :param boxes1:
+        :param boxes2:
+        :return:
+        '''
 
         boxes1_area = boxes1[..., 2] * boxes1[..., 3]
         boxes2_area = boxes2[..., 2] * boxes2[..., 3]
@@ -246,12 +302,15 @@ class YOLOV3(object):
 
         self.giou = tf.expand_dims(self.bbox_giou(pred_xywh, label_xywh), axis=-1)  # giou
         self.diou = tf.expand_dims(self.bbox_diou(pred_xywh, label_xywh), axis=-1)  # diou
+        self.ciou = tf.expand_dims(self.bbox_ciou(pred_xywh, label_xywh), axis=-1)  # ciou
+
         input_size = tf.cast(input_size, tf.float32)
 
         self.bbox_loss_scale = 2.0 - 1.0 * label_xywh[:, :, :, :, 2:3] * label_xywh[:, :, :, :, 3:4] / (input_size ** 2)
 
-        # giou_loss = respond_bbox * self.bbox_loss_scale * (1 - self.giou)   #giou loss
+        giou_loss = respond_bbox * self.bbox_loss_scale * (1 - self.giou)  # giou loss
         diou_loss = respond_bbox * self.bbox_loss_scale * (1 - self.diou)  # diou loss
+        ciou_loss = respond_bbox * self.bbox_loss_scale * (1 - self.ciou)
 
         iou = self.bbox_iou(pred_xywh[:, :, :, :, np.newaxis, :], bboxes[:, np.newaxis, np.newaxis, np.newaxis, :, :])
         max_iou = tf.expand_dims(tf.reduce_max(iou, axis=-1), axis=-1)
@@ -268,13 +327,14 @@ class YOLOV3(object):
 
         prob_loss = respond_bbox * tf.nn.sigmoid_cross_entropy_with_logits(labels=label_prob, logits=conv_raw_prob)
 
-        # giou_loss = tf.reduce_mean(tf.reduce_sum(giou_loss, axis=[1, 2, 3, 4]))   #giou loss
+        giou_loss = tf.reduce_mean(tf.reduce_sum(giou_loss, axis=[1, 2, 3, 4]))  # giou loss
         diou_loss = tf.reduce_mean(tf.reduce_sum(diou_loss, axis=[1, 2, 3, 4]))  # diou loss
+        ciou_loss = tf.reduce_mean(tf.reduce_sum(ciou_loss, axis=[1, 2, 3, 4]))  # ciou loss
         # giou_loss = tf.reduce_mean(tf.reduce_sum(bbox_loss_scale, axis=[1, 2, 3, 4]))
         conf_loss = tf.reduce_mean(tf.reduce_sum(conf_loss, axis=[1, 2, 3, 4]))
         prob_loss = tf.reduce_mean(tf.reduce_sum(prob_loss, axis=[1, 2, 3, 4]))
 
-        return diou_loss, conf_loss, prob_loss, tf.reduce_sum(self.giou, axis=[1, 2, 3, 4]), tf.reduce_sum(
+        return ciou_loss, conf_loss, prob_loss, tf.reduce_sum(self.ciou, axis=[1, 2, 3, 4]), tf.reduce_sum(
             self.bbox_loss_scale)
 
     def compute_loss(self, label_sbbox, label_mbbox, label_lbbox, true_sbbox, true_mbbox, true_lbbox):

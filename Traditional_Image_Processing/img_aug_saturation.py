@@ -7,7 +7,6 @@
 """
 import cv2
 import sys
-import numpy as np
 import matplotlib.pyplot as plt
 
 def PSAlgorithm(rgb_img, increment):

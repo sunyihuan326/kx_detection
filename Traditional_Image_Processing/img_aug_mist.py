@@ -21,7 +21,7 @@ def img_mist(img_path):
     :return:
     '''
     img1 = cv2.imread(img_path)  # 目标图片
-    img2 = cv2.imread('C:/Users/sunyihuan/Desktop/material/shuidi_da.jpg')  # 水雾图片
+    img2 = cv2.imread('./material/shuidi_da.jpg')  # 水雾图片
     img2 = cv2.resize(img2, (800, 600))  # 统一图片大小
     # dst=cv2.add(img1,img2)
     dst = cv2.addWeighted(img1, 0.7, img2, 0.3, 0)  # 图片融合
@@ -35,7 +35,7 @@ def img_dirt(img_path):
     :return:
     '''
     img1 = cv2.imread(img_path)  # 目标图片
-    img2 = cv2.imread('C:/Users/sunyihuan/Desktop/material/youzi.jpg')  # 污渍图片
+    img2 = cv2.imread('./material/youzi.jpg')  # 污渍图片
     img2 = cv2.resize(img2, (800, 600))  # 统一图片大小
     # dst=cv2.add(img1,img2)
     dst = cv2.addWeighted(img1, 0.8, img2, 0.2, 0)  # 图片融合
@@ -49,8 +49,8 @@ def img_warm(img_path):
     :return:
     '''
     img1 = cv2.imread(img_path)  # 目标图片
-    # img2 = cv2.imread('C:/Users/sunyihuan/Desktop/112.jpg')  # 暖色图片
-    img2 = cv2.imread('C:/Users/sunyihuan/Desktop/material/hongse.jpg')  # 暖色图片
+    # img2 = cv2.imread('./material/112.jpg')  # 暖色图片
+    img2 = cv2.imread('./material/hongse.jpg')  # 暖色图片
     img2 = cv2.resize(img2, (800, 600))  # 统一图片大小
     dst = cv2.addWeighted(img1, 0.8, img2, 0.2, 0)  # 图片融合
     return dst

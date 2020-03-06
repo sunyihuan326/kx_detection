@@ -26,122 +26,11 @@ from tqdm import tqdm
 import xlwt
 import time
 from sklearn.metrics import confusion_matrix
+from multi_detection.food_correct_utils import correct_bboxes
 
 # gpu限制
 gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.8)
 config = tf.ConfigProto(gpu_options=gpu_options)
-
-
-def correct_bboxes(bboxes_pr, layer_n):
-    '''
-    bboxes_pr结果矫正
-    :param bboxes_pr: 模型预测结果，格式为[x_min, y_min, x_max, y_max, probability, cls_id]
-    :param layer_n:
-    :return:
-    '''
-    num_label = len(bboxes_pr)
-    # 未检测食材
-    if num_label == 0:
-        return bboxes_pr, layer_n
-
-    # 检测到一个食材
-    elif num_label == 1:
-        if bboxes_pr[0][4] < 0.45:
-            if bboxes_pr[0][5] == 10:  # 低分nofood
-                bboxes_pr[0][4] = 0.75
-            elif bboxes_pr[0][5] == 11:  # 低分花生米
-                bboxes_pr[0][4] = 0.85
-            elif bboxes_pr[0][5] == 25:  # 低分整鸡
-                bboxes_pr[0][4] = 0.75
-            else:
-                del bboxes_pr[0]
-
-        # else:
-        #    if bboxes_pr[0][4] < 0.9 and bboxes_pr[0][4] >= 0.6:
-        #        bboxes_pr[0][4] = 0.9
-
-        return bboxes_pr, layer_n
-
-    # 检测到多个食材
-    else:
-        new_bboxes_pr = []
-        for i in range(len(bboxes_pr)):
-            if bboxes_pr[i][4] >= 0.45:
-                new_bboxes_pr.append(bboxes_pr[i])
-
-        new_num_label = len(new_bboxes_pr)
-        if new_num_label == 0:
-            return new_bboxes_pr, layer_n
-        same_label = True
-        for i in range(new_num_label):
-            if i == (new_num_label - 1):
-                break
-            if new_bboxes_pr[i][5] == new_bboxes_pr[i + 1][5]:
-                continue
-            else:
-                same_label = False
-
-        sumProb = 0.
-        # 多个食材，同一标签
-        if same_label:
-            new_bboxes_pr[0][4] = 0.98
-            return new_bboxes_pr, layer_n
-        # 多个食材，非同一标签
-        else:
-            problist = list(map(lambda x: x[4], new_bboxes_pr))
-            labellist = list(map(lambda x: x[5], new_bboxes_pr))
-
-            labeldict = {}
-            for key in labellist:
-                labeldict[key] = labeldict.get(key, 0) + 1
-                # 按同种食材label数量降序排列
-            s_labeldict = sorted(labeldict.items(), key=lambda x: x[1], reverse=True)
-
-            n_name = len(s_labeldict)
-            name1 = s_labeldict[0][0]
-            num_name1 = s_labeldict[0][1]
-            name2 = s_labeldict[1][0]
-            num_name2 = s_labeldict[1][1]
-
-            # 优先处理食材特例
-            if n_name == 2:
-                # 如果鸡翅中检测到了排骨，默认单一食材为鸡翅
-                if (name1 == 2 and name2 == 16) or (name1 == 16 and name2 == 2):
-                    for i in range(new_num_label):
-                        new_bboxes_pr[i][5] = 2
-                    return new_bboxes_pr, layer_n
-                # 如果对切土豆中检测到了大土豆，默认单一食材为对切土豆
-                if (name1 == 17 and name2 == 18) or (name1 == 18 and name2 == 17):
-                    for i in range(new_num_label):
-                        new_bboxes_pr[i][5] = 17
-                    return new_bboxes_pr, layer_n
-                # 如果对切红薯中检测到了大红薯，默认单一食材为对切红薯
-                if (name1 == 21 and name2 == 22) or (name1 == 22 and name2 == 21):
-                    for i in range(new_num_label):
-                        new_bboxes_pr[i][5] = 21
-                    return new_bboxes_pr, layer_n
-                # 如果对切红薯中检测到了中红薯，默认单一食材为对切红薯
-                if (name1 == 21 and name2 == 23) or (name1 == 23 and name2 == 21):
-                    for i in range(new_num_label):
-                        new_bboxes_pr[i][5] = 21
-                    return new_bboxes_pr, layer_n
-
-            # 数量最多label对应的食材占比0.7以上
-            if num_name1 / new_num_label > 0.7:
-                name1_bboxes_pr = []
-                for i in range(new_num_label):
-                    if name1 == new_bboxes_pr[i][5]:
-                        name1_bboxes_pr.append(new_bboxes_pr[i])
-
-                name1_bboxes_pr[0][4] = 0.95
-                return name1_bboxes_pr, layer_n
-
-            # 按各个label的probability降序排序
-            else:
-                new_bboxes_pr = sorted(new_bboxes_pr, key=lambda x: x[4], reverse=True)
-                for i in range(len(new_bboxes_pr)):
-                    new_bboxes_pr[i][4] = new_bboxes_pr[i][4] * 0.9
-                return new_bboxes_pr, layer_n
 
 
 def he_foods(pre):
@@ -150,13 +39,13 @@ def he_foods(pre):
     :param pre:
     :return:
     '''
-    if pre in [8, 9] and classes_id[classes[i]] in [8, 9]:
+    if pre in [8, 9] and classes_id[classes[i]] in [8, 9]:  # 合并蛋挞
         rigth_label = True
-    elif pre in [12, 14] and classes_id[classes[i]] in [12, 14]:
+    elif pre in [12, 14] and classes_id[classes[i]] in [12, 14]:  # 合并四分之一披萨、六分之一披萨
         rigth_label = True
-    elif pre in [18, 19] and classes_id[classes[i]] in [18, 19]:
+    elif pre in [18, 19] and classes_id[classes[i]] in [18, 19]:  # 合并中土豆、大土豆
         rigth_label = True
-    elif pre in [22, 23] and classes_id[classes[i]] in [22, 23]:
+    elif pre in [22, 23] and classes_id[classes[i]] in [22, 23]:  # 合并中红薯、大红薯
         rigth_label = True
     else:
         rigth_label = False
@@ -169,7 +58,7 @@ class YoloTest(object):
         self.num_classes = 30  # 种类数
         self.score_threshold = 0.1
         self.iou_threshold = 0.5
-        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food/20200227/yolov3_train_loss=5.2137.ckpt-152"  # ckpt文件地址
+        self.weight_file = "E:/ckpt_dirs/Food_detection/local/20191216/yolov3_train_loss=4.7698.ckpt-80"  # ckpt文件地址
         # self.weight_file = "./checkpoint/yolov3_train_loss=6.2933.ckpt-36"
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
@@ -232,7 +121,7 @@ class YoloTest(object):
         :return:
         '''
         image = cv2.imread(image_path)  # 图片读取
-        image = utils.white_balance(image)  # 图片白平衡处理
+        # image = utils.white_balance(image)  # 图片白平衡处理
         bboxes_pr, layer_n = self.predict(image)  # 预测结果
         # print(bboxes_pr)
         # print(layer_n)
@@ -248,8 +137,8 @@ class YoloTest(object):
 
 
 if __name__ == '__main__':
-    mode = "multi_0227"
-    tag = "_bai"
+    mode = "multi_0302"
+    tag = ""
     img_dir = "E:/test_from_ye_new20200113/JPGImages"  # 文件夹地址
     save_dir = "E:/test_from_ye_new20200113/detection_{0}{1}".format(mode, tag)  # 图片保存地址
     if not os.path.exists(save_dir): os.mkdir(save_dir)

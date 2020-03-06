@@ -56,7 +56,7 @@ class YoloTrain(object):
         with tf.name_scope("define_loss"):
             self.model = YOLOV3(self.input_data, self.trainable)
             self.net_var = tf.global_variables()
-            self.giou_loss, self.conf_loss, self.prob_loss, self.giou, self.bbox_loss_scale = self.model.compute_loss(
+            self.giou_loss, self.conf_loss, self.prob_loss, self.giou, self.bbox_loss_scale= self.model.compute_loss(
                 self.label_sbbox, self.label_mbbox, self.label_lbbox,
                 self.true_sbboxes, self.true_mbboxes, self.true_lbboxes)
             self.layer_loss = self.model.layer_loss(self.layer_label)
@@ -64,6 +64,7 @@ class YoloTrain(object):
             print(self.layer_loss)
             self.l2_loss = tf.add_n([tf.nn.l2_loss(var) for var in tf.trainable_variables()])
             self.layer_loss = tf.cond(self.layer_loss > 0.01, lambda: self.layer_loss, lambda: 0.0)
+            # self.loss = self.giou_loss + self.conf_loss + 2 * self.prob_loss + 10 * self.layer_loss
             self.loss = self.giou_loss + self.conf_loss + 2 * self.prob_loss + 10 * self.layer_loss + 1e-5 * self.l2_loss
         self.layer_out = self.model.out
 
@@ -160,10 +161,11 @@ class YoloTrain(object):
             # train_op = self._optimizer
             pbar = tqdm(self.trainset)
             train_epoch_loss, test_epoch_loss = [], []
-
+            # self.l2_loss,
+            # train_step_l2loss,
             for train_data in pbar:
-                _, summary, train_step_loss, train_step_l2loss, global_step_val, gi, bbo, layer_loss_v, layer_o = self.sess.run(
-                    [train_op, self.write_op, self.loss, self.l2_loss, self.global_step, self.giou,
+                _, summary, train_step_loss, global_step_val, gi_loss,gi,bbo, layer_loss_v, layer_o = self.sess.run(
+                    [train_op, self.write_op, self.loss, self.global_step, self.giou_loss,self.giou,
                      self.bbox_loss_scale,
                      self.layer_loss, self.layer_out], feed_dict={
                         # _, summary, train_step_loss, global_step_val, gi, bbo, = self.sess.run(
