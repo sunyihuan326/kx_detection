@@ -10,7 +10,7 @@ class ImageRename():
 
     def rename0(self):
         for i, item in enumerate(os.listdir(self.root_path)):
-            if item.endswith('.xml'):
+            if item.endswith('.jpg'):
                 src = os.path.join(os.path.abspath(self.root_path), item)
                 filename = str(i + 1)
                 # filename = str(item).split(".")[0]
@@ -21,14 +21,14 @@ class ImageRename():
                 # #
                 try:
                     dst = os.path.join(os.path.abspath(self.root_path),
-                                       filename + "_200306" + "_X5_" + self.target + '.xml')
+                                       filename + "_200310" + "_X4_" + self.target + '.jpg')
                     os.rename(src, dst)
                     print('converting %s to %s ...' % (src, dst))
                 except:
                     pass
 
     def rename(self):
-        for k in ["kaojia", "kaojia(bupuxizhi)", "kaopan", "kaopan(budaixizhi)"]:
+        for k in ["kaojia", "kaojia(bujiaxizhi)", "kaopan", "kaopan(bujiaxizhi)"]:
             path_dir = self.root_path + "/" + k
             for b in ["shang", "xia", "zhong"]:
                 path_name = path_dir + "/" + b
@@ -47,7 +47,7 @@ class ImageRename():
                         # #
                         try:
                             dst = os.path.join(os.path.abspath(path_name),
-                                               filename + "_200304" + "_X5_" + "zl_{}".format(k) + "_{}_".format(
+                                               filename + "_200311" + "_X5_qie_" + "{}".format(k) + "_{}_".format(
                                                    b) + self.target + '.jpg')
                             os.rename(src, dst)
                             print('converting %s to %s ...' % (src, dst))
@@ -59,8 +59,8 @@ class ImageRename():
 #
 
 if __name__ == '__main__':
-    path = "C:/Users/sunyihuan/Desktop/mantou"
-    target = "steamedBread"
+    path = "E:/WLS_originalData/二期数据/第一批/banli(qiekou)"
+    target = "chestnut"
 
     newname = ImageRename(path, target)
-    newname.rename0()
+    newname.rename()

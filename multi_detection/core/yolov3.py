@@ -194,13 +194,13 @@ class YOLOV3(object):
         out_max_xy = tf.maximum(boxes1[..., 2:], boxes2[..., 2:])
         out_min_xy = tf.minimum(boxes1[..., :2], boxes2[..., :2])
 
-        inter = tf.clip_by_value((inter_max_xy - inter_min_xy), clip_value_min=1e-5, clip_value_max=10000)
+        inter = tf.clip_by_value((inter_max_xy - inter_min_xy), clip_value_min=1e-5, clip_value_max=1e5)
         inter_area = inter[..., 0] * inter[..., 1]
         inter_diag = (center_x2 - center_x1) ** 2 + (center_y2 - center_y1) ** 2
-        outer = tf.clip_by_value((out_max_xy - out_min_xy), clip_value_min=1e-5, clip_value_max=10000)
+        outer = tf.clip_by_value((out_max_xy - out_min_xy), clip_value_min=1e-5, clip_value_max=1e5)
         outer_diag = (outer[..., 0] ** 2) + (outer[..., 1] ** 2)
         union = area1 + area2 - inter_area
-        dious = inter_area / union - (inter_diag) / outer_diag
+        dious = inter_area / tf.maximum(union, 1e-5) - (inter_diag) / tf.maximum(outer_diag, 1e-5)
         dious = tf.clip_by_value(dious, clip_value_min=-1.0, clip_value_max=1.0)
         if exchange:
             dious = dious.T
@@ -249,7 +249,6 @@ class YOLOV3(object):
         alpha = v / tf.maximum((1 - iou + v), 1e-5)
         # w_temp = 2 * w1
         # ar = (8 / (math.pi ** 2)) * arctan * ((w1 - w_temp) * h1)
-        cious = iou - u
         cious = iou - u - alpha * v
         cious = tf.clip_by_value(cious, clip_value_min=-1.0, clip_value_max=1.0)
         if exchange:

@@ -7,10 +7,10 @@
 import shutil
 import os
 
-img_dir = "C:/Users/sunyihuan/Desktop/xiaomantou/hongtang"
+img_dir = "E:/WLS_originalData/二期数据/第一批/X5_20200310/chestnut"
 
-dst_img_dir = "C:/Users/sunyihuan/Desktop/xiaomantou/hongtang"
-for k in ["kaojia", "kaojia(bupuxizhi)", "kaopan", "kaopan(budaixizhi)"]:
+dst_img_dir = "E:/WLS_originalData/二期数据/第一批/X5_20200310/chestnut"
+for k in ["kaojia", "kaojia(bujiaxizhi)", "kaopan", "kaopan(bujiaxizhi)"]:
     img_dirs = dst_img_dir + "/" + k
     for l in ["shang", "xia", "zhong"]:
         img_dir_name = img_dirs + "/" + l
