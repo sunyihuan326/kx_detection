@@ -21,7 +21,7 @@ class YoloPredict(object):
     def __init__(self):
         self.input_size = 416  # 输入图片尺寸（默认正方形）
         self.num_classes = 30  # 种类数
-        self.score_threshold = 0.1
+        self.score_threshold = 0.01
         self.iou_threshold = 0.5
         self.weight_file = "E:/ckpt_dirs/Food_detection/local/20191216/yolov3_train_loss=4.7698.ckpt-80"  # ckpt文件地址
         self.write_image = True  # 是否画图
@@ -81,7 +81,7 @@ if __name__ == '__main__':
     import time
 
     start_time = time.time()
-    img_path = "docs/images/404_cookies.jpg"  # 图片地址
+    img_path = "C:/Users/sunyihuan/Desktop/20200313_073044805.jpg"  # 图片地址
     Y = YoloPredict()
     end_time0 = time.time()
 

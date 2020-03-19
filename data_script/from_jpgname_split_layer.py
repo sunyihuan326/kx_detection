@@ -43,7 +43,7 @@ def copy_layer_jpgs(img_dir, layer_dir):
 
 
 if __name__ == "__main__":
-    img_dir = "E:/已标数据备份/二期数据/第一批/X5_20200304/taro"
-    layer_dir = "E:/已标数据备份/二期数据/第一批/X5_20200304/layer_data/taro"
+    img_dir = "E:/已标数据备份/二期数据/第一批/X5_20200310/chestnut"
+    layer_dir = "E:/已标数据备份/二期数据/第一批/X5_20200310/layer_data/chestnut"
     if not os.path.exists(layer_dir): os.mkdir(layer_dir)
     copy_layer_jpgs(img_dir, layer_dir)

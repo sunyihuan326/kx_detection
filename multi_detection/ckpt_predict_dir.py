@@ -27,7 +27,7 @@ class YoloPredict(object):
         self.input_size = 416  # 输入图片尺寸（默认正方形）
         self.num_classes = 30  # 种类数
         self.score_threshold = 0.1
-        self.iou_threshold = 0.5
+        self.iou_threshold = 0.3
         self.pb_file = "E:/ckpt_dirs/Food_detection/local/20191216/yolo_model.pb"  # ckpt文件地址
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
@@ -81,8 +81,8 @@ class YoloPredict(object):
         image = cv2.imread(image_path)  # 图片读取
         # image = utils.white_balance(image)  # 图片白平衡处理
         bboxes_pr, layer_n = self.predict(image)  # 预测结果
-        # print(bboxes_pr)
-        # print(layer_n)
+        print(bboxes_pr)
+        print(layer_n)
         if not os.path.exists(save_dir): os.mkdir(save_dir)
         if self.write_image:
             image = utils.draw_bbox(image, bboxes_pr, show_label=self.show_label)
@@ -95,12 +95,13 @@ class YoloPredict(object):
 
 if __name__ == '__main__':
     start_time = time.time()
-    img_dir = "C:/Users/sunyihuan/Desktop/chicken"  # 图片文件地址
+    img_dir = "C:/Users/sunyihuan/Desktop/x6"  # 图片文件地址
     Y = YoloPredict()
     end_time0 = time.time()
     print("model loading time:", end_time0 - start_time)
 
     for img in os.listdir(img_dir):
+        print(img)
         img_path = img_dir + "/" + img
         end_time1 = time.time()
         Y.result(img_path)

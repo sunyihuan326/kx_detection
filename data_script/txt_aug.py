@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 
 """
+直接更改txt中图片地址
 @File    : txt_aug.py
 @Time    : 2019/12/6 19:50
 @Author  : sunyihuan

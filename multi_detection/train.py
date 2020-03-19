@@ -51,12 +51,12 @@ class YoloTrain(object):
             self.true_sbboxes = tf.placeholder(dtype=tf.float32, name='sbboxes')
             self.true_mbboxes = tf.placeholder(dtype=tf.float32, name='mbboxes')
             self.true_lbboxes = tf.placeholder(dtype=tf.float32, name='lbboxes')
-            self.trainable = tf.placeholder(dtype=tf.bool, shape=[], name='training')
+            self.trainable = tf.placeholder(dtype=tf.bool, name='training')
 
         with tf.name_scope("define_loss"):
             self.model = YOLOV3(self.input_data, self.trainable)
             self.net_var = tf.global_variables()
-            self.giou_loss, self.conf_loss, self.prob_loss, self.giou, self.bbox_loss_scale= self.model.compute_loss(
+            self.giou_loss, self.conf_loss, self.prob_loss, self.giou, self.bbox_loss_scale = self.model.compute_loss(
                 self.label_sbbox, self.label_mbbox, self.label_lbbox,
                 self.true_sbboxes, self.true_mbboxes, self.true_lbboxes)
             self.layer_loss = self.model.layer_loss(self.layer_label)
@@ -164,8 +164,8 @@ class YoloTrain(object):
             # self.l2_loss,
             # train_step_l2loss,
             for train_data in pbar:
-                _, summary, train_step_loss, global_step_val, gi_loss,gi,bbo, layer_loss_v, layer_o = self.sess.run(
-                    [train_op, self.write_op, self.loss, self.global_step, self.giou_loss,self.giou,
+                _, summary, train_step_loss, global_step_val, gi_loss, gi, bbo, layer_loss_v, layer_o = self.sess.run(
+                    [train_op, self.write_op, self.loss, self.global_step, self.giou_loss, self.giou,
                      self.bbox_loss_scale,
                      self.layer_loss, self.layer_out], feed_dict={
                         # _, summary, train_step_loss, global_step_val, gi, bbo, = self.sess.run(
@@ -204,15 +204,14 @@ class YoloTrain(object):
                 f.write(constant_graph.SerializeToString())
 
             # 生成tflite文件
-            # out_tensors = [self.model.pred_sbbox, self.model.pred_mbbox,
-            #                self.model.pred_lbbox, self.model.predict_op]
+            out_tensors = [self.model.pred_sbbox, self.model.pred_mbbox,
+                           self.model.pred_lbbox, self.model.predict_op]
             # print("----------------------------------------------------------------")
             # print(self.input_data.shape.as_list())
             # print(self.trainable.shape.as_list())
             # print("----------------------------------------------------------------")
-            # tflite_model = tf.lite.TFLiteConverter.from_frozen_graph(constant_graph, ['define_input/input_data',
-            #                                                                           'define_input/training'],
-            #                                                          out_tensors)
+            # tflite_model = tf.lite.TFLiteConverter.from_session(self.sess, [self.input_data, self.trainable],
+            #                                                     out_tensors)
             # tflite_model = tflite_model.convert()
             # open("./model/converted_model.tflite", "wb").write(tflite_model)
 

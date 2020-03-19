@@ -8,7 +8,7 @@
 @Author  : sunyihuan
 """
 
-txt_path = "E:/kx_detection/multi_detection/data/dataset/XandOld/serve_train0926_oldAndX1217_cut_pizzatwo.txt"
+txt_path = "/multi_detection/data/dataset/XandOld/serve_train0926_oldAndX1217_cut_pizzatwo.txt"
 txt_file = open(txt_path, "r")
 txt_files = txt_file.readlines()
 print(len(txt_files))

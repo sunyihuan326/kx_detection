@@ -50,9 +50,9 @@ def img_warm(img_path):
     '''
     img1 = cv2.imread(img_path)  # 目标图片
     # img2 = cv2.imread('./material/112.jpg')  # 暖色图片
-    img2 = cv2.imread('./material/hongse.jpg')  # 暖色图片
+    img2 = cv2.imread('C:/Users/sunyihuan/Desktop/material/hongse.jpg')  # 暖色图片
     img2 = cv2.resize(img2, (800, 600))  # 统一图片大小
-    dst = cv2.addWeighted(img1, 0.8, img2, 0.2, 0)  # 图片融合
+    dst = cv2.addWeighted(img1, 0.9, img2, 0.15, 0.01)  # 图片融合
     return dst
 
 
@@ -78,10 +78,10 @@ def img_dir_aug(img_dir, xml_dir, img_save_dir, xml_save_dir):
 
 
 if __name__ == "__main__":
-    img_dir = "E:/DataSets/KX_FOODSets_model_data/XandOld1206/JPGImages"
-    xml_dir = "C:/Users/sunyihuan/Desktop/peanuts_all/cropy/Annotations"
-    img_save_dir = "E:/DataSets/KX_FOODSets_model_data/XandOld1206/JPGImages_hot"
-    xml_save_dir = "C:/Users/sunyihuan/Desktop/peanuts_all/cropyHot_annotations"
+    img_dir = "E:/DataSets/2020_two_phase_KXData/test/JPGImages"
+    xml_dir = "E:/DataSets/2020_two_phase_KXData/test/Annotations"
+    img_save_dir = "E:/DataSets/2020_two_phase_KXData/test/JPGImages_hot"
+    xml_save_dir = "E:/DataSets/2020_two_phase_KXData/test/cropyHot_annotations"
     if not os.path.exists(img_save_dir): os.mkdir(img_save_dir)
     if not os.path.exists(xml_save_dir): os.mkdir(xml_save_dir)
     img_dir_aug(img_dir, xml_dir, img_save_dir, xml_save_dir)
