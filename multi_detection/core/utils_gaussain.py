@@ -2,7 +2,7 @@
 
 """
 @File    : utils_gaussain.py
-@Time    : 2020/1/15 16:36
+@Time    : 202003/1/15 16:36
 @Author  : sunyihuan
 """
 

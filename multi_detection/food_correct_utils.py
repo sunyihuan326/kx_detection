@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# @Time    : 2020/2/27
+# @Time    : 202003/2/27
 # @Author  : sunyihuan
 # @File    : food_correct_utils.py
 
@@ -12,7 +12,7 @@ import math
 
 def get_potatoscale(bboxes_pr, layer_n):
     '''
-    最新修改时间：2020/2/27
+    最新修改时间：202003/2/27
 
     获得土豆红薯的大小级别参数
     :param bboxes_pr: 模型预测结果，格式为[x_min, y_min, x_max, y_max, probability, cls_id]
@@ -102,7 +102,7 @@ def get_potatoscale(bboxes_pr, layer_n):
 
 def get_time(obj_c, obj_length, layer_nums):
     '''
-    最新修改时间：2020/2/27
+    最新修改时间：202003/2/27
 
     根据红薯或者土豆长度，得出需要烤制的时间
     :param obj_c: 食材标签
@@ -148,7 +148,7 @@ def get_time(obj_c, obj_length, layer_nums):
 
 def correct_bboxes(bboxes_pr, layer_n):
     '''
-    最新修改时间：2020/2/27
+    最新修改时间：202003/2/27
 
     bboxes_pr结果矫正
     :param bboxes_pr: 模型预测结果，格式为[x_min, y_min, x_max, y_max, probability, cls_id]

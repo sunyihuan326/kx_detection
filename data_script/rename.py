@@ -21,7 +21,7 @@ class ImageRename():
                 # #
                 try:
                     dst = os.path.join(os.path.abspath(self.root_path),
-                                       filename + "_200310" + "_X4_" + self.target + '.jpg')
+                                       filename + "_200326" + "_X4_" + self.target + '.jpg')
                     os.rename(src, dst)
                     print('converting %s to %s ...' % (src, dst))
                 except:
@@ -56,11 +56,9 @@ class ImageRename():
                         # if self.target not in filename:
 
 
-#
-
 if __name__ == '__main__':
-    path = "E:/WLS_originalData/二期数据/第一批/banli(qiekou)"
-    target = "chestnut"
+    path = "E:/WLS_originalData/二期数据/第二批/X4_20200326/containers"
+    target = "containers"
 
     newname = ImageRename(path, target)
-    newname.rename()
+    newname.rename0()

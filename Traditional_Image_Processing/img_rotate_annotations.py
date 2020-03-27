@@ -87,8 +87,8 @@ def image_rotate(img_path, xml_path):
 
             xmin.text = str(xmin_)
             ymin.text = str(ymin_)
-            xmin.text = str(xmax_)
-            ymin.text = str(ymax_)
+            xmax.text = str(xmax_)
+            ymax.text = str(ymax_)
     return np.array(img_new), tree
 
 

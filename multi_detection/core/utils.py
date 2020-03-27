@@ -31,13 +31,18 @@ def image_preporcess(image, target_size, gt_boxes=None):
 
     ih, iw = target_size
     h, w, _ = image.shape
+    # print("h,w")
+    # print(h,w)
 
     scale = min(iw / w, ih / h)
+    # print(scale)
     nw, nh = int(scale * w), int(scale * h)
     image_resized = cv2.resize(image, (nw, nh))
 
     image_paded = np.full(shape=[ih, iw, 3], fill_value=128.0)
     dw, dh = (iw - nw) // 2, (ih - nh) // 2
+    # print("dw,dh")
+    # print(dw,dh)
     image_paded[dh:nh + dh, dw:nw + dw, :] = image_resized
     image_paded = image_paded / 255.
 
@@ -45,7 +50,9 @@ def image_preporcess(image, target_size, gt_boxes=None):
         return image_paded
 
     else:
+        # print( gt_boxes[:, [0, 2]])
         gt_boxes[:, [0, 2]] = gt_boxes[:, [0, 2]] * scale + dw
+        # print(gt_boxes[:, [0, 2]])
         gt_boxes[:, [1, 3]] = gt_boxes[:, [1, 3]] * scale + dh
         return image_paded, gt_boxes
 

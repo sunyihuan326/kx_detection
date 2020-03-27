@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# @Time    : 2020/3/6
+# @Time    : 202003/3/6
 # @Author  : sunyihuan
 # @File    : from_jpgname_split_layer.py
 

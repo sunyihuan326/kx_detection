@@ -151,6 +151,7 @@ class Dataset(object):
 
         line = annotation.split()
         image_path = line[0]
+        # print(image_path)
 
         if not os.path.exists(image_path):
             raise KeyError("%s does not exist ... " % image_path)
@@ -181,6 +182,8 @@ class Dataset(object):
         layer_label = int(line[1])
 
         bboxes = np.array([list(map(int, box.split(','))) for box in line[2:]])
+        # print("bboxes::::")
+        # print(bboxes)
 
         if self.data_aug:
             image, bboxes = self.random_horizontal_flip(np.copy(image), np.copy(bboxes))
@@ -188,6 +191,8 @@ class Dataset(object):
             image, bboxes = self.random_translate(np.copy(image), np.copy(bboxes))
         image, bboxes = utils.image_preporcess(np.copy(image), [self.train_input_size, self.train_input_size],
                                                np.copy(bboxes))
+        # print("bboxes---------------------------------------:")
+        # print(bboxes)
         return image, layer_label, bboxes
 
     def bbox_iou(self, boxes1, boxes2):

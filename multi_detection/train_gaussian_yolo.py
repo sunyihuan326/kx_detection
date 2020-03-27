@@ -4,7 +4,7 @@
 Gaussian YOLOv3 train
 
 @File    : train_gaussian_yolo.py
-@Time    : 2020/1/15 15:14
+@Time    : 202003/1/15 15:14
 @Author  : sunyihuan
 """
 import time

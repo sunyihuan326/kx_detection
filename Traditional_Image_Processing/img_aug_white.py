@@ -62,6 +62,7 @@ def data_aug(img_dir, xml_dir, img_save_dir, xml_save_dir):
         xml_name = str(img_name).split(".")[0] + ".xml"  # xml文件名称
         shutil.copy(xml_dir + "/" + str(img_file).split(".")[0] + ".xml", xml_save_dir + "/" + xml_name)  # 拷贝xml数据
 
+
 if __name__ == "__main__":
     img_dir = "E:/DataSets/KX_FOODSets0802/JPGImages/SweetPotatoM"
     xml_dir = "E:/DataSets/KX_FOODSets0802/Anotations/SweetPotatoM"

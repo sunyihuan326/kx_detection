@@ -2,7 +2,7 @@
 
 """
 @File    : ckpt_predict_gaussain.py
-@Time    : 2020/1/15 16:40
+@Time    : 202003/1/15 16:40
 @Author  : sunyihuan
 """
 

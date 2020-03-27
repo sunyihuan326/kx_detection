@@ -333,7 +333,7 @@ class YOLOV3(object):
         conf_loss = tf.reduce_mean(tf.reduce_sum(conf_loss, axis=[1, 2, 3, 4]))
         prob_loss = tf.reduce_mean(tf.reduce_sum(prob_loss, axis=[1, 2, 3, 4]))
 
-        return ciou_loss, conf_loss, prob_loss, tf.reduce_sum(self.ciou, axis=[1, 2, 3, 4]), tf.reduce_sum(
+        return giou_loss, conf_loss, prob_loss, tf.reduce_sum(self.ciou, axis=[1, 2, 3, 4]), tf.reduce_sum(
             self.bbox_loss_scale)
 
     def compute_loss(self, label_sbbox, label_mbbox, label_lbbox, true_sbbox, true_mbbox, true_lbbox):

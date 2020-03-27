@@ -55,10 +55,10 @@ def he_foods(pre):
 class YoloTest(object):
     def __init__(self):
         self.input_size = 416  # 输入图片尺寸（默认正方形）
-        self.num_classes = 30  # 种类数
+        self.num_classes = 36  # 种类数
         self.score_threshold = 0.1
         self.iou_threshold = 0.5
-        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food2/20200316/yolov3_train_loss=9.4709.ckpt-116"  # ckpt文件地址
+        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food/20200325/yolov3_train_loss=5.1615.ckpt-144"  # ckpt文件地址
         # self.weight_file = "./checkpoint/yolov3_train_loss=6.2933.ckpt-36"
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
@@ -137,19 +137,19 @@ class YoloTest(object):
 
 
 if __name__ == '__main__':
-    mode = "multi2_0316"
+    mode = "multi_0325"
     tag = ""
-    img_dir = "E:/test_from_ye_new20200113/JPGImages"  # 文件夹地址
-    save_dir = "E:/test_from_ye_new20200113/detection_{0}{1}".format(mode, tag)  # 图片保存地址
+    img_dir = "E:/check_2_phase/JPGImages"  # 文件夹地址
+    save_dir = "E:/check_2_phase/detection_{0}{1}".format(mode, tag)  # 图片保存地址
     if not os.path.exists(save_dir): os.mkdir(save_dir)
 
-    layer_error_dir = "E:/test_from_ye_new20200113/layer_error_{0}{1}".format(mode, tag)  # 预测结果错误保存地址
+    layer_error_dir = "E:/check_2_phase/layer_error_{0}{1}".format(mode, tag)  # 预测结果错误保存地址
     if not os.path.exists(layer_error_dir): os.mkdir(layer_error_dir)
 
-    fooderror_dir = "E:/test_from_ye_new20200113/food_error_{0}{1}".format(mode, tag)  # 食材预测结果错误保存地址
+    fooderror_dir = "E:/check_2_phase/food_error_{0}{1}".format(mode, tag)  # 食材预测结果错误保存地址
     if not os.path.exists(fooderror_dir): os.mkdir(fooderror_dir)
 
-    no_result_dir = "E:/test_from_ye_new20200113/no_result_{0}{1}".format(mode, tag)  # 无任何输出结果保存地址
+    no_result_dir = "E:/check_2_phase/no_result_{0}{1}".format(mode, tag)  # 无任何输出结果保存地址
     if not os.path.exists(no_result_dir): os.mkdir(no_result_dir)
 
     start_time = time.time()
@@ -162,7 +162,8 @@ if __name__ == '__main__':
                "ChiffonCake8", "CranberryCookies", "eggtarts", "eggtartl", "nofood",
                "Peanuts", "PorkChops", "PotatoCut", "Potatol", "Potatom",
                "Potatos", "RoastedChicken", "SweetPotatoCut", "SweetPotatol", "SweetPotatom",
-               "SweetPotatoS", "Toast"]
+               "SweetPotatoS", "Toast", "chestnut", "cornone", "corntwo", "drumsticks",
+               "taro", "steamedbread"]
 
     # classes = ["RoastedChicken"]
 
@@ -178,7 +179,8 @@ if __name__ == '__main__':
                   "Potatom": 19, "Potatos": 20, "SweetPotatoCut": 21, "SweetPotatol": 22, "SweetPotatom": 23,
                   "Pizzafour": 12, "Pizzaone": 13, "Pizzasix": 14, "RoastedChicken": 25,
                   "Pizzatwo": 15, "SweetPotatoS": 24, "Toast": 26, "sweetpotato_others": 27, "pizza_others": 28,
-                  "potato_others": 29, }
+                  "potato_others": 29, "chestnut": 30, "cornone": 31, "corntwo": 32, "drumsticks": 33,
+                  "taro": 34, "steamedbread": 35, }
     new_classes = {v: k for k, v in classes_id.items()}
 
     jpgs_count_all = 0
@@ -503,7 +505,7 @@ if __name__ == '__main__':
     sheet1.write(35, 4, round((layer_jpgs_acc / jpgs_count_all) * 100, 2))
     sheet1.write(35, 5, round((food_jpgs_acc / jpgs_count_all) * 100, 2))
 
-    workbook.save("E:/test_from_ye_new20200113/all_he_{0}{1}.xls".format(mode, tag))
+    workbook.save("E:/check_2_phase/all_he_{0}{1}.xls".format(mode, tag))
 
     end_time = time.time()
     print("all jpgs time:", end_time - end0_time)
