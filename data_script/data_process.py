@@ -7,11 +7,11 @@
 原数据格式说明：
              JPGImages             Annotations             ImageSets/Main         layer_data
                  xxxx                    xxxx                      *.txt               xxxx
-                    *.jpg                   *.xml                                         train
+                    *.jpg                   *.xml                                         bottom
                                                                                              *.jpg
-                                                                                           test
+                                                                                           middle
                                                                                              *.jpg
-                                                                                           val
+                                                                                           top
                                                                                              *.jpg
 将原始数据处理成./multi_detection/scripts/voc_annotation.py可用数据
 step1:各类别数据单独分xx_train.txt、xx_test.txt、xx_val.txt
@@ -191,18 +191,20 @@ class process(object):
                         shutil.copy(img_layer_dir + "/" + img, self.layer_root + "/val/" + l + "/" + img)
                     elif img.split(".")[0] in test_txt_files:  # 判断若img名称在test中，拷贝图片至test中
                         shutil.copy(img_layer_dir + "/" + img, self.layer_root + "/test/" + l + "/" + img)
-                    else:  # 其他的拷贝图片至train中
+                    elif img.split(".")[0] in train_txt_files:  # 其他的拷贝图片至train中
                         shutil.copy(img_layer_dir + "/" + img, self.layer_root + "/train/" + l + "/" + img)
+                    else:
+                        print("*****************:",img)
 
 
 if __name__ == "__main__":
-    data_root = "E:/DataSets/2020_two_phase_KXData/20200318"
+    data_root = "E:/DataSets/2020_two_phase_KXData/only2phase_data/20200402"
     dprocess = process(data_root)
-    classes = ["chestnut", "cornOne", "cornTwo", "drumsticks", "taro","steamedbread"]
+    classes = ["eggplant", "eggplant_cut", "eggplant_cut_sauce"]
     train_percent = 0.8
     test_percent = 0.1
-    dprocess.split_data(classes, train_percent, test_percent)
-    dprocess.train_all_txt(["train", "test", "val"])
-    dprocess.copy2dir(classes, "xml")
-    dprocess.copy2dir(classes, "jpg")
+    # dprocess.split_data(classes, train_percent, test_percent)
+    # dprocess.train_all_txt(["train", "test", "val"])
+    # dprocess.copy2dir(classes, "xml")
+    # dprocess.copy2dir(classes, "jpg")
     dprocess.copy_layer2split_dir(classes)

@@ -25,13 +25,13 @@ def changesku(inputpath, label_name='Potatom'):
             root = tree.getroot()
             for object1 in root.findall('object'):
                 for sku in object1.findall('name'):
-                    if sku.text=="corn_others":
-                        print(file)
-                    # sku.text = label_name
-                    # tree.write(file, encoding='utf-8')
+                    # if sku.text=="corn_others":
+                    #     print(file)
+                    sku.text = label_name
+                    tree.write(file, encoding='utf-8')
 
 
 if __name__ == '__main__':
-    inputpath = "E:/已标数据备份/二期数据/第一批/Annotations/cornTwo"  # 这是xml文件的文件夹的绝对地址
-    label_name = "chestnut"
+    inputpath = "E:/WLS_originalData/二期数据/第二批/Annotations/duck"  # 这是xml文件的文件夹的绝对地址
+    label_name = "roastedchicken"
     changesku(inputpath,label_name)

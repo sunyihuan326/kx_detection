@@ -12,7 +12,7 @@ def get_layer(typ):
     :param typ:
     :return:
     '''
-    layer_data_dir = "E:/DataSets/2020_two_phase_KXData/20200318"
+    layer_data_dir = "E:/DataSets/2020_two_phase_KXData/only2phase_data/20200402"
     bottom = os.listdir(layer_data_dir + "/layer_data/{}/bottom".format(typ))
     bottom = [b for b in bottom if b.endswith(".jpg")]
 
@@ -57,16 +57,16 @@ def convert_voc_annotation(data_path, data_type, anno_path, use_difficult_bbox=T
     #            "potatos", "sweetpotatocut", "sweetpotatol", "sweetpotatom", "sweetpotatos",
     #            "roastedchicken", "toast", "sweetpotato_others", "pizza_others",
     #            "potato_others"]  # 30分类,加入了sweetpotato_others,pizza_others,potato_others
-    # classes = ["beefsteak", "cartooncookies", "chickenwings", "chiffoncake6", "chiffoncake8",
-    #            "cookies", "cranberrycookies", "cupcake", "eggtart", "eggtartbig",
-    #            "nofood", "peanuts", "pizzafour", "pizzaone", "pizzasix",
-    #            "pizzatwo", "porkchops", "potatocut", "potatol", "potatom",
-    #            "potatos", "sweetpotatocut", "sweetpotatol", "sweetpotatom", "sweetpotatos",
-    #            "roastedchicken", "toast", "sweetpotato_others", "pizza_others",
-    #            "potato_others", "chestnut", "cornone", "corntwo", "drumsticks", "taro",
-    #            "steamedbread"]  # 原30分类，加入二期6类
-    classes = ["nofood","chestnut", "cornone", "corntwo", "drumsticks", "taro",
-               "steamedbread"]  # 仅二期6类
+    classes = ["beefsteak", "cartooncookies", "chickenwings", "chiffoncake6", "chiffoncake8",
+               "cookies", "cranberrycookies", "cupcake", "eggtart", "eggtartbig",
+               "nofood", "peanuts", "pizzafour", "pizzaone", "pizzasix",
+               "pizzatwo", "porkchops", "potatocut", "potatol", "potatom",
+               "potatos", "sweetpotatocut", "sweetpotatol", "sweetpotatom", "sweetpotatos",
+               "roastedchicken", "toast", "sweetpotato_others", "pizza_others",
+               "potato_others", "chestnut", "cornone", "corntwo", "drumsticks", "taro",
+               "steamedbread","eggplant","eggplant_cut","eggplant_cut_sauce"]  # 原30分类，加入二期6类
+    # classes = ["nofood","chestnut", "cornone", "corntwo", "drumsticks", "taro",
+    #            "steamedbread"]  # 仅二期6类
     # img_inds_file = os.path.join(data_path, 'ImageSets', 'Main', data_type + '.txt')
 
     img_inds_file = data_path + '/ImageSets' + '/Main/' + '{}.txt'.format(data_type)
@@ -111,21 +111,24 @@ def convert_voc_annotation(data_path, data_type, anno_path, use_difficult_bbox=T
             label_path = st.join(label_path)
             root = ET.parse(label_path).getroot()
             objects = root.findall('object')
-            for obj in objects:
-                # difficult = obj.find('difficult').text.strip()
-                # if (not use_difficult_bbox) and (int(difficult) == 1):
-                #     continue
-                bbox = obj.find('bndbox')
-                label_name = obj.find('name').text.lower()
+            try:
+                for obj in objects:
+                    # difficult = obj.find('difficult').text.strip()
+                    # if (not use_difficult_bbox) and (int(difficult) == 1):
+                    #     continue
+                    bbox = obj.find('bndbox')
+                    label_name = obj.find('name').text.lower()
 
-                # if "enwings" in label_name:
-                #     label_name = "chickenwings"
-                class_ind = classes.index(label_name.strip())
-                xmin = bbox.find('xmin').text.strip()
-                xmax = bbox.find('xmax').text.strip()
-                ymin = bbox.find('ymin').text.strip()
-                ymax = bbox.find('ymax').text.strip()
-                annotation += ' ' + ','.join([xmin, ymin, xmax, ymax, str(class_ind)])
+                    # if "enwings" in label_name:
+                    #     label_name = "chickenwings"
+                    class_ind = classes.index(label_name.strip())
+                    xmin = bbox.find('xmin').text.strip()
+                    xmax = bbox.find('xmax').text.strip()
+                    ymin = bbox.find('ymin').text.strip()
+                    ymax = bbox.find('ymax').text.strip()
+                    annotation += ' ' + ','.join([xmin, ymin, xmax, ymax, str(class_ind)])
+            except:
+                print(image_path)
             f.write(annotation + "\n")
     return len(image_inds)
 
@@ -133,13 +136,13 @@ def convert_voc_annotation(data_path, data_type, anno_path, use_difficult_bbox=T
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--data_path",
-                        default="E:/DataSets/2020_two_phase_KXData/20200318")
+                        default="E:/DataSets/2020_two_phase_KXData/only2phase_data/20200402")
     parser.add_argument("--train_annotation",
-                        default="E:/kx_detection/multi_detection/data/dataset/only2phase_data/train2phase.txt")
+                        default="E:/DataSets/2020_two_phase_KXData/only2phase_data/20200402/train2phase0402.txt")
     parser.add_argument("--test_annotation",
-                        default="E:/kx_detection/multi_detection/data/dataset/only2phase_data/test2phase.txt")
+                        default="E:/DataSets/2020_two_phase_KXData/only2phase_data/20200402/test2phase0402.txt")
     parser.add_argument("--val_annotation",
-                        default="E:/kx_detection/multi_detection/data/dataset/only2phase_data/val2phase.txt")
+                        default="E:/DataSets/2020_two_phase_KXData/only2phase_data/20200402/val2phase0402.txt")
     flags = parser.parse_args()
     #
     if os.path.exists(flags.train_annotation): os.remove(flags.train_annotation)
