@@ -27,5 +27,5 @@ def filename_txt(imgdir, txt_path):
 
 if __name__ == "__main__":
     imgdir = "/Users/sunyihuan/Desktop/WLS/KX38I95FOODSETS/train_2classes/JPGImages"
-    txt_path = "/Users/sunyihuan/Desktop/WLS/KX38I95FOODSETS/train_2classes/ImageSets/train.txt"
+    txt_path = "/Users/sunyihuan/Desktop/WLS/KX38I95FOODSETS/train_2classes/ImageSets/train_all.txt"
     filename_txt(imgdir, txt_path)

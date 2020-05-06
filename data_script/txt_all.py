@@ -44,7 +44,7 @@ for txt_file_one in txt_files_1203:
 
 print(len(train_all_list))
 
-new_txt_name = "E:/DataSets/KX_FOODSets_model_data/20191206data/ImageSets/Main/train.txt"
+new_txt_name = "E:/DataSets/KX_FOODSets_model_data/20191206data/ImageSets/Main/train_all.txt"
 file = open(new_txt_name, "w")
 for i in train_all_list:
     file.write(i)

@@ -32,8 +32,8 @@ def train_all_txt(txt_name):
 
 
 if __name__ == "__main__":
-    all_txt_name = "test.txt"  # 写入到train文件中
-    # all_txt_name = "test.txt"  # 写入到test文件中
+    all_txt_name = "test_all.txt"  # 写入到train文件中
+    # all_txt_name = "test_all.txt"  # 写入到test文件中
     for txt_name in os.listdir(root_path):
         if "_test" in txt_name:
             train_all_list = train_all_txt(txt_name)

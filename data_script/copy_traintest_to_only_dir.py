@@ -19,8 +19,8 @@ def copy_img_to_only_dir(tpye, root_path, save_to_path):
                                               Annotations
                                               ImageSets
                                                   Main
-                                                     test.txt
-                                                     train.txt
+                                                     test_all.txt
+                                                     train_all.txt
                           其中，JPGImages目录下为所有jpg图片文件
                                 Annotations目录下为所有xml标注文件
                                 test.txt为所有的test集图片name（不含.jpg）

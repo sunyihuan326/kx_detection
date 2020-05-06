@@ -6,13 +6,13 @@ import random
 from tqdm import tqdm
 
 
-def get_layer(typ):
+def get_layer(data_path, typ):
     '''
     获取各层文件名
     :param typ:
     :return:
     '''
-    layer_data_dir = "E:/DataSets/2020_two_phase_KXData/only2phase_data/20200402"
+    layer_data_dir = data_path
     bottom = os.listdir(layer_data_dir + "/layer_data/{}/bottom".format(typ))
     bottom = [b for b in bottom if b.endswith(".jpg")]
 
@@ -57,14 +57,20 @@ def convert_voc_annotation(data_path, data_type, anno_path, use_difficult_bbox=T
     #            "potatos", "sweetpotatocut", "sweetpotatol", "sweetpotatom", "sweetpotatos",
     #            "roastedchicken", "toast", "sweetpotato_others", "pizza_others",
     #            "potato_others"]  # 30分类,加入了sweetpotato_others,pizza_others,potato_others
-    classes = ["beefsteak", "cartooncookies", "chickenwings", "chiffoncake6", "chiffoncake8",
-               "cookies", "cranberrycookies", "cupcake", "eggtart", "eggtartbig",
-               "nofood", "peanuts", "pizzafour", "pizzaone", "pizzasix",
-               "pizzatwo", "porkchops", "potatocut", "potatol", "potatom",
-               "potatos", "sweetpotatocut", "sweetpotatol", "sweetpotatom", "sweetpotatos",
-               "roastedchicken", "toast", "sweetpotato_others", "pizza_others",
-               "potato_others", "chestnut", "cornone", "corntwo", "drumsticks", "taro",
-               "steamedbread","eggplant","eggplant_cut","eggplant_cut_sauce"]  # 原30分类，加入二期6类
+
+    # classes = ["beefsteak", "cartooncookies", "chickenwings", "chiffoncake6", "chiffoncake8",
+    #            "cookies", "cranberrycookies", "cupcake", "eggtart", "eggtartbig",
+    #            "nofood", "peanuts", "pizzafour", "pizzaone", "pizzasix",
+    #            "pizzatwo", "porkchops", "potatocut", "potatol", "potatom",
+    #            "potatos", "sweetpotatocut", "sweetpotatol", "sweetpotatom", "sweetpotatos",
+    #            "roastedchicken", "toast", "sweetpotato_others", "pizza_others",
+    #            "potato_others", "chestnut", "cornone", "corntwo", "drumsticks", "taro",
+    #            "steamedbread", "eggplant", "eggplant_cut_sauce", "bread", "container_nonhigh"
+    #            , "container", "fish", "hotdog", "redshrimp", "shrimp", "strand"]  # 原30分类，加入二期17类
+    classes = ["nofood","chestnut", "cornone", "corntwo", "drumsticks", "taro",
+               "steamedbread", "eggplant", "eggplant_cut_sauce", "bread", "container_nonhigh",
+               "container", "roastedchicken", "fish", "hotdog", "redshrimp",
+               "shrimp", "strand"]  # 仅二期17类
     # classes = ["nofood","chestnut", "cornone", "corntwo", "drumsticks", "taro",
     #            "steamedbread"]  # 仅二期6类
     # img_inds_file = os.path.join(data_path, 'ImageSets', 'Main', data_type + '.txt')
@@ -75,7 +81,7 @@ def convert_voc_annotation(data_path, data_type, anno_path, use_difficult_bbox=T
         image_inds = [line.strip() for line in txt]
     random.shuffle(image_inds)
 
-    bottom, middle, top, others = get_layer(data_type)
+    bottom, middle, top, others = get_layer(data_path, data_type)
     print(len(bottom))
     print(len(middle))
     print(len(top))
@@ -136,13 +142,13 @@ def convert_voc_annotation(data_path, data_type, anno_path, use_difficult_bbox=T
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--data_path",
-                        default="E:/DataSets/2020_two_phase_KXData/only2phase_data/20200402")
+                        default="E:/DataSets/2020_two_phase_KXData/only2phase_data")
     parser.add_argument("--train_annotation",
-                        default="E:/DataSets/2020_two_phase_KXData/only2phase_data/20200402/train2phase0402.txt")
+                        default="E:/DataSets/2020_two_phase_KXData/only2phase_data/train17.txt")
     parser.add_argument("--test_annotation",
-                        default="E:/DataSets/2020_two_phase_KXData/only2phase_data/20200402/test2phase0402.txt")
+                        default="E:/DataSets/2020_two_phase_KXData/only2phase_data/test17.txt")
     parser.add_argument("--val_annotation",
-                        default="E:/DataSets/2020_two_phase_KXData/only2phase_data/20200402/val2phase0402.txt")
+                        default="E:/DataSets/2020_two_phase_KXData/only2phase_data/val17.txt")
     flags = parser.parse_args()
     #
     if os.path.exists(flags.train_annotation): os.remove(flags.train_annotation)

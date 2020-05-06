@@ -15,9 +15,9 @@
                                                                                              *.jpg
 将原始数据处理成./multi_detection/scripts/voc_annotation.py可用数据
 step1:各类别数据单独分xx_train.txt、xx_test.txt、xx_val.txt
-step2:将各类别数据合成完整train.txt、test.txt、val.txt
+step2:将各类别数据合成完整train.txt、test_all.txt、val.txt
 step3:拷贝所有单类别图片至JPGImages中、拷贝所有xml文件至Annotations中
-step4:layer数据按train.txt、test.txt、val.txt分到相应文件夹
+step4:layer数据按train.txt、test_all.txt、val.txt分到相应文件夹
 '''
 import os
 import random
@@ -168,12 +168,12 @@ class process(object):
             os.mkdir(layer_val_bottom_dir)
 
         # 获取train中的所有文件名称
-        train_txt = self.txt_root + "/" + "train.txt"
+        train_txt = self.txt_root + "/" + "train_all.txt"
         txt_file = open(train_txt, "r")
         train_txt_files = txt_file.readlines()
         train_txt_files = [v.strip() for v in train_txt_files]
         # 获取test中的所有文件名称
-        test_txt = self.txt_root + "/" + "test.txt"
+        test_txt = self.txt_root + "/" + "test_all.txt"
         txt_file = open(test_txt, "r")
         test_txt_files = txt_file.readlines()
         test_txt_files = [v.strip() for v in test_txt_files]
@@ -198,13 +198,15 @@ class process(object):
 
 
 if __name__ == "__main__":
-    data_root = "E:/DataSets/2020_two_phase_KXData/only2phase_data/20200402"
+    data_root = "E:/DataSets/2020_two_phase_KXData/only2phase_data"
     dprocess = process(data_root)
-    classes = ["eggplant", "eggplant_cut", "eggplant_cut_sauce"]
+    classes = ["bread", "chestnut", "container_nonhigh", "containers", "duck",
+               "eggplant", "eggplant_cut_sauce", "fish", "hotdog","shrimp",
+               "shrimp_red", "strand"]
     train_percent = 0.8
     test_percent = 0.1
     # dprocess.split_data(classes, train_percent, test_percent)
     # dprocess.train_all_txt(["train", "test", "val"])
     # dprocess.copy2dir(classes, "xml")
     # dprocess.copy2dir(classes, "jpg")
-    dprocess.copy_layer2split_dir(classes)
+    # dprocess.copy_layer2split_dir(classes)

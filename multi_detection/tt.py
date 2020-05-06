@@ -2,11 +2,11 @@ from PIL import Image, ImageFilter, ImageEnhance
 import random
 import numpy as np
 from skimage import util
-
-image_name= "C:/Users/sunyihuan/Desktop/x6/20200227_010722979.jpg"
-image=Image.open(image_name)
-image=image.resize((400, 300))
-image.save("C:/Users/sunyihuan/Desktop/x6/20200227_010722979_400.jpg")
+#
+# image_name= "C:/Users/sunyihuan/Desktop/x6/20200227_010722979.jpg"
+# image=Image.open(image_name)
+# image=image.resize((400, 300))
+# image.save("C:/Users/sunyihuan/Desktop/x6/20200227_010722979_400.jpg")
 
 # image_path = "C:/Users/sunyihuan/Desktop/85_new_cam/20191216_062713704.jpg"
 # image = Image.open(image_path)
@@ -18,23 +18,26 @@ image.save("C:/Users/sunyihuan/Desktop/x6/20200227_010722979_400.jpg")
 #
 # print(np.array(image).astype(int))
 
-# import tensorflow as tf
-#
-# pb_file = "E:/kx_detection/multi_detection/model/yolo_model.pb"
-#
-# with tf.Session() as sess:
-#     with open(pb_file, 'rb') as f:
-#         graph_def = tf.GraphDef()
-#         graph_def.ParseFromString(f.read())
-#         print(graph_def)
-# input_array = ['define_input/input_data', 'define_input/training']
-# output = ["define_loss/pred_sbbox/concat_2", "define_loss/pred_mbbox/concat_2",
-#           "define_loss/pred_lbbox/concat_2", "define_loss/layer_classes"]
-#
-# # sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
-# converter = tf.lite.TFLiteConverter.from_session(sess, input_array, output)
-# tflite_model = converter.convert()
-# open("converted_model.tflite", "wb").write(tflite_model)
+import tensorflow as tf
+
+pb_file = "E:/ckpt_dirs/Food_detection/local/20191216/yolo_model.pb"
+
+with tf.Session() as sess:
+    with tf.gfile.FastGFile(pb_file, 'rb') as f:
+        graph_def = tf.GraphDef()
+        graph_def.ParseFromString(f.read())
+        # Imports the graph from graph_def into the current default Graph.
+        tf.import_graph_def(graph_def, name='')
+
+input_array = ['define_input/input_data', 'define_input/training']
+output = ["define_loss/pred_sbbox/concat_2", "define_loss/pred_mbbox/concat_2",
+          "define_loss/pred_lbbox/concat_2", "define_loss/layer_classes"]
+
+# sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
+input_shape={'define_input/input_data':[None,416,416,3],'define_input/training':[None]}
+converter = tf.lite.TFLiteConverter.from_session(sess, input_array, output)
+tflite_model = converter.convert()
+open("converted_model.tflite", "wb").write(tflite_model)
 
 # import tensorflow as tf
 #

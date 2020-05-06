@@ -31,7 +31,30 @@ def changesku(inputpath, label_name='Potatom'):
                     tree.write(file, encoding='utf-8')
 
 
+def check_labelname(inputpath, label_name='Potatom'):
+    '''
+    检查标签是否有更改完成，标签名不正确的输出
+    :param inputpath: xml文件路径
+    :param label_name: 标签名
+    :return:
+    '''
+    listdir = os.listdir(inputpath)
+    for file in listdir:
+        if file.endswith('xml'):
+            file = os.path.join(inputpath, file)
+            tree = ET.parse(file)
+            root = tree.getroot()
+            for object1 in root.findall('object'):
+                for sku in object1.findall('name'):
+                    # if sku.text=="corn_others":
+                    #     print(file)
+                    if sku.text != label_name:
+                        print(file)
+
+
 if __name__ == '__main__':
-    inputpath = "E:/WLS_originalData/二期数据/第二批/Annotations/duck"  # 这是xml文件的文件夹的绝对地址
-    label_name = "roastedchicken"
-    changesku(inputpath,label_name)
+    inputpath = "E:/WLS_originalData/二期数据/20200423/Annotations/shrimp_red0"  # 这是xml文件的文件夹的绝对地址
+    label_name = "redshrimp"
+    changesku(inputpath, label_name)
+
+    check_labelname(inputpath, label_name)

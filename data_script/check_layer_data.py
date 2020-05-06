@@ -2,7 +2,6 @@
 
 """
 查看layer数据是否有漏标注
-
 @File    : check_layer_data.py
 @Time    : 2019/10/25 10:51
 @Author  : sunyihuan

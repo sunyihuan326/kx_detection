@@ -67,10 +67,10 @@ def replace_txt_path(txt_path, src_txtpath, file_path, target_path):
 
 
 if __name__ == "__main__":
-    txt_path = "E:/DataSets/2020_two_phase_KXData/only2phase_data/20200402/train2phase_sauce0402.txt"
-    new_txt_name = "E:/DataSets/2020_two_phase_KXData/only2phase_data/20200402/serve_train2phase_sauce0402.txt"
+    txt_path = "E:/DataSets/2020_two_phase_KXData/only2phase_data/val46.txt"
+    new_txt_name = "E:/DataSets/2020_two_phase_KXData/only2phase_data/serve_val46.txt"
     # file_path = "E:/DataSets/2020_two_phase_KXData/only2phase_data" + "/JPGImages"
-    file_path = "E:/DataSets/2020_two_phase_KXData/only2phase_data/20200402/JPGImages"
-    target_path = "/home/sunyihuan/sunyihuan_algorithm/data/2020_KXData/20200403"
+    file_path = "E:/DataSets/2020_two_phase_KXData/only2phase_data/JPGImages"
+    target_path = "/home/sunyihuan/sunyihuan_algorithm/data/2020_two_phase_KXData/only2phsae_data/JPGImages"
 
     replace_txt_path(txt_path, new_txt_name, file_path, target_path)

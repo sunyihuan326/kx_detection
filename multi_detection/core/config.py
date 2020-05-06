@@ -25,7 +25,7 @@ __C.YOLO.DEMO_WEIGHT            = "./checkpoint/yolov3_train_loss=4.0603.ckpt-48
 # Train options
 __C.TRAIN                       = edict()
 
-__C.TRAIN.ANNOT_PATH            = "./data/dataset/202004/train_all_sauce0403.txt"
+__C.TRAIN.ANNOT_PATH            = "./data/dataset/XandOld/111111111.txt"
 __C.TRAIN.BATCH_SIZE            = 2
 __C.TRAIN.INPUT_SIZE            = 416
 __C.TRAIN.DATA_AUG              = True
@@ -42,7 +42,7 @@ __C.TRAIN.INITIAL_WEIGHT        = ""
 __C.TEST                        = edict()
 
 # __C.TEST.ANNOT_PATH             = "./data/dataset/foodSets1105_XandOld_test27.txt"
-__C.TEST.ANNOT_PATH             = "./data/dataset/202004/test_all_sauce0403.txt"
+__C.TEST.ANNOT_PATH             = "./data/dataset/XandOld/111111111.txt"
 __C.TEST.BATCH_SIZE             = 2
 __C.TEST.INPUT_SIZE             = 416
 __C.TEST.DATA_AUG               = False

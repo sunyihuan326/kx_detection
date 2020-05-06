@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 
 """
-将每类layer数据按train.txt、test.txt、val.txt分到完整的train、test、val中
+将每类layer数据按train.txt、test_all.txt、val.txt分到完整的train、test、val中
 @File    : copy_classes_layer2train.py
 @Time    : 2019/12/3 19:35
 @Author  : sunyihuan
@@ -23,12 +23,12 @@ os.mkdir(layer_val_bottom_dir)
 
 def copy_img2train(layer_root, txt_root):
     # 获取train中的所有文件名称
-    train_txt = txt_root + "/" + "train.txt"
+    train_txt = txt_root + "/" + "train_all.txt"
     txt_file = open(train_txt, "r")
     train_txt_files = txt_file.readlines()
     train_txt_files = [v.strip() for v in train_txt_files]
     # 获取test中的所有文件名称
-    test_txt = txt_root + "/" + "test.txt"
+    test_txt = txt_root + "/" + "test_all.txt"
     txt_file = open(test_txt, "r")
     test_txt_files = txt_file.readlines()
     test_txt_files = [v.strip() for v in test_txt_files]

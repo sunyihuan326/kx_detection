@@ -22,14 +22,14 @@ for t in os.listdir(txt_dir):
             jpg_name = f.strip() + ".jpg"
             shutil.copy(JPGImages + "/" + jpg_name, JPGImages_save + "/" + cls + "/" + jpg_name)
 
-# txt_path_1203 = "E:/DataSets/KX_FOODSets_model_data/20191206data/ImageSets/Main/train.txt"
+# txt_path_1203 = "E:/DataSets/KX_FOODSets_model_data/20191206data/ImageSets/Main/train_all.txt"
 # txt_file_1203 = open(txt_path_1203, "r")
 # txt_files_1203 = txt_file_1203.readlines()
 # txt_files_1203 = [a.strip() for a in txt_files_1203]
 # print(len(txt_files_1203))
 # print(len(set(txt_files_1203)))
 #
-# txt_path_ = "E:/DataSets/KX_FOODSets_model_data/20191206data/ImageSets/Main/test.txt"
+# txt_path_ = "E:/DataSets/KX_FOODSets_model_data/20191206data/ImageSets/Main/test_all.txt"
 # txt_path_ = open(txt_path_, "r")
 # txt_path_ = txt_path_.readlines()
 # print(len(txt_path_))

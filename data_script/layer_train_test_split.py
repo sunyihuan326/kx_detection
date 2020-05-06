@@ -33,12 +33,12 @@ def layer_data_split(layer_root, txt_root):
     :return:
     '''
     # 获取train中的所有文件名称
-    train_txt = txt_root + "/" + "train.txt"
+    train_txt = txt_root + "/" + "train_all.txt"
     txt_file = open(train_txt, "r")
     train_txt_files = txt_file.readlines()
     train_txt_files = [v.strip() for v in train_txt_files]
     # 获取test中的所有文件名称
-    test_txt = txt_root + "/" + "test.txt"
+    test_txt = txt_root + "/" + "test_all.txt"
     txt_file = open(test_txt, "r")
     test_txt_files = txt_file.readlines()
     test_txt_files = [v.strip() for v in test_txt_files]
