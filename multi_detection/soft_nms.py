@@ -1,6 +1,8 @@
 # -*- encoding: utf-8 -*-
 
 """
+soft_nms
+
 @File    : soft_nms.py
 @Time    : 2019/10/29 14:49
 @Author  : sunyihuan

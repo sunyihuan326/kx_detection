@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 
 def image_xml_resize(img_path, xml_path):
     '''
-    图片padding，将图照片自动padding成正方形
+    图片padding，将图片自动padding成正方形
     :param img_path: 图片地址
     :return:
     '''

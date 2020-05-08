@@ -2,6 +2,7 @@
 
 """
 test集、val集直接查看矫正后的结果
+
 @File    : ckpt_result_check.py
 @Time    : 2019/11/6 10:52
 @Author  : sunyihuan
@@ -222,18 +223,7 @@ class YoloTest(object):
                     error_noresults += 1
                     shutil.copy(image_path,
                                 noresult_dir + "/" + image_name.split(".")[0] + ".jpg")
-                # elif result[1] == 1:  # flag==1,直接输出结果
-                #     img_food_name_true = int(str(annotation[2]).split(",")[-1])  # 获取标准food_name
-                #     food_name_true.append(int(img_food_name_true))  # 写入到food_name_true
-                #
-                #     img_food_name_pre = int(result[0])  # 食材类别结果
-                #     food_name_pre.append(img_food_name_pre)  # 预测结果写入到food_name_pre
-                #
-                #     if img_food_name_true != img_food_name_pre:  # 结果错误，图片拷贝至food_name_dir
-                #         flag1_error += 1  # 错误统计
-                #         shutil.copy(image_path,
-                #                     food_name_dir + "/" + image_name.split(".")[0] + "_" + str(
-                #                         img_food_name_pre) + ".jpg")
+
                 else:
                     img_food_name_true = int(str(annotation[2]).split(",")[-1])  # 获取标准food_name
                     food_name_true.append(int(img_food_name_true))  # 写入到food_name_true

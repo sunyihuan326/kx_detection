@@ -1,6 +1,8 @@
 # -*- encoding: utf-8 -*-
 
 """
+单张图片白平衡
+
 @File    : img_white_balance.py
 @Time    : 2019/11/19 9:56
 @Author  : sunyihuan

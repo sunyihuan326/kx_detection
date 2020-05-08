@@ -1,5 +1,9 @@
 # coding=utf-8
 
+'''
+pb文件评估test集
+
+'''
 import cv2
 import os
 import shutil

@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 
 """
-预测一张图片结果
+预测一个文件夹图片结果
 @File    : ckpt_predict.py
 @Time    : 2019/12/16 15:45
 @Author  : sunyihuan

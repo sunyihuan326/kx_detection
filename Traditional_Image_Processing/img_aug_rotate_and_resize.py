@@ -1,6 +1,8 @@
 # -*- encoding: utf-8 -*-
 
 """
+图片旋转和压缩尺寸
+
 @File    : img_aug_rotate.py
 @Time    : 2019/11/8 11:45
 @Author  : sunyihuan

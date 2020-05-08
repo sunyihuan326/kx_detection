@@ -1,6 +1,8 @@
 # -*- encoding: utf-8 -*-
 
 """
+png格式图片转为jpg
+
 @File    : png2jpg.py
 @Time    : 2019/11/19 11:05
 @Author  : sunyihuan

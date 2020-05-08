@@ -144,11 +144,11 @@ if __name__ == '__main__':
     parser.add_argument("--data_path",
                         default="E:/DataSets/2020_two_phase_KXData/only2phase_data")
     parser.add_argument("--train_annotation",
-                        default="E:/DataSets/2020_two_phase_KXData/only2phase_data/train17.txt")
+                        default="E:/DataSets/2020_two_phase_KXData/only2phase_data/train18.txt")
     parser.add_argument("--test_annotation",
-                        default="E:/DataSets/2020_two_phase_KXData/only2phase_data/test17.txt")
+                        default="E:/DataSets/2020_two_phase_KXData/only2phase_data/test18.txt")
     parser.add_argument("--val_annotation",
-                        default="E:/DataSets/2020_two_phase_KXData/only2phase_data/val17.txt")
+                        default="E:/DataSets/2020_two_phase_KXData/only2phase_data/val18.txt")
     flags = parser.parse_args()
     #
     if os.path.exists(flags.train_annotation): os.remove(flags.train_annotation)

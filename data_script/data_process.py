@@ -168,12 +168,12 @@ class process(object):
             os.mkdir(layer_val_bottom_dir)
 
         # 获取train中的所有文件名称
-        train_txt = self.txt_root + "/" + "train_all.txt"
+        train_txt = self.txt_root + "/" + "train.txt"
         txt_file = open(train_txt, "r")
         train_txt_files = txt_file.readlines()
         train_txt_files = [v.strip() for v in train_txt_files]
         # 获取test中的所有文件名称
-        test_txt = self.txt_root + "/" + "test_all.txt"
+        test_txt = self.txt_root + "/" + "test.txt"
         txt_file = open(test_txt, "r")
         test_txt_files = txt_file.readlines()
         test_txt_files = [v.strip() for v in test_txt_files]
@@ -200,13 +200,13 @@ class process(object):
 if __name__ == "__main__":
     data_root = "E:/DataSets/2020_two_phase_KXData/only2phase_data"
     dprocess = process(data_root)
-    classes = ["bread", "chestnut", "container_nonhigh", "containers", "duck",
-               "eggplant", "eggplant_cut_sauce", "fish", "hotdog","shrimp",
-               "shrimp_red", "strand"]
+    classes = ["nofood","bread", "chestnut", "container_nonhigh", "containers",
+               "duck", "eggplant", "eggplant_cut_sauce", "fish", "hotdog",
+               "shrimp","shrimp_red", "strand"]
     train_percent = 0.8
     test_percent = 0.1
     # dprocess.split_data(classes, train_percent, test_percent)
-    # dprocess.train_all_txt(["train", "test", "val"])
+    dprocess.train_all_txt(["train", "test", "val"])
     # dprocess.copy2dir(classes, "xml")
     # dprocess.copy2dir(classes, "jpg")
     # dprocess.copy_layer2split_dir(classes)

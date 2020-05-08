@@ -55,10 +55,10 @@ def he_foods(pre):
 class YoloTest(object):
     def __init__(self):
         self.input_size = 416  # 输入图片尺寸（默认正方形）
-        self.num_classes = 39  # 种类数
+        self.num_classes = 46 # 种类数
         self.score_threshold = 0.1
         self.iou_threshold = 0.5
-        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food4/20200413/yolov3_train_loss=1.8139.ckpt-100"  # ckpt文件地址
+        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food4/20200508/yolov3_train_loss=5.4446.ckpt-66"  # ckpt文件地址
         # self.weight_file = "./checkpoint/yolov3_train_loss=4.7681.ckpt-80"
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
@@ -137,7 +137,62 @@ class YoloTest(object):
 
 
 if __name__ == '__main__':
-    mode = "multi4_0413"
+    #
+    # classes = ["Beefsteak", "CartoonCookies", "Cookies", "CupCake", "Pizzafour",
+    #            "Pizzatwo", "Pizzaone", "Pizzasix", "ChickenWings", "ChiffonCake6",
+    #            "ChiffonCake8", "CranberryCookies", "eggtarts", "eggtartl", "nofood",
+    #            "Peanuts", "PorkChops", "PotatoCut", "Potatol", "Potatom",
+    #            "Potatos", "RoastedChicken", "SweetPotatoCut", "SweetPotatol", "SweetPotatom",
+    #            "SweetPotatoS", "Toast", "chestnut", "cornone", "corntwo", "drumsticks",
+    #            "taro", "steamedbread", "eggplant", "eggplant_cut", "eggplant_cut_sauce"]
+    classes_label46 = ["beefsteak", "cartooncookies", "chickenwings", "chiffoncake6", "chiffoncake8",
+                       "cookies", "cranberrycookies", "cupcake", "eggtartl", "eggtarts",
+                       "nofood", "peanuts", "pizzafour", "pizzaone", "pizzasix",
+                       "pizzatwo", "porkchops", "potatocut", "potatol", "potatom",
+                       "potatos", "sweetpotatocut", "sweetpotatol", "sweetpotatom", "sweetpotatos",
+                       "roastedchicken", "toast",
+                       "chestnut", "cornone", "corntwo", "drumsticks", "taro",
+                       "steamedbread", "eggplant", "eggplant_cut_sauce", "bread", "container_nonhigh",
+                       "container", "duck", "fish", "hotdog", "redshrimp",
+                       "shrimp", "strand"]
+    classes_label17 = ["chestnut", "cornone", "corntwo", "drumsticks", "taro",
+                        "steamedbread", "eggplant", "eggplant_cut_sauce", "bread",
+                       "container_nonhigh", "container", "duck", "fish", "hotdog",
+                       "redshrimp", "shrimp", "strand"]
+
+    # classes = ["RoastedChicken"]
+
+    # ab_classes = ["Pizzafour", "Pizzatwo", "Pizzaone", "Pizzasix",
+    #               "PotatoCut", "Potatol", "Potatom",
+    #               "RoastedChicken",
+    #               "SweetPotatoCut", "SweetPotatol", "SweetPotatom", "SweetPotatoS",
+    #               "Toast"]
+    # classes_id = {"CartoonCookies": 1, "Cookies": 5, "CupCake": 7, "Beefsteak": 0, "ChickenWings": 2,
+    #               "ChiffonCake6": 3, "ChiffonCake8": 4, "CranberryCookies": 6, "eggtarts": 8, "eggtartl": 9,
+    #               "nofood": 10, "Peanuts": 11, "PorkChops": 16, "PotatoCut": 17, "Potatol": 18,
+    #               "Potatom": 19, "Potatos": 20, "SweetPotatoCut": 21, "SweetPotatol": 22, "SweetPotatom": 23,
+    #               "Pizzafour": 12, "Pizzaone": 13, "Pizzasix": 14, "RoastedChicken": 25,
+    #               "Pizzatwo": 15, "SweetPotatoS": 24, "Toast": 26, "sweetpotato_others": 27, "pizza_others": 28,
+    #               "potato_others": 29, "chestnut": 30, "cornone": 31, "corntwo": 32, "drumsticks": 33,
+    #               "taro": 34, "steamedbread": 35,}
+    classes_id17 = {"chestnut": 1, "cornone": 2, "corntwo": 3, "drumsticks": 4, "taro": 5,
+                    "nofood": 0, "steamedbread": 6, "eggplant": 7, "eggplant_cut_sauce": 8, "bread": 9,
+                    "container_nonhigh": 10, "container": 11, "duck": 12, "fish": 13, "hotdog": 14,
+                    "redshrimp": 15, "shrimp": 16, "strand": 17}
+    classes_id46 = {"cartooncookies": 1, "cookies": 5, "cupcake": 7, "beefsteak": 0, "chickenwings": 2,
+                    "chiffoncake6": 3, "chiffoncake8": 4, "cranberrycookies": 6, "eggtarts": 8, "eggtartl": 9,
+                    "nofood": 10, "peanuts": 11, "porkchops": 16, "potatocut": 17, "potatol": 18,
+                    "potatom": 19, "potatos": 20, "sweetpotatocut": 21, "sweetpotatol": 22, "sweetpotatom": 23,
+                    "pizzafour": 12, "pizzaone": 13, "pizzasix": 14, "roastedchicken": 25,
+                    "pizzatwo": 15, "sweetpotatos": 24, "toast": 26, "sweetpotato_others": 27, "pizza_others": 28,
+                    "potato_others": 29, "chestnut": 30, "cornone": 31, "corntwo": 32, "drumsticks": 33,
+                    "taro": 34, "steamedbread": 35, "eggplant": 36, "eggplant_cut_sauce": 37, "bread": 38,"container_nonhigh": 39,
+                    "container": 40, "duck": 25, "fish": 41, "hotdog": 42, "redshrimp": 43,
+                    "shrimp": 44, "strand": 45}
+    # 需要修改
+    classes_id = classes_id46 #######
+    classes = classes_label46  #######
+    mode = "multi4_0508"  #######
     tag = ""
     img_dir = "E:/check_2_phase/JPGImages"  # 文件夹地址
     save_dir = "E:/check_2_phase/detection_{0}{1}".format(mode, tag)  # 图片保存地址
@@ -156,46 +211,6 @@ if __name__ == '__main__':
     Y = YoloTest()  # 加载模型
     end0_time = time.time()
     print("model loading time:", end0_time - start_time)
-
-    classes = ["Beefsteak", "CartoonCookies", "Cookies", "CupCake", "Pizzafour",
-               "Pizzatwo", "Pizzaone", "Pizzasix", "ChickenWings", "ChiffonCake6",
-               "ChiffonCake8", "CranberryCookies", "eggtarts", "eggtartl", "nofood",
-               "Peanuts", "PorkChops", "PotatoCut", "Potatol", "Potatom",
-               "Potatos", "RoastedChicken", "SweetPotatoCut", "SweetPotatol", "SweetPotatom",
-               "SweetPotatoS", "Toast", "chestnut", "cornone", "corntwo", "drumsticks",
-               "taro", "steamedbread", "eggplant", "eggplant_cut", "eggplant_cut_sauce"]
-    classes_label = ["beefsteak", "cartooncookies", "chickenwings", "chiffoncake6", "chiffoncake8",
-                     "cookies", "cranberrycookies", "cupcake", "eggtart", "eggtartbig",
-                     "nofood", "peanuts", "pizzafour", "pizzaone", "pizzasix",
-                     "pizzatwo", "porkchops", "potatocut", "potatol", "potatom",
-                     "potatos", "sweetpotatocut", "sweetpotatol", "sweetpotatom", "sweetpotatos",
-                     "roastedchicken", "toast", "sweetpotato_others", "pizza_others", "potato_others",
-                     "chestnut", "cornone", "corntwo", "drumsticks", "taro",
-                     "steamedbread", "eggplant", "eggplant_cut", "eggplant_cut_sauce"]
-
-    # classes = ["RoastedChicken"]
-
-    # ab_classes = ["Pizzafour", "Pizzatwo", "Pizzaone", "Pizzasix",
-    #               "PotatoCut", "Potatol", "Potatom",
-    #               "RoastedChicken",
-    #               "SweetPotatoCut", "SweetPotatol", "SweetPotatom", "SweetPotatoS",
-    #               "Toast"]
-    # classes_id = {"CartoonCookies": 1, "Cookies": 5, "CupCake": 7, "Beefsteak": 0, "ChickenWings": 2,
-    #               "ChiffonCake6": 3, "ChiffonCake8": 4, "CranberryCookies": 6, "eggtarts": 8, "eggtartl": 9,
-    #               "nofood": 10, "Peanuts": 11, "PorkChops": 16, "PotatoCut": 17, "Potatol": 18,
-    #               "Potatom": 19, "Potatos": 20, "SweetPotatoCut": 21, "SweetPotatol": 22, "SweetPotatom": 23,
-    #               "Pizzafour": 12, "Pizzaone": 13, "Pizzasix": 14, "RoastedChicken": 25,
-    #               "Pizzatwo": 15, "SweetPotatoS": 24, "Toast": 26, "sweetpotato_others": 27, "pizza_others": 28,
-    #               "potato_others": 29, "chestnut": 30, "cornone": 31, "corntwo": 32, "drumsticks": 33,
-    #               "taro": 34, "steamedbread": 35,}
-    classes_id = {"CartoonCookies": 1, "Cookies": 5, "CupCake": 7, "Beefsteak": 0, "ChickenWings": 2,
-                  "ChiffonCake6": 3, "ChiffonCake8": 4, "CranberryCookies": 6, "eggtarts": 8, "eggtartl": 9,
-                  "nofood": 10, "Peanuts": 11, "PorkChops": 16, "PotatoCut": 17, "Potatol": 18,
-                  "Potatom": 19, "Potatos": 20, "SweetPotatoCut": 21, "SweetPotatol": 22, "SweetPotatom": 23,
-                  "Pizzafour": 12, "Pizzaone": 13, "Pizzasix": 14, "RoastedChicken": 25,
-                  "Pizzatwo": 15, "SweetPotatoS": 24, "Toast": 26, "sweetpotato_others": 27, "pizza_others": 28,
-                  "potato_others": 29, "chestnut": 30, "cornone": 31, "corntwo": 32, "drumsticks": 33,
-                  "taro": 34, "steamedbread": 35, "eggplant": 36, "eggplant_cut": 37, "eggplant_cut_sauce": 38, }
     new_classes = {v: k for k, v in classes_id.items()}
 
     jpgs_count_all = 0
@@ -521,11 +536,11 @@ if __name__ == '__main__':
     print(food_conf)
     print(sum(sum(food_conf)))
 
-    sheet1.write(45, 1, jpgs_count_all)
-    sheet1.write(45, 2, layer_jpgs_acc)
-    sheet1.write(45, 3, food_jpgs_acc)
-    sheet1.write(45, 4, round((layer_jpgs_acc / jpgs_count_all) * 100, 2))
-    sheet1.write(45, 5, round((food_jpgs_acc / jpgs_count_all) * 100, 2))
+    sheet1.write(55, 1, jpgs_count_all)
+    sheet1.write(55, 2, layer_jpgs_acc)
+    sheet1.write(55, 3, food_jpgs_acc)
+    sheet1.write(55, 4, round((layer_jpgs_acc / jpgs_count_all) * 100, 2))
+    sheet1.write(55, 5, round((food_jpgs_acc / jpgs_count_all) * 100, 2))
 
     workbook.save("E:/check_2_phase/all_he_{0}{1}.xls".format(mode, tag))
 

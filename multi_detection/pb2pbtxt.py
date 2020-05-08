@@ -1,6 +1,8 @@
 # -*- encoding: utf-8 -*-
 
 """
+pb文件转为pbtxt
+
 @File    : pb2pbtxt.py
 @Time    : 202003/1/9 13:08
 @Author  : sunyihuan

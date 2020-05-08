@@ -1,6 +1,8 @@
 # -*- encoding: utf-8 -*-
 
 """
+图片翻转，包含xml文件处理
+
 @File    : img_aug_flip.py
 @Time    : 2019/11/22 10:05
 @Author  : sunyihuan

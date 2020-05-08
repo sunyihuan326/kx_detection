@@ -1,5 +1,9 @@
 #! /usr/bin/env python
 # coding=utf-8
+'''
+仅pred_sbbox、pred_mbbox两个concate
+
+'''
 
 import os
 import time

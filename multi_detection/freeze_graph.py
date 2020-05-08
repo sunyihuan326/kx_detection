@@ -1,6 +1,8 @@
 # -*- encoding: utf-8 -*-
 
 """
+ckpt文件转成pb文件
+
 @File    : freeze_graph.py
 @Time    : 2019/12/21 11:43
 @Author  : sunyihuan

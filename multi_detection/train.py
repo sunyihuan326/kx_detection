@@ -1,6 +1,10 @@
 #! /usr/bin/env python
 # coding=utf-8
 
+'''
+yolo train
+'''
+
 import os
 import time
 import shutil
