@@ -12,7 +12,7 @@ import xml.etree.ElementTree as ET
 
 def changesku(inputpath, label_name='Potatom'):
     '''
-
+    更改标签名称
     :param inputpath: xml文件夹地址
     :param label_name: 标签名称
     :return:
@@ -53,8 +53,8 @@ def check_labelname(inputpath, label_name='Potatom'):
 
 
 if __name__ == '__main__':
-    inputpath = "E:/WLS_originalData/二期数据/20200423/Annotations/shrimp_red0"  # 这是xml文件的文件夹的绝对地址
-    label_name = "redshrimp"
+    inputpath = "E:/已标数据备份/补采土豆红薯202004/Annotations/potatocut"  # 这是xml文件的文件夹的绝对地址
+    label_name = "potatocut"
     changesku(inputpath, label_name)
 
     check_labelname(inputpath, label_name)

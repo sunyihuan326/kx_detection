@@ -198,15 +198,13 @@ class process(object):
 
 
 if __name__ == "__main__":
-    data_root = "E:/DataSets/2020_two_phase_KXData/only2phase_data"
+    data_root = "E:/DataSets/KX_FOODSets_model_data/202005potatos"
     dprocess = process(data_root)
-    classes = ["nofood","bread", "chestnut", "container_nonhigh", "containers",
-               "duck", "eggplant", "eggplant_cut_sauce", "fish", "hotdog",
-               "shrimp","shrimp_red", "strand"]
+    classes = ["nofood","potatocut", "potatol", "sweetpotatocut", "sweetpotatol"]
     train_percent = 0.8
-    test_percent = 0.1
-    # dprocess.split_data(classes, train_percent, test_percent)
+    test_percent =0.0
+    dprocess.split_data(classes, train_percent, test_percent)
     dprocess.train_all_txt(["train", "test", "val"])
-    # dprocess.copy2dir(classes, "xml")
-    # dprocess.copy2dir(classes, "jpg")
-    # dprocess.copy_layer2split_dir(classes)
+    dprocess.copy2dir(classes, "xml")
+    dprocess.copy2dir(classes, "jpg")
+    dprocess.copy_layer2split_dir(classes)

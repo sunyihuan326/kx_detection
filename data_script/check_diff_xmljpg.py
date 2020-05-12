@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2020/4/24
 # @Author  : sunyihuan
-# @File    : print_diff.py
+# @File    : check_diff_xmljpg.py
 
 # 输出两个文件中不同的名称（xml、jpg文件）
-
+# 输出jpg、layer数据的不同
 
 import os
 
@@ -65,8 +65,8 @@ def check_layerjpg_diff(img_dir, layer_dir):
 
 
 if __name__ == "__main__":
-    img_dir = "E:/WLS_originalData/二期数据/第二批/JPGImages/fish"
-    xml_dir = "E:/WLS_originalData/二期数据/第二批/Annotations/fish"
-    # layer_dir="E:/WLS_originalData/二期数据/第二批/layer_data/bread"
-    check_xmljpg_diff(img_dir, xml_dir)
-    # check_layerjpg_diff(img_dir,layer_dir)
+    img_dir = "E:/已标数据备份/补采土豆红薯202004/JPGImages/nofood"
+    xml_dir = "E:/已标数据备份/补采土豆红薯202004/Annotations/nofood"
+    layer_dir="E:/已标数据备份/补采土豆红薯202004/layer_data/nofood"
+    # check_xmljpg_diff(img_dir, xml_dir)
+    check_layerjpg_diff(img_dir,layer_dir)

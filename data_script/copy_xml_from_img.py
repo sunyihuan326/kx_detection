@@ -2,7 +2,7 @@
 
 """
 根据img文件拷贝xml文件
-@File    : from_img_copy_xml.py
+@File    : copy_xml_from_img.py
 @Time    : 2019/12/3 8:45
 @Author  : sunyihuan
 """

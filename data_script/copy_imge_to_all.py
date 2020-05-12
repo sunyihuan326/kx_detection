@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 # @Time    : 202003/2/29
 # @Author  : sunyihuan
-# @File    : copy_imge.py
+# @File    : copy_imge_to_all.py
+'''
+将图片从子文件夹中拷贝到根目录下
+
+'''
 
 
 import shutil

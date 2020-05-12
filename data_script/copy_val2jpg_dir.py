@@ -7,11 +7,20 @@
 将xxx_val.txt图片拷贝到对应的xxx_val文件中
 并对其进行分层
 '''
+
 import os
 import shutil
 
 
 def copy_val2jpg_dir(txt_root, all_jpg_dir, save_dir):
+    '''
+    将val中的数据拷贝到单独的文件夹中，并且烤层也分类
+
+    :param txt_root: val数据根目录，如：ImageSets/Main
+    :param all_jpg_dir: 所有图片地址
+    :param save_dir: 要保存图片地址
+    :return:
+    '''
     layer_data = "E:/DataSets/2020_two_phase_KXData/only2phase_data/layer_data/val"
     val_b_list = os.listdir(layer_data + "/bottom")
     val_m_list = os.listdir(layer_data + "/middle")

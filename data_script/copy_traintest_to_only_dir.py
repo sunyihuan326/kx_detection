@@ -4,7 +4,9 @@
 # @Author  : sunyihuan
 '''
 将JPGImages、Annotations下的文件，按ImageSets/Main下test.txt、train.txt目录拷贝到对应的test或者train文件夹中。
+即：生成所有的train、test、val文件夹
 '''
+
 import shutil
 from tqdm import tqdm
 import os

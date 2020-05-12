@@ -55,10 +55,10 @@ def he_foods(pre):
 class YoloTest(object):
     def __init__(self):
         self.input_size = 416  # 输入图片尺寸（默认正方形）
-        self.num_classes = 46 # 种类数
+        self.num_classes = 18 # 种类数
         self.score_threshold = 0.1
         self.iou_threshold = 0.5
-        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food4/20200508/yolov3_train_loss=5.4446.ckpt-66"  # ckpt文件地址
+        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food3/20200512/yolov3_train_loss=3.0475.ckpt-150"  # ckpt文件地址
         # self.weight_file = "./checkpoint/yolov3_train_loss=4.7681.ckpt-80"
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
@@ -155,7 +155,7 @@ if __name__ == '__main__':
                        "steamedbread", "eggplant", "eggplant_cut_sauce", "bread", "container_nonhigh",
                        "container", "duck", "fish", "hotdog", "redshrimp",
                        "shrimp", "strand"]
-    classes_label17 = ["chestnut", "cornone", "corntwo", "drumsticks", "taro",
+    classes_label18 = ["chestnut", "cornone", "corntwo", "drumsticks", "taro",
                         "steamedbread", "eggplant", "eggplant_cut_sauce", "bread",
                        "container_nonhigh", "container", "duck", "fish", "hotdog",
                        "redshrimp", "shrimp", "strand"]
@@ -175,7 +175,7 @@ if __name__ == '__main__':
     #               "Pizzatwo": 15, "SweetPotatoS": 24, "Toast": 26, "sweetpotato_others": 27, "pizza_others": 28,
     #               "potato_others": 29, "chestnut": 30, "cornone": 31, "corntwo": 32, "drumsticks": 33,
     #               "taro": 34, "steamedbread": 35,}
-    classes_id17 = {"chestnut": 1, "cornone": 2, "corntwo": 3, "drumsticks": 4, "taro": 5,
+    classes_id18 = {"chestnut": 1, "cornone": 2, "corntwo": 3, "drumsticks": 4, "taro": 5,
                     "nofood": 0, "steamedbread": 6, "eggplant": 7, "eggplant_cut_sauce": 8, "bread": 9,
                     "container_nonhigh": 10, "container": 11, "duck": 12, "fish": 13, "hotdog": 14,
                     "redshrimp": 15, "shrimp": 16, "strand": 17}
@@ -190,9 +190,9 @@ if __name__ == '__main__':
                     "container": 40, "duck": 25, "fish": 41, "hotdog": 42, "redshrimp": 43,
                     "shrimp": 44, "strand": 45}
     # 需要修改
-    classes_id = classes_id46 #######
-    classes = classes_label46  #######
-    mode = "multi4_0508"  #######
+    classes_id = classes_id18 #######
+    classes = classes_label18  #######
+    mode = "multi3_0512"  #######
     tag = ""
     img_dir = "E:/check_2_phase/JPGImages"  # 文件夹地址
     save_dir = "E:/check_2_phase/detection_{0}{1}".format(mode, tag)  # 图片保存地址

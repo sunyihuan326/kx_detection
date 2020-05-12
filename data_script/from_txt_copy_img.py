@@ -3,7 +3,6 @@
 """
 从txt文件中读取图片地址，并将图片保存至统一文件夹
 
-
 @File    : from_txt_copy_img.py
 @Time    : 2019/12/5 16:52
 @Author  : sunyihuan
@@ -19,7 +18,7 @@ def from_txt_copy_data2all(txt_path, save_dir, jpg_typ, layer_tpy=True):
     :param txt_path:txt文件路径，全路径
     :param save_dir:保存地址
     :param jpg_typ:jpg或者xml，str格式
-    :param layer_tpy:是否保存layer数据，jpg时使用
+    :param layer_tpy:是否保存layer数据，与jpg_typ=jpg同时使用
     :return:
     '''
     txt_file = open(txt_path, "r")

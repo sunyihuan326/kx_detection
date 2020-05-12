@@ -1,7 +1,9 @@
 # -*- encoding: utf-8 -*-
 
 """
-@File    : from_img_dir_write_txt.py
+将文件夹中的所有图片名写入到txt文件中
+
+@File    : write_txt_from_img_dir.py
 @Time    : 2019/12/9 14:29
 @Author  : sunyihuan
 """
