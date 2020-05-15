@@ -16,7 +16,7 @@ def check_2_txt(train_txt, test_txt):
     '''
     train_txt_file = open(train_txt, "r")
     train_txt_files = train_txt_file.readlines()
-
+    print(len(train_txt_files))
     test_txt_file = open(test_txt, "r")
     test_txt_files = test_txt_file.readlines()
     print(len(test_txt_files))
@@ -28,12 +28,12 @@ def check_2_txt(train_txt, test_txt):
             else:
                 t_txt_list.append(t_txt)
         print(len(t_txt_list))
-        test_txt_file = open(test_txt, "w")
-        for i in t_txt_list:
-            test_txt_file.write(i)
+        # test_txt_file = open(test_txt, "w")
+        # for i in t_txt_list:
+        #     test_txt_file.write(i)
 
 
 if __name__ == "__main__":
-    train_txt = "E:/DataSets/2020_two_phase_KXData/all_data36classes/JPGImages/train_resize.txt"
-    test_txt = "E:/DataSets/2020_two_phase_KXData/all_data36classes/JPGImages/test_resize.txt"
+    train_txt = "E:/kx_detection/multi_detection/data/dataset/202005/train_all0513.txt"
+    test_txt = "E:/kx_detection/multi_detection/data/dataset/202005/test_all0513.txt"
     check_2_txt(train_txt, test_txt)

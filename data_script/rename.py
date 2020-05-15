@@ -34,7 +34,7 @@ class ImageRename():
                 try:
                     # 修改命名，规则为：i_日期_烤箱/其他说明_类别名.jpg
                     dst = os.path.join(os.path.abspath(self.root_path),
-                                       filename + "_200511" + "_others_" + self.target + '.jpg')
+                                       filename + "_200514" + "_X1_" + self.target + '.jpg')
                     os.rename(src, dst)
                     print('converting %s to %s ...' % (src, dst))
                 except:
@@ -75,8 +75,8 @@ class ImageRename():
 
 
 if __name__ == '__main__':
-    path = "E:/已标数据备份/补采土豆红薯202004/layer_data/nofood/转叉"
-    target = "nofood"
+    path = "E:/WLS_originalData/二期数据/202005/0514/taro"
+    target = "taro"
 
     newname = ImageRename(path, target)
     newname.rename0()

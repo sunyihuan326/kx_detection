@@ -58,7 +58,7 @@ class YoloTest(object):
         self.num_classes = 18 # 种类数
         self.score_threshold = 0.1
         self.iou_threshold = 0.5
-        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food3/20200512/yolov3_train_loss=3.0475.ckpt-150"  # ckpt文件地址
+        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food3/20200515/yolov3_train_loss=3.0987.ckpt-150"  # ckpt文件地址
         # self.weight_file = "./checkpoint/yolov3_train_loss=4.7681.ckpt-80"
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
@@ -192,7 +192,7 @@ if __name__ == '__main__':
     # 需要修改
     classes_id = classes_id18 #######
     classes = classes_label18  #######
-    mode = "multi3_0512"  #######
+    mode = "multi3_0515"  #######
     tag = ""
     img_dir = "E:/check_2_phase/JPGImages"  # 文件夹地址
     save_dir = "E:/check_2_phase/detection_{0}{1}".format(mode, tag)  # 图片保存地址

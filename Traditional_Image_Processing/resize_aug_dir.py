@@ -3,7 +3,9 @@
 # @Author  : sunyihuan
 # @File    : resize_aug_dir.py
 
-import math
+'''
+resize图片，并同时修改xml中标注数据
+'''
 from PIL import Image
 import random
 import numpy as np
@@ -15,14 +17,14 @@ import matplotlib.pyplot as plt
 
 def image_xml_resize(img_path, xml_path):
     '''
-    图片padding，将图片自动padding成正方形
+    图片resize,并同时修改xml数据
     :param img_path: 图片地址
     :return:
     '''
     img = Image.open(img_path)
     (img_w, img_h) = img.size
 
-    w = random.randrange(320, 1600)
+    w = random.randrange(800,1600)
     h = int((w / 800) * 600)
     img_new = img.resize((w, h), Image.ANTIALIAS)  # 图片尺寸变化
 
@@ -66,7 +68,7 @@ def img_dir_aug(img_dir, xml_dir, img_save_dir, xml_save_dir):
         if img_file.endswith(".jpg"):
             img_path = img_dir + "/" + img_file
 
-            img_name = str(img_file).split(".")[0] + "_resize" + ".jpg"  # 图片名称
+            img_name = str(img_file).split(".")[0] + "_resize_l" + ".jpg"  # 图片名称
             xml_name = xml_dir + "/" + str(img_file).split(".jpg")[0] + ".xml"  # xml文件名称
             xml_save_name = xml_save_dir + "/" + str(img_name).split(".jpg")[0] + ".xml"  # xml文件保存名称
             img, tree = image_xml_resize(img_path, xml_name)
@@ -76,10 +78,10 @@ def img_dir_aug(img_dir, xml_dir, img_save_dir, xml_save_dir):
 
 
 if __name__ == "__main__":
-    img_dir = "E:/DataSets/2020_two_phase_KXData/all_data36classes/JPGImages/train"
-    xml_dir = "E:/DataSets/2020_two_phase_KXData/all_data36classes/Annotations/train"
-    img_save_dir = "E:/DataSets/2020_two_phase_KXData/all_data36classes/JPGImages/train_resize"
-    xml_save_dir = "E:/DataSets/2020_two_phase_KXData/all_data36classes/Annotations/train_resize"
+    img_dir = "E:/DataSets/KXDataAll/JPGImages"
+    xml_dir = "E:/DataSets/KXDataAll/Annotations"
+    img_save_dir = "E:/DataSets/KXDataAll/JPGImages_resize_l"
+    xml_save_dir = "E:/DataSets/KXDataAll/Annotations_resize_l"
 
     if not os.path.exists(img_save_dir): os.mkdir(img_save_dir)
     if not os.path.exists(xml_save_dir): os.mkdir(xml_save_dir)

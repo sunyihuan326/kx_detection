@@ -10,7 +10,7 @@
 
 import os
 
-img_dir = "E:/DataSets/2020_two_phase_KXData/all_data36classes/JPGImages/test_resize"
+img_dir = "E:/DataSets/KXDataAll/Annotations_test"
 
 txt_list = []
 for img_name in os.listdir(img_dir):
@@ -18,7 +18,7 @@ for img_name in os.listdir(img_dir):
         txt_list.append(img_name.split(".jpg")[0] + "\n")
 
 print(len(txt_list))
-txt_name = "E:/DataSets/2020_two_phase_KXData/all_data36classes/JPGImages/test_resize.txt"
+txt_name = "E:/DataSets/KXDataAll/ImageSets/Main/test.txt"
 file = open(txt_name, "w")
 for i in txt_list:
     file.write(i)
