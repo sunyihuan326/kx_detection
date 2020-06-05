@@ -194,15 +194,15 @@ class process(object):
                     elif img.split(".")[0] in train_txt_files:  # 其他的拷贝图片至train中
                         shutil.copy(img_layer_dir + "/" + img, self.layer_root + "/train/" + l + "/" + img)
                     else:
-                        print("*****************:",img)
+                        print("*****************:", img)
 
 
 if __name__ == "__main__":
-    data_root = "E:/DataSets/KX_FOODSets_model_data/202005potatos"
+    data_root = "E:/DataSets/X_data_27classes/20200602porkchops"
     dprocess = process(data_root)
-    classes = ["nofood","potatocut", "potatol", "sweetpotatocut", "sweetpotatol"]
-    train_percent = 0.8
-    test_percent =0.0
+    classes = ["porkchops"]
+    train_percent = 1.0
+    test_percent = 0.0
     dprocess.split_data(classes, train_percent, test_percent)
     dprocess.train_all_txt(["train", "test", "val"])
     dprocess.copy2dir(classes, "xml")

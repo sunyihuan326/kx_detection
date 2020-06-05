@@ -53,8 +53,8 @@ def check_labelname(inputpath, label_name='Potatom'):
 
 
 if __name__ == '__main__':
-    inputpath = "E:/已标数据备份/补采土豆红薯202004/Annotations/potatocut"  # 这是xml文件的文件夹的绝对地址
-    label_name = "potatocut"
+    inputpath = "E:/DataSets/20200602chickenwings/Annotations"  # 这是xml文件的文件夹的绝对地址
+    label_name = "chickenwings"
     changesku(inputpath, label_name)
 
     check_labelname(inputpath, label_name)

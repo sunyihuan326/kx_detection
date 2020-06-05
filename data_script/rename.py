@@ -16,7 +16,7 @@ class ImageRename():
         self.root_path = root_path
         self.target = target
 
-    def rename0(self):
+    def rename0(self,say):
         '''
         将文件夹中排序命名
         :return:
@@ -34,9 +34,27 @@ class ImageRename():
                 try:
                     # 修改命名，规则为：i_日期_烤箱/其他说明_类别名.jpg
                     dst = os.path.join(os.path.abspath(self.root_path),
-                                       filename + "_200514" + "_X1_" + self.target + '.jpg')
+                                       filename + "_200511" + "_{}".format(say) + self.target + '.jpg')
                     os.rename(src, dst)
                     print('converting %s to %s ...' % (src, dst))
+                except:
+                    pass
+
+    def change_jpg_name(self):
+        for i, item in enumerate(os.listdir(self.root_path)):
+            if item.endswith('.jpg'):
+                src = os.path.join(os.path.abspath(self.root_path), item)
+                try:
+                    # 修改命名，规则为：i_日期_炸锅型号/其他说明_类别名.jpg
+                    # tj:托架、xz:锡纸、gyz:硅油纸、jk:净空、cp:瓷盘
+                    # qh:浅红、zh:正红、ch:橙红、sh:深红
+                    if "cornone" in src:
+                        dst = src.replace("cornone", "corntwo")
+                        os.rename(src, dst)
+                        print('converting %s to %s ...' % (src, dst))
+                    else:
+                        pass
+
                 except:
                     pass
 
@@ -57,12 +75,6 @@ class ImageRename():
                     if item.endswith('.jpg'):
                         src = os.path.join(os.path.abspath(path_name), item)
                         filename = str(i + 1)
-                        # filename = str(item).split(".")[0]
-                        # print(filename)
-                        # dst = os.path.join(os.path.abspath(self.path),
-                        #                    filename + '_s.jpg')
-                        # os.rename(src, dst)
-                        # #
                         try:
                             dst = os.path.join(os.path.abspath(path_name),
                                                filename + "_200311" + "_X5_qie_" + "{}".format(k) + "_{}_".format(
@@ -75,8 +87,9 @@ class ImageRename():
 
 
 if __name__ == '__main__':
-    path = "E:/WLS_originalData/二期数据/202005/0514/taro"
+    path = "E:/WLS_originalData/二期数据/第二轮202005/X5/taro/top"
     target = "taro"
 
     newname = ImageRename(path, target)
-    newname.rename0()
+    # newname.change_jpg_name()
+    newname.rename0("X5_top_")

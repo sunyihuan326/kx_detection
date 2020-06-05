@@ -163,11 +163,11 @@ def correct_bboxes(bboxes_pr, layer_n):
     # 检测到一个食材
     elif num_label == 1:
         if bboxes_pr[0][4] < 0.45:
-            if bboxes_pr[0][5] == 10:  # 低分nofood
+            if bboxes_pr[0][5] == 9:  # 低分nofood
                 bboxes_pr[0][4] = 0.75
-            elif bboxes_pr[0][5] == 11:  # 低分花生米
+            elif bboxes_pr[0][5] == 10:  # 低分花生米
                 bboxes_pr[0][4] = 0.85
-            elif bboxes_pr[0][5] == 25:  # 低分整鸡
+            elif bboxes_pr[0][5] == 21:  # 低分整鸡
                 bboxes_pr[0][4] = 0.75
             else:
                 del bboxes_pr[0]
@@ -222,25 +222,33 @@ def correct_bboxes(bboxes_pr, layer_n):
             # 优先处理食材特例
             if n_name == 2:
                 # 如果鸡翅中检测到了排骨，默认单一食材为鸡翅
-                if (name1 == 2 and name2 == 16) or (name1 == 16 and name2 == 2):
-                    for i in range(new_num_label):
-                        new_bboxes_pr[i][5] = 2
-                    return new_bboxes_pr, layer_n
+                # if (name1 == 2 and name2 == 16) or (name1 == 16 and name2 == 2):
+                if (name1 == 2 and name2 == 13) or (name1 == 13 and name2 == 2):
+                    if int(s_labeldict[0][0])==13:  #如果鸡翅数量比排骨多，直接判断为鸡翅
+                        for i in range(new_num_label):
+                            new_bboxes_pr[i][5] = 13
+                        return new_bboxes_pr, layer_n
+                    else:
+                        for i in range(new_num_label):
+                            new_bboxes_pr[i][5] = 2
+                        return new_bboxes_pr, layer_n
                 # 如果对切土豆中检测到了大土豆，默认单一食材为对切土豆
-                if (name1 == 17 and name2 == 18) or (name1 == 18 and name2 == 17):
-                    for i in range(new_num_label):
-                        new_bboxes_pr[i][5] = 17
-                    return new_bboxes_pr, layer_n
+                # if (name1 == 17 and name2 == 18) or (name1 == 18 and name2 == 17):
+                # if (name1 == 15 and name2 == 16) or (name1 == 16 and name2 == 15):
+                #     for i in range(new_num_label):
+                #         new_bboxes_pr[i][5] = 15
+                #     return new_bboxes_pr, layer_n
                 # 如果对切红薯中检测到了大红薯，默认单一食材为对切红薯
-                if (name1 == 21 and name2 == 22) or (name1 == 22 and name2 == 21):
-                    for i in range(new_num_label):
-                        new_bboxes_pr[i][5] = 21
-                    return new_bboxes_pr, layer_n
+                # if (name1 == 21 and name2 == 22) or (name1 == 22 and name2 == 21):
+                # if (name1 == 19 and name2 == 18) or (name1 == 18 and name2 == 19):
+                #     for i in range(new_num_label):
+                #         new_bboxes_pr[i][5] = 18
+                #     return new_bboxes_pr, layer_n
                 # 如果对切红薯中检测到了中红薯，默认单一食材为对切红薯
-                if (name1 == 21 and name2 == 23) or (name1 == 23 and name2 == 21):
-                    for i in range(new_num_label):
-                        new_bboxes_pr[i][5] = 21
-                    return new_bboxes_pr, layer_n
+                # if (name1 == 21 and name2 == 23) or (name1 == 23 and name2 == 21):
+                #     for i in range(new_num_label):
+                #         new_bboxes_pr[i][5] = 21
+                #     return new_bboxes_pr, layer_n
 
             # 数量最多label对应的食材占比0.7以上
             if num_name1 / new_num_label > 0.7:

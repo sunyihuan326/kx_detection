@@ -39,26 +39,27 @@ def he_foods(pre):
     :param pre:
     :return:
     '''
-    if pre in [8, 9] and classes_id[classes[i]] in [8, 9]:  # 合并蛋挞
-        rigth_label = True
-    elif pre in [12, 14] and classes_id[classes[i]] in [12, 14]:  # 合并四分之一披萨、六分之一披萨
-        rigth_label = True
-    elif pre in [18, 19] and classes_id[classes[i]] in [18, 19]:  # 合并中土豆、大土豆
-        rigth_label = True
-    elif pre in [22, 23] and classes_id[classes[i]] in [22, 23]:  # 合并中红薯、大红薯
-        rigth_label = True
-    else:
-        rigth_label = False
+    # if pre in [8, 9] and classes_id[classes[i]] in [8, 9]:  # 合并蛋挞
+    #     rigth_label = True
+    # elif pre in [12, 14] and classes_id[classes[i]] in [12, 14]:  # 合并四分之一披萨、六分之一披萨
+    #     rigth_label = True
+    # elif pre in [18, 19] and classes_id[classes[i]] in [18, 19]:  # 合并中土豆、大土豆
+    #     rigth_label = True
+    # elif pre in [22, 23] and classes_id[classes[i]] in [22, 23]:  # 合并中红薯、大红薯
+    #     rigth_label = True
+    # else:
+    #     rigth_label = False
+    rigth_label = False
     return rigth_label
 
 
 class YoloTest(object):
     def __init__(self):
-        self.input_size = 416  # 输入图片尺寸（默认正方形）
-        self.num_classes = 18 # 种类数
-        self.score_threshold = 0.1
+        self.input_size = 320  # 输入图片尺寸（默认正方形）
+        self.num_classes = 22  # 种类数
+        self.score_threshold = 0.3
         self.iou_threshold = 0.5
-        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food3/20200515/yolov3_train_loss=3.0987.ckpt-150"  # ckpt文件地址
+        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food3/20200605/yolov3_train_loss=4.9544.ckpt-173"  # ckpt文件地址
         # self.weight_file = "./checkpoint/yolov3_train_loss=4.7681.ckpt-80"
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
@@ -137,14 +138,14 @@ class YoloTest(object):
 
 
 if __name__ == '__main__':
-    #
-    # classes = ["Beefsteak", "CartoonCookies", "Cookies", "CupCake", "Pizzafour",
-    #            "Pizzatwo", "Pizzaone", "Pizzasix", "ChickenWings", "ChiffonCake6",
-    #            "ChiffonCake8", "CranberryCookies", "eggtarts", "eggtartl", "nofood",
-    #            "Peanuts", "PorkChops", "PotatoCut", "Potatol", "Potatom",
-    #            "Potatos", "RoastedChicken", "SweetPotatoCut", "SweetPotatol", "SweetPotatom",
-    #            "SweetPotatoS", "Toast", "chestnut", "cornone", "corntwo", "drumsticks",
-    #            "taro", "steamedbread", "eggplant", "eggplant_cut", "eggplant_cut_sauce"]
+
+    classes_label22 = ["beefsteak", "cartooncookies", "chickenwings", "chiffoncake6", "chiffoncake8",
+                       "cookies", "cranberrycookies", "cupcake", "eggtartl", "eggtarts",
+                       "nofood", "peanuts", "pizzafour", "pizzaone", "pizzasix",
+                       "pizzatwo", "porkchops", "potatocut", "potatol", "potatom",
+                       "potatos", "sweetpotatocut", "sweetpotatol", "sweetpotatom", "sweetpotatos",
+                       "roastedchicken", "toast", ]
+
     classes_label46 = ["beefsteak", "cartooncookies", "chickenwings", "chiffoncake6", "chiffoncake8",
                        "cookies", "cranberrycookies", "cupcake", "eggtartl", "eggtarts",
                        "nofood", "peanuts", "pizzafour", "pizzaone", "pizzasix",
@@ -156,7 +157,7 @@ if __name__ == '__main__':
                        "container", "duck", "fish", "hotdog", "redshrimp",
                        "shrimp", "strand"]
     classes_label18 = ["chestnut", "cornone", "corntwo", "drumsticks", "taro",
-                        "steamedbread", "eggplant", "eggplant_cut_sauce", "bread",
+                       "steamedbread", "eggplant", "eggplant_cut_sauce", "bread",
                        "container_nonhigh", "container", "duck", "fish", "hotdog",
                        "redshrimp", "shrimp", "strand"]
 
@@ -186,14 +187,27 @@ if __name__ == '__main__':
                     "pizzafour": 12, "pizzaone": 13, "pizzasix": 14, "roastedchicken": 25,
                     "pizzatwo": 15, "sweetpotatos": 24, "toast": 26, "sweetpotato_others": 27, "pizza_others": 28,
                     "potato_others": 29, "chestnut": 30, "cornone": 31, "corntwo": 32, "drumsticks": 33,
-                    "taro": 34, "steamedbread": 35, "eggplant": 36, "eggplant_cut_sauce": 37, "bread": 38,"container_nonhigh": 39,
+                    "taro": 34, "steamedbread": 35, "eggplant": 36, "eggplant_cut_sauce": 37, "bread": 38,
+                    "container_nonhigh": 39,
                     "container": 40, "duck": 25, "fish": 41, "hotdog": 42, "redshrimp": 43,
                     "shrimp": 44, "strand": 45}
+    classes_id22 = {"cartooncookies": 1, "cookies": 4, "cupcake": 6, "beefsteak": 0, "chickenwings": 2,
+                    "chiffoncake6": 3, "chiffoncake8": 3, "cranberrycookies": 5, "eggtarts": 7, "eggtartl": 7,
+                    "nofood": 8, "peanuts": 9, "porkchops": 13, "potatocut": 14, "potatol": 15,
+                    "potatom": 15, "potatos": 16, "sweetpotatocut": 17, "sweetpotatol": 18, "sweetpotatom": 18,
+                    "pizzafour": 10, "pizzaone": 11, "pizzasix": 10, "roastedchicken": 20,
+                    "pizzatwo": 12, "sweetpotatos": 19, "toast": 21}
+    classes_id23 = {"cartooncookies": 1, "cookies": 5, "cupcake": 7, "beefsteak": 0, "chickenwings": 2,
+                    "chiffoncake6": 3, "chiffoncake8": 4, "cranberrycookies": 6, "eggtarts": 8, "eggtartl": 8,
+                    "nofood": 9, "peanuts": 10, "porkchops": 14, "potatocut": 15, "potatol": 16,
+                    "potatom": 16, "potatos": 17, "sweetpotatocut": 18, "sweetpotatol": 19, "sweetpotatom": 19,
+                    "pizzafour": 11, "pizzaone": 12, "pizzasix": 11, "roastedchicken": 21,
+                    "pizzatwo": 13, "sweetpotatos": 20, "toast": 22}
     # 需要修改
-    classes_id = classes_id18 #######
-    classes = classes_label18  #######
-    mode = "multi3_0515"  #######
-    tag = ""
+    classes_id = classes_id22  #######
+    classes = classes_label22  #######
+    mode = "multi3_0605_173"  #######
+    tag = "_local_c"
     img_dir = "E:/check_2_phase/JPGImages"  # 文件夹地址
     save_dir = "E:/check_2_phase/detection_{0}{1}".format(mode, tag)  # 图片保存地址
     if not os.path.exists(save_dir): os.mkdir(save_dir)
@@ -303,7 +317,7 @@ if __name__ == '__main__':
                     error_noresults += 1
                     shutil.copy(image_path, noresult_dir + "/" + file)
                 else:
-                    pre = bboxes_pr[0][-1]
+                    pre = int(bboxes_pr[0][-1])
                     food_img_pre.append(pre)
                     food_img_true.append(classes_id[classes[i]])
 
@@ -411,30 +425,35 @@ if __name__ == '__main__':
                     error_noresults += 1
                     shutil.copy(image_path, noresult_dir + "/" + file)
                 else:
-                    # bboxes_pr, layer_n = correct_bboxes(bboxes_pr, layer_n)  # 矫正输出结果
-                    pre = bboxes_pr[0][-1]
-                    food_img_pre.append(pre)
-                    food_img_true.append(classes_id[classes[i]])
-
-                    if pre == classes_id[classes[i]]:  # 若结果正确，食材正确数+1
-                        food_acc_t += 1
-                        food_acc += 1
-                        c_food_right_list.append(str(c) + "/" + file)  # 食材正确将名字写入c_food_right_list中
+                    bboxes_pr, layer_n = correct_bboxes(bboxes_pr, layer_n)  # 矫正输出结果
+                    if len(bboxes_pr) == 0:
+                        error_noresults += 1
+                        shutil.copy(image_path, noresult_dir + "/" + file)
                     else:
-                        right_label_t = he_foods(pre)
-                        if right_label_t:  # 合并后结果正确
+                        pre = bboxes_pr[0][-1]
+                        food_img_pre.append(pre)
+                        food_img_true.append(classes_id[classes[i]])
+
+                        if pre == classes_id[classes[i]]:  # 若结果正确，食材正确数+1
                             food_acc_t += 1
                             food_acc += 1
                             c_food_right_list.append(str(c) + "/" + file)  # 食材正确将名字写入c_food_right_list中
                         else:
-                            drawed_img_save_to_path = str(image_path).split("/")[-1]
-                            drawed_img_save_to_path = str(drawed_img_save_to_path).split(".")[0] + "_" + str(
-                                layer_n) + ".jpg"  # 图片保存地址，烤层结果在命名中
-                            shutil.copy(save_c_dir + "/" + drawed_img_save_to_path,
-                                        fooderror_dirs + "/" + file.split(".jpg")[0] + "_" + str(layer_n) + "_" + str(
-                                            pre) + ".jpg")
-                            shutil.copy(image_path, fooderror_dirs + "/" + file.split(".jpg")[0] + "_{}.jpg".format(
-                                new_classes[pre]))
+                            right_label_t = he_foods(pre)
+                            if right_label_t:  # 合并后结果正确
+                                food_acc_t += 1
+                                food_acc += 1
+                                c_food_right_list.append(str(c) + "/" + file)  # 食材正确将名字写入c_food_right_list中
+                            else:
+                                drawed_img_save_to_path = str(image_path).split("/")[-1]
+                                drawed_img_save_to_path = str(drawed_img_save_to_path).split(".")[0] + "_" + str(
+                                    layer_n) + ".jpg"  # 图片保存地址，烤层结果在命名中
+                                shutil.copy(save_c_dir + "/" + drawed_img_save_to_path,
+                                            fooderror_dirs + "/" + file.split(".jpg")[0] + "_" + str(
+                                                layer_n) + "_" + str(
+                                                pre) + ".jpg")
+                                shutil.copy(image_path, fooderror_dirs + "/" + file.split(".jpg")[0] + "_{}.jpg".format(
+                                    new_classes[pre]))
 
         if len(os.listdir(img_dirs + "/top")) == 0:  # 判断是否有值
             layer_top_acc = 0
@@ -524,9 +543,12 @@ if __name__ == '__main__':
     layer_conf = confusion_matrix(y_pred=layer_img_pre, y_true=layer_img_true)
     food_conf = confusion_matrix(y_pred=food_img_pre, y_true=food_img_true,
                                  labels=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
-                                         22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38])
+                                         22, 23])
 
     sheet2 = workbook.add_sheet("food_confusion_matrix")
+    for i in range(23):
+        sheet2.write(i + 1, 0, classes[i])
+        sheet2.write(0, i + 1, classes[i])
     for i in range(food_conf.shape[0]):
         for j in range(food_conf.shape[1]):
             sheet2.write(i + 1, j + 1, str(food_conf[i, j]))
@@ -536,10 +558,10 @@ if __name__ == '__main__':
     print(food_conf)
     print(sum(sum(food_conf)))
 
-    sheet1.write(55, 1, jpgs_count_all)
-    sheet1.write(55, 2, layer_jpgs_acc)
-    sheet1.write(55, 3, food_jpgs_acc)
-    sheet1.write(55, 4, round((layer_jpgs_acc / jpgs_count_all) * 100, 2))
+    sheet1.write(45, 1, jpgs_count_all)
+    sheet1.write(45, 2, layer_jpgs_acc)
+    sheet1.write(45, 3, food_jpgs_acc)
+    sheet1.write(45, 4, round((layer_jpgs_acc / jpgs_count_all) * 100, 2))
     sheet1.write(55, 5, round((food_jpgs_acc / jpgs_count_all) * 100, 2))
 
     workbook.save("E:/check_2_phase/all_he_{0}{1}.xls".format(mode, tag))

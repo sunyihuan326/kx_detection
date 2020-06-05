@@ -28,12 +28,12 @@ def check_2_txt(train_txt, test_txt):
             else:
                 t_txt_list.append(t_txt)
         print(len(t_txt_list))
-        # test_txt_file = open(test_txt, "w")
-        # for i in t_txt_list:
-        #     test_txt_file.write(i)
+        test_txt_file = open(test_txt, "w")
+        for i in t_txt_list:
+            test_txt_file.write(i)
 
 
 if __name__ == "__main__":
-    train_txt = "E:/kx_detection/multi_detection/data/dataset/202005/train_all0513.txt"
-    test_txt = "E:/kx_detection/multi_detection/data/dataset/202005/test_all0513.txt"
+    train_txt = "E:/DataSets/X_data_27classes/train.txt"
+    test_txt = "E:/DataSets/X_data_27classes/val.txt"
     check_2_txt(train_txt, test_txt)

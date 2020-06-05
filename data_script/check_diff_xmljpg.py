@@ -65,8 +65,8 @@ def check_layerjpg_diff(img_dir, layer_dir):
 
 
 if __name__ == "__main__":
-    img_dir = "E:/已标数据备份/补采土豆红薯202004/JPGImages/nofood"
+    img_dir = "E:/DataSets/X_data_27classes/JPGImages"
     xml_dir = "E:/已标数据备份/补采土豆红薯202004/Annotations/nofood"
-    layer_dir="E:/已标数据备份/补采土豆红薯202004/layer_data/nofood"
+    layer_dir="E:/DataSets/X_data_27classes/layer_data"
     # check_xmljpg_diff(img_dir, xml_dir)
     check_layerjpg_diff(img_dir,layer_dir)

@@ -20,7 +20,7 @@ def read_tensor_name(model_path, typ):
     :param typ: 类型，pb或ckpt
     :return:
     '''
-    assert typ == ["pb", "ckpt"]
+    assert typ in ["pb", "ckpt"]
     key_name = []
     if typ == "ckpt":
         reader = pywrap_tensorflow.NewCheckpointReader(model_path)
@@ -41,6 +41,6 @@ def read_tensor_name(model_path, typ):
 
 
 ckpt_path = "E:/ckpt_dirs/Food_detection/multi_food2/20200507/yolov3_train_loss=5.0711.ckpt-157"
-pb_path = "E:/ckpt_dirs/Food_detection/multi_food2/20200507/yolo_model.pb"
-key_name = read_tensor_name(ckpt_path, "ckpt")
+pb_path = "E:/multi_yolov3_predict-20191220/checkpoint/yolov3_1220.pb"
+key_name = read_tensor_name(pb_path, "pb")
 print(key_name)

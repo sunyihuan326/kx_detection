@@ -12,7 +12,7 @@ __C.YOLO                        = edict()
 
 # Set the class name
 __C.YOLO.LAYER_NUMS             = 4
-__C.YOLO.CLASSES                = "./data/classes/food46.names"
+__C.YOLO.CLASSES                = "./data/classes/food22.names"
 __C.YOLO.ANCHORS                = "./data/anchors/basline_anchors.txt"
 __C.YOLO.MOVING_AVE_DECAY       = 0.9995
 __C.YOLO.STRIDES                = [8, 16, 32]

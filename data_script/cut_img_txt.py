@@ -40,6 +40,6 @@ def cut_txt_data(cut_name, cut_len):
 
 
 if __name__ == "__main__":
-    txt_path = "E:/kx_detection/multi_detection/data/dataset/20191205/base_line_train1205.txt"
-    new_txt_name = "E:/kx_detection/multi_detection/data/dataset/20191205/base_line_480_train1205.txt"
-    cut_txt_data("SweetPotatos", 480)
+    txt_path = "E:/DataSets/X_data_27classes/serve_train23.txt"
+    new_txt_name =  "E:/DataSets/X_data_27classes/serve_train23_new.txt"
+    cut_txt_data("20200522data", 0)

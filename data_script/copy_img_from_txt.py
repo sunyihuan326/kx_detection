@@ -3,7 +3,7 @@
 """
 从txt文件中读取图片地址，并将图片保存至统一文件夹，含layer数据
 
-@File    : from_txt_copy_img.py
+@File    : copy_img_from_txt.py
 @Time    : 2019/12/5 16:52
 @Author  : sunyihuan
 """
@@ -64,7 +64,7 @@ def from_txt_copy_data2all(txt_path, save_dir, jpg_typ, layer_tpy=True):
 
 
 if __name__ == "__main__":
-    txt_path = "E:/kx_detection/multi_detection/data/dataset/202005/train_all0513.txt"
-    save_dir = "E:/DataSets/KXDataAll/Annotations_train"
+    txt_path = "E:/kx_detection/multi_detection/data/dataset/X_KX_data_27_1127_val27.txt"
+    save_dir = "E:/DataSets/1127X_data/JPGImages_val"
     if not os.path.exists(save_dir): os.mkdir(save_dir)
-    from_txt_copy_data2all(txt_path, save_dir, "xml", False)
+    from_txt_copy_data2all(txt_path, save_dir, "jpg", True)
