@@ -146,6 +146,100 @@ def get_time(obj_c, obj_length, layer_nums):
     return work_time
 
 
+def get_chiffon_size(layer, xmin, ymin, xmax, ymax):
+    '''
+    根据烤层和检测框信息，判断戚风尺寸，6寸还是8寸
+    :param layer:
+    :param xmin:
+    :param ymin:
+    :param xmax:
+    :param ymax:
+    :return:
+    '''
+    x_weight = int(xmax - xmin)
+    y_high = int(ymax - ymin)
+    if int(layer) == 0:
+        if x_weight <= 550:
+            size = 6
+        else:
+            size = 8
+    elif int(layer) == 1:
+        if x_weight <= 577:
+            size = 6
+        else:
+            size = 8
+    else:
+        if x_weight <= 600:
+            size = 6
+        else:
+            size = 8
+    return size
+
+
+def get_potatoml(bboxes_pr, layer_n):
+    '''
+    判断大土豆为大土豆或者中土豆
+    判断大红薯为大红薯或者中红薯
+
+     戚风6寸、8寸判断
+    :param bboxes_pr:
+    :param layer_n:
+    :return:
+    '''
+    if len(bboxes_pr) == 0:  # 无任何结果直接输出
+        return bboxes_pr, layer_n
+    else:
+        if int(bboxes_pr[0][-1]) == 3:  # 戚风6-8寸判断
+            size = get_chiffon_size(int(layer_n), int(bboxes_pr[0][0]), int(bboxes_pr[0][1]), int(bboxes_pr[0][2]),
+                                    int(bboxes_pr[0][3]))
+            if size == 6:
+                return bboxes_pr, layer_n
+            else:
+                bboxes_pr_new = []
+                for bb in bboxes_pr:
+                    bb[-1] = 24
+                    bboxes_pr_new.append(bb)
+                return bboxes_pr_new, layer_n
+
+        cls_list = []  # 标签类别，主要存储土豆红薯标签，用于将大红薯分为中、大，大土豆分为中、大
+        for c in bboxes_pr:
+            if int(c[-1]) == 15:  # 若输出类别结果为大土豆
+                if int(c[-1]) not in cls_list:  # 若标签列表中无大土豆，加入
+                    cls_list.append(int(c[-1]))
+            elif int(c[-1]) == 16:  # 若输出类别为小土豆
+                if 15 in cls_list and int(c[-1]) not in cls_list:  # 若大土豆在标签中，且标签列别中无小土豆，标签加入
+                    cls_list.append(int(c[-1]))
+            elif int(c[-1]) == 18:  # 若输出类别结果为大红薯
+                if int(c[-1]) not in cls_list:  # 若标签列表中无大红薯，标签加入
+                    cls_list.append(int(c[-1]))
+            elif int(c[-1]) == 19:  # 若输出类别结果为小红薯
+                if 18 in cls_list and int(c[-1]) not in cls_list:  # 若大红薯在标签中，且标签列别中无小红薯，标签加入
+                    cls_list.append(int(c[-1]))
+        if len(cls_list) == 0:  # 若标签类别为空，直接返回结果
+            return bboxes_pr, layer_n
+        else:  # 若标签结果有值，获取长度、判断大中
+            ave_length = get_potatoscale(bboxes_pr, layer_n)
+            if int(cls_list[0]) == 15 or cls_list == [15, 16]:  # 标签为大土豆,或者大小土豆
+                if int(ave_length) < 14:  # 长度小于14，结果为中土豆，label标签为：22
+                    bboxes_pr_new = []
+                    for bb in bboxes_pr:
+                        bb[-1] = 22
+                        bboxes_pr_new.append(bb)
+                    return bboxes_pr_new, layer_n
+                else:
+                    return bboxes_pr, layer_n
+            elif int(cls_list[0]) == 18 or cls_list == [18, 19]:  # 标签为大红薯，或者大小红薯
+                if int(ave_length) < 18:  # 长度小于18，结果为中红薯，label标签为：23
+                    bboxes_pr_new = []
+                    for bb in bboxes_pr:
+                        bb[-1] = 23
+                        bboxes_pr_new.append(bb)
+                    return bboxes_pr_new, layer_n
+                else:
+                    return bboxes_pr, layer_n
+            else:
+                return bboxes_pr, layer_n
+
 def correct_bboxes(bboxes_pr, layer_n):
     '''
     最新修改时间：202003/2/27
@@ -232,18 +326,18 @@ def correct_bboxes(bboxes_pr, layer_n):
                         for i in range(new_num_label):
                             new_bboxes_pr[i][5] = 2
                         return new_bboxes_pr, layer_n
-                # 如果对切土豆中检测到了大土豆，默认单一食材为对切土豆
+                # 如果对土豆中检测到了大土豆，默认单一食材为大土豆
                 # if (name1 == 17 and name2 == 18) or (name1 == 18 and name2 == 17):
-                # if (name1 == 15 and name2 == 16) or (name1 == 16 and name2 == 15):
-                #     for i in range(new_num_label):
-                #         new_bboxes_pr[i][5] = 15
-                #     return new_bboxes_pr, layer_n
-                # 如果对切红薯中检测到了大红薯，默认单一食材为对切红薯
+                if (name1 == 15 and name2 == 16) or (name1 == 16 and name2 == 15):
+                    for i in range(new_num_label):
+                        new_bboxes_pr[i][5] = 15
+                    return new_bboxes_pr, layer_n
+                # 如果红薯中检测到了大红薯，默认单一食材为大红薯
                 # if (name1 == 21 and name2 == 22) or (name1 == 22 and name2 == 21):
-                # if (name1 == 19 and name2 == 18) or (name1 == 18 and name2 == 19):
-                #     for i in range(new_num_label):
-                #         new_bboxes_pr[i][5] = 18
-                #     return new_bboxes_pr, layer_n
+                if (name1 == 19 and name2 == 18) or (name1 == 18 and name2 == 19):
+                    for i in range(new_num_label):
+                        new_bboxes_pr[i][5] = 18
+                    return new_bboxes_pr, layer_n
                 # 如果对切红薯中检测到了中红薯，默认单一食材为对切红薯
                 # if (name1 == 21 and name2 == 23) or (name1 == 23 and name2 == 21):
                 #     for i in range(new_num_label):

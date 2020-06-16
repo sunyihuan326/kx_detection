@@ -55,11 +55,11 @@ def he_foods(pre):
 
 class YoloTest(object):
     def __init__(self):
-        self.input_size = 320  # 输入图片尺寸（默认正方形）
+        self.input_size = 416  # 输入图片尺寸（默认正方形）
         self.num_classes = 23  # 种类数
         self.score_threshold = 0.3
         self.iou_threshold = 0.5
-        self.weight_file =  "E:/ckpt_dirs/Food_detection/multi_food3/20200611/yolov3_train_loss=6.6101.ckpt-108"   # ckpt文件地址
+        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food/20200609/yolov3_train_loss=4.9670.ckpt-154"  # ckpt文件地址
         # self.weight_file = "./checkpoint/yolov3_train_loss=4.7681.ckpt-80"
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
@@ -83,6 +83,9 @@ class YoloTest(object):
             # 输出烤层结果
             self.layer_num = graph.get_tensor_by_name("define_loss/layer_classes:0")
 
+            # 食材结果
+            self.food_class = graph.get_tensor_by_name("define_loss/food_classes:0")
+
     def predict(self, image):
         '''
         预测结果
@@ -97,8 +100,8 @@ class YoloTest(object):
         image_data = utils.image_preporcess(image, [self.input_size, self.input_size])
         image_data = image_data[np.newaxis, ...]
 
-        pred_sbbox, pred_mbbox, pred_lbbox, layer_n = self.sess.run(
-            [self.pred_sbbox, self.pred_mbbox, self.pred_lbbox, self.layer_num],
+        pred_sbbox, pred_mbbox, pred_lbbox, layer_n, food_class = self.sess.run(
+            [self.pred_sbbox, self.pred_mbbox, self.pred_lbbox, self.layer_num, self.food_class],
             feed_dict={
                 self.input: image_data,
                 self.trainable: False
@@ -112,7 +115,7 @@ class YoloTest(object):
         bboxes = utils.postprocess_boxes(pred_bbox, (org_h, org_w), self.input_size, self.score_threshold)
         bboxes = utils.nms(bboxes, self.iou_threshold)
 
-        return bboxes, layer_n[0]
+        return bboxes, layer_n[0],food_class[0]
 
     def result(self, image_path, save_dir):
         '''
@@ -123,7 +126,7 @@ class YoloTest(object):
         '''
         image = cv2.imread(image_path)  # 图片读取
         # image = utils.white_balance(image)  # 图片白平衡处理
-        bboxes_pr, layer_n = self.predict(image)  # 预测结果
+        bboxes_pr, layer_n,food_class = self.predict(image)  # 预测结果
         # print(bboxes_pr)
         # print(layer_n)
 
@@ -134,7 +137,7 @@ class YoloTest(object):
                 layer_n) + ".jpg"  # 图片保存地址，烤层结果在命名中
             # cv2.imshow('Detection result', image)
             cv2.imwrite(save_dir + "/" + drawed_img_save_to_path, image)  # 保存图片
-        return bboxes_pr, layer_n
+        return bboxes_pr, layer_n,food_class
 
 
 if __name__ == '__main__':
@@ -145,7 +148,6 @@ if __name__ == '__main__':
                        "pizzatwo", "porkchops", "potatocut", "potatol", "potatom",
                        "potatos", "sweetpotatocut", "sweetpotatol", "sweetpotatom", "sweetpotatos",
                        "roastedchicken", "toast", ]
-    # classes_label22 = ["chiffoncake6", "chiffoncake8", ]
 
     classes_label46 = ["beefsteak", "cartooncookies", "chickenwings", "chiffoncake6", "chiffoncake8",
                        "cookies", "cranberrycookies", "cupcake", "eggtartl", "eggtarts",
@@ -207,8 +209,8 @@ if __name__ == '__main__':
     # 需要修改
     classes_id = classes_id23  #######
     classes = classes_label22  #######
-    mode = "multi3_0611_108"  #######
-    tag = "_local_c"
+    mode = "multi_0609"  #######
+    tag = ""
     img_dir = "E:/check_2_phase/JPGImages"  # 文件夹地址
     save_dir = "E:/check_2_phase/detection_{0}{1}".format(mode, tag)  # 图片保存地址
     if not os.path.exists(save_dir): os.mkdir(save_dir)
@@ -301,7 +303,7 @@ if __name__ == '__main__':
             if file.endswith("jpg"):
                 all_jpgs += 1  # 统计总jpg图片数量
                 image_path = img_dirs + "/bottom" + "/" + file
-                bboxes_pr, layer_n = Y.result(image_path, save_c_dir)  # 预测每一张结果并保存
+                bboxes_pr, layer_n ,food_class= Y.result(image_path, save_c_dir)  # 预测每一张结果并保存
 
                 layer_img_true.append(0)  # 烤层真实结果
                 layer_img_pre.append(layer_n)  # 烤层预测结果
@@ -318,7 +320,8 @@ if __name__ == '__main__':
                     error_noresults += 1
                     shutil.copy(image_path, noresult_dir + "/" + file)
                 else:
-                    pre = int(bboxes_pr[0][-1])
+                    # pre = int(bboxes_pr[0][-1])
+                    pre=int(food_class)
                     food_img_pre.append(pre)
                     food_img_true.append(classes_id[classes[i]])
 
@@ -355,7 +358,7 @@ if __name__ == '__main__':
             if file.endswith("jpg"):
                 all_jpgs += 1  # 统计总jpg图片数量
                 image_path = img_dirs + "/middle" + "/" + file
-                bboxes_pr, layer_n = Y.result(image_path, save_c_dir)  # 预测每一张结果并保存
+                bboxes_pr, layer_n,food_class = Y.result(image_path, save_c_dir)  # 预测每一张结果并保存
 
                 layer_img_true.append(1)  # 烤层真实结果
                 layer_img_pre.append(layer_n)  # 烤层预测结果
@@ -367,12 +370,13 @@ if __name__ == '__main__':
                     layer_acc += 1  # 烤层正确+1
                     c_layer_right_list.append(str(c) + "/" + file)  # 正确将名字写入c_layer_right_list中
 
-                bboxes_pr, layer_n = correct_bboxes(bboxes_pr, layer_n)  # 矫正输出结果
+                bboxes_pr, layer_n= correct_bboxes(bboxes_pr, layer_n)  # 矫正输出结果
                 if len(bboxes_pr) == 0:  # 无任何结果返回，输出并统计+1
                     error_noresults += 1
                     shutil.copy(image_path, noresult_dir + "/" + file)
                 else:
-                    pre = bboxes_pr[0][-1]
+                    # pre = int(bboxes_pr[0][-1])
+                    pre = int(food_class)
                     food_img_pre.append(pre)
                     food_img_true.append(classes_id[classes[i]])
 
@@ -409,7 +413,7 @@ if __name__ == '__main__':
             if file.endswith("jpg"):
                 all_jpgs += 1  # 统计总jpg图片数量
                 image_path = img_dirs + "/top" + "/" + file
-                bboxes_pr, layer_n = Y.result(image_path, save_c_dir)  # 预测每一张结果并保存
+                bboxes_pr, layer_n,food_class = Y.result(image_path, save_c_dir)  # 预测每一张结果并保存
 
                 layer_img_true.append(2)  # 烤层真实结果
                 layer_img_pre.append(layer_n)  # 烤层预测结果
@@ -431,7 +435,8 @@ if __name__ == '__main__':
                         error_noresults += 1
                         shutil.copy(image_path, noresult_dir + "/" + file)
                     else:
-                        pre = bboxes_pr[0][-1]
+                        # pre = int(bboxes_pr[0][-1])
+                        pre = int(food_class)
                         food_img_pre.append(pre)
                         food_img_true.append(classes_id[classes[i]])
 
@@ -469,7 +474,7 @@ if __name__ == '__main__':
             if file.endswith("jpg"):
                 all_jpgs += 1  # 统计总jpg图片数量
                 image_path = img_dirs + "/others" + "/" + file
-                bboxes_pr, layer_n = Y.result(image_path, save_c_dir)  # 预测每一张结果并保存
+                bboxes_pr, layer_n ,food_class= Y.result(image_path, save_c_dir)  # 预测每一张结果并保存
 
                 layer_img_true.append(3)  # 烤层真实结果
                 layer_img_pre.append(layer_n)  # 烤层预测结果
@@ -486,7 +491,8 @@ if __name__ == '__main__':
                     error_noresults += 1
                     shutil.copy(image_path, noresult_dir + "/" + file)
                 else:
-                    pre = bboxes_pr[0][-1]
+                    # pre = int(bboxes_pr[0][-1])
+                    pre = int(food_class)
                     food_img_pre.append(pre)
                     food_img_true.append(classes_id[classes[i]])
 
@@ -547,7 +553,7 @@ if __name__ == '__main__':
                                          22, 23])
 
     sheet2 = workbook.add_sheet("food_confusion_matrix")
-    for i in range(2):
+    for i in range(23):
         sheet2.write(i + 1, 0, classes[i])
         sheet2.write(0, i + 1, classes[i])
     for i in range(food_conf.shape[0]):

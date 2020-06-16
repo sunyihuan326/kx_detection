@@ -11,7 +11,7 @@ import cv2
 import numpy as np
 import tensorflow as tf
 import multi_detection.core.utils as utils
-from multi_detection.food_correct_utils import correct_bboxes
+from multi_detection.food_correct_utils import correct_bboxes,get_potatoml
 
 
 class YoloPredict(object):
@@ -71,6 +71,7 @@ class YoloPredict(object):
     def result(self, image_path):
         image = cv2.imread(image_path)  # 图片读取
         bboxes_pr, layer_n = self.predict(image)  # 预测结果
+        print(bboxes_pr)
         bboxes_pr,layer_n=correct_bboxes(bboxes_pr,layer_n)
         print(bboxes_pr)
         print(layer_n)
@@ -84,7 +85,7 @@ if __name__ == '__main__':
     import time
 
     start_time = time.time()
-    img_path = "C:/Users/sunyihuan/Desktop/X5_test/20200601_051629339.jpg" # 图片地址
+    img_path = "C:/Users/sunyihuan/Desktop/X5_test/611_test/sweetpotatos/sweetpotatos/20200611112531.jpg" # 图片地址
     Y = YoloPredict()
     end_time0 = time.time()
 

@@ -14,8 +14,6 @@ import multi_detection.core.utils as utils
 import os
 import time
 from multi_detection.food_correct_utils import correct_bboxes
-import shutil
-from tqdm import tqdm
 import xlwt
 
 # gpu限制
@@ -81,7 +79,7 @@ class YoloPredict(object):
 
         return bboxes, layer_n
 
-    def result(self, image_path, save_dir="E:/all_chiffon_data/chiffoncake0603/size6_detect"):
+    def result(self, image_path, save_dir="C:/Users/sunyihuan/Desktop/X5_test/X6_0610/chiffoncake6_detect"):
         image = cv2.imread(image_path)  # 图片读取
         # image = utils.white_balance(image)  # 图片白平衡处理
         bboxes_pr, layer_n = self.predict(image)  # 预测结果
@@ -99,7 +97,7 @@ class YoloPredict(object):
 
 if __name__ == '__main__':
     start_time = time.time()
-    img_dir = "E:/all_chiffon_data/chiffoncake0603/size6"  # 图片文件地址
+    img_dir = "C:/Users/sunyihuan/Desktop/X5_test/X6_0610/chiffoncake6"  # 图片文件地址
     Y = YoloPredict()
     end_time0 = time.time()
     print("model loading time:", end_time0 - start_time)
@@ -118,7 +116,6 @@ if __name__ == '__main__':
     sheet.write(0, 5, "class")
     sheet.write(0, 6, "layer")
     for i, img in enumerate(os.listdir(img_dir)):
-        print(i)
         if img.endswith("jpg"):
             img_path = img_dir + "/" + img
             end_time1 = time.time()
@@ -135,4 +132,4 @@ if __name__ == '__main__':
                 sheet.write(i + 1, 4, int(bboxes_pr[0][3]))
                 sheet.write(i + 1, 5, pre)
                 sheet.write(i + 1, 6, int(layer_n[0]))
-    wk.save("chiffon_predict.xls")
+    wk.save("C:/Users/sunyihuan/Desktop/X5_test/X6_0610/chiffoncake6/chiffon_predict.xls")
