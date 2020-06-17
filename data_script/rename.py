@@ -16,7 +16,7 @@ class ImageRename():
         self.root_path = root_path
         self.target = target
 
-    def rename0(self,say):
+    def rename0(self, say):
         '''
         将文件夹中排序命名
         :return:
