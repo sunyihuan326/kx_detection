@@ -294,7 +294,7 @@ def correct_bboxes(bboxes_pr, layer_n):
         sumProb = 0.
         # 多个食材，同一标签
         if same_label:
-            new_bboxes_pr[0][4] = 0.98
+            # new_bboxes_pr[0][4] = 0.98
             return new_bboxes_pr, layer_n
         # 多个食材，非同一标签
         else:

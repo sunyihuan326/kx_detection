@@ -6,23 +6,23 @@ import random
 from tqdm import tqdm
 
 
-def get_layer(data_path):
+def get_layer(data_path, typ):
     '''
     获取各层文件名
     :param typ:
     :return:
     '''
-    layer_data_dir = data_path + "/layer_data"
-    bottom = os.listdir(layer_data_dir + "/bottom")
+    layer_data_dir = data_path
+    bottom = os.listdir(layer_data_dir + "/layer_data/{}/bottom".format(typ))
     bottom = [b for b in bottom if b.endswith(".jpg")]
 
-    middle = os.listdir(layer_data_dir + "/middle")
+    middle = os.listdir(layer_data_dir + "/layer_data/{}/middle".format(typ))
     middle = [b for b in middle if b.endswith(".jpg")]
 
-    top = os.listdir(layer_data_dir + "/top")
+    top = os.listdir(layer_data_dir + "/layer_data/{}/top".format(typ))
     top = [b for b in top if b.endswith(".jpg")]
 
-    others_path = layer_data_dir + "/others"
+    others_path = layer_data_dir + "/layer_data/{}/others".format(typ)
     if os.path.exists(others_path):
         others = os.listdir(others_path)
         others = [b for b in others if b.endswith(".jpg")]
@@ -57,11 +57,11 @@ def convert_voc_annotation(data_path, data_type, anno_path, use_difficult_bbox=T
     #            "potatos", "sweetpotatocut", "sweetpotatol", "sweetpotatom", "sweetpotatos",
     #            "roastedchicken", "toast", "sweetpotato_others", "pizza_others",
     #            "potato_others"]  # 30分类,加入了sweetpotato_others,pizza_others,potato_others
-    classes = ["beefsteak", "cartooncookies", "chickenwings", "chiffoncake6",
-               "cookies","cranberrycookies", "cupcake", "eggtart","nofood",
-               "peanuts", "pizzacut", "pizzaone","pizzatwo", "porkchops",
-               "potatocut", "potatol","potatos", "sweetpotatocut", "sweetpotatol",
-               "sweetpotatos", "roastedchicken", "toast",]  # 23分类,合并蛋挞、土豆、披萨切、红薯；去掉sweetpotato_others,pizza_others,potato_others
+    # classes = ["beefsteak", "cartooncookies", "chickenwings", "chiffoncake6",
+    #            "cookies","cranberrycookies", "cupcake", "eggtart","nofood",
+    #            "peanuts", "pizzacut", "pizzaone","pizzatwo", "porkchops",
+    #            "potatocut", "potatol","potatos", "sweetpotatocut", "sweetpotatol",
+    #            "sweetpotatos", "roastedchicken", "toast",]  # 22分类,合并蛋挞、土豆、披萨切、红薯；去掉sweetpotato_others,pizza_others,potato_others
     # classes = ["beefsteak", "cartooncookies", "chickenwings", "chiffoncake6", "chiffoncake8",
     #            "cookies", "cranberrycookies", "cupcake", "eggtart", "eggtartbig",
     #            "nofood", "peanuts", "pizzafour", "pizzaone", "pizzasix",
@@ -71,6 +71,16 @@ def convert_voc_annotation(data_path, data_type, anno_path, use_difficult_bbox=T
     #            "potato_others", "chestnut", "cornone", "corntwo", "drumsticks", "taro",
     #            "steamedbread", "eggplant", "eggplant_cut_sauce", "bread", "container_nonhigh"
     #     , "container", "fish", "hotdog", "redshrimp", "shrimp", "strand"]  # 原30分类，加入二期17类
+
+    # 39分类
+    classes = ["beefsteak", "cartooncookies", "chickenwings", "chiffoncake6","chiffoncake8",
+               "cookies","cranberrycookies", "cupcake", "eggtart","nofood",
+               "peanuts", "pizzacut", "pizzaone","pizzatwo", "porkchops",
+               "potatocut", "potatol","potatos", "sweetpotatocut", "sweetpotatol",
+               "sweetpotatos", "roastedchicken", "toast","chestnut", "cornone",
+               "corntwo", "drumsticks", "taro","steamedbread", "eggplant",
+               "eggplant_cut_sauce", "bread", "container_nonhigh" , "container", "fish",
+               "hotdog", "redshrimp", "shrimp", "strand"]
     # classes = ["nofood","chestnut", "cornone", "corntwo", "drumsticks", "taro",
     #            "steamedbread", "eggplant", "eggplant_cut_sauce", "bread", "container_nonhigh",
     #            "container", "roastedchicken", "fish", "hotdog", "redshrimp",
@@ -85,7 +95,7 @@ def convert_voc_annotation(data_path, data_type, anno_path, use_difficult_bbox=T
         image_inds = [line.strip() for line in txt]
     random.shuffle(image_inds)
 
-    bottom, middle, top, others = get_layer(data_path)
+    bottom, middle, top, others = get_layer(data_path, data_type)
     print(len(bottom))
     print(len(middle))
     print(len(top))
@@ -147,25 +157,25 @@ def convert_voc_annotation(data_path, data_type, anno_path, use_difficult_bbox=T
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--data_path",
-                        default="E:/DataSets/X_data_27classes/20200602porkchops")
+                        default="E:/DataSets/2020_two_phase_KXData/only2phase_data")
     parser.add_argument("--train_annotation",
-                        default="E:/DataSets/X_data_27classes/20200602porkchops/train22.txt")
-    # parser.add_argument("--test_annotation",
-    #                     default="E:/DataSets/X_data_27classes/20200522data/test23.txt")
-    # parser.add_argument("--val_annotation",
-    #                     default="E:/DataSets/X_data_27classes/20200522data/val23.txt")
+                        default="E:/DataSets/2020_two_phase_KXData/only2phase_data/train39.txt")
+    parser.add_argument("--test_annotation",
+                        default="E:/DataSets/2020_two_phase_KXData/only2phase_data/test39.txt")
+    parser.add_argument("--val_annotation",
+                        default="E:/DataSets/2020_two_phase_KXData/only2phase_data/val39.txt")
     flags = parser.parse_args()
     #
     if os.path.exists(flags.train_annotation): os.remove(flags.train_annotation)
-    # if os.path.exists(flags.test_annotation): os.remove(flags.test_annotation)
-    # if os.path.exists(flags.val_annotation): os.remove(flags.val_annotation)
+    if os.path.exists(flags.test_annotation): os.remove(flags.test_annotation)
+    if os.path.exists(flags.val_annotation): os.remove(flags.val_annotation)
     # # #
     num1 = convert_voc_annotation(flags.data_path, 'train',
                                   flags.train_annotation, False)
-    # num2 = convert_voc_annotation(flags.data_path, 'test',
-    #                               flags.test_annotation, False)
-    # num3 = convert_voc_annotation(flags.data_path, 'val',
-    #                               flags.val_annotation, False)
+    num2 = convert_voc_annotation(flags.data_path, 'test',
+                                  flags.test_annotation, False)
+    num3 = convert_voc_annotation(flags.data_path, 'val',
+                                  flags.val_annotation, False)
     print(
         '=> The number of image for train is: %d\tThe number of image for test is:%d\tThe number of image for val is:%d' % (
             num1, num2, num3))

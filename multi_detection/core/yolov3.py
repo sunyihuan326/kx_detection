@@ -15,9 +15,9 @@ import math
 class YOLOV3(object):
     """Implement tensoflow yolov3 here"""
 
-    def __init__(self, input_data):
+    def __init__(self, input_data,trainable):
 
-        self.trainable = False
+        self.trainable = trainable
         self.classes = utils.read_class_names(cfg.YOLO.CLASSES)
         self.num_class = len(self.classes)
         self.strides = np.array(cfg.YOLO.STRIDES)

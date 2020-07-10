@@ -83,6 +83,7 @@ def draw_bbox(image, bboxes, show_label=True):
         cv2.rectangle(image, c1, c2, bbox_color, bbox_thick)
 
         if show_label:
+            # print(classes[class_ind])
             bbox_mess = '%s: %.2f' % (classes[class_ind], score)
             t_size = cv2.getTextSize(bbox_mess, 0, fontScale, thickness=bbox_thick // 2)[0]
             cv2.rectangle(image, c1, (c1[0] + t_size[0], c1[1] - t_size[1] + 18), bbox_color, -1)  # filled

@@ -26,6 +26,18 @@ def read_tensor_name(model_path, typ):
         reader = pywrap_tensorflow.NewCheckpointReader(model_path)
         var_to_shape_map = reader.get_variable_to_shape_map()
         for key in var_to_shape_map:
+            if "darknet/conv0/weight" ==key:
+                print(key)
+                w=reader.get_tensor(key)
+                print(w.shape)
+                # print(sum(w))
+                print(reader.get_tensor(key))
+            if "darknet/conv1/weight" ==key:
+                print(key)
+                w=reader.get_tensor(key)
+                print(w.shape)
+                # print(sum(w))
+                print(reader.get_tensor(key))
             key_name.append(key)
     else:
         with tf.Session() as sess:
@@ -40,7 +52,7 @@ def read_tensor_name(model_path, typ):
     return key_name
 
 
-ckpt_path = "E:/ckpt_dirs/Food_detection/multi_food2/20200507/yolov3_train_loss=5.0711.ckpt-157"
+ckpt_path =  "E:/ckpt_dirs/Food_detection/multi_food3/20200604_22class/yolov3_train_loss=4.9799.ckpt-158"
 pb_path = "E:/multi_yolov3_predict-20191220/checkpoint/yolov3_1220.pb"
-key_name = read_tensor_name(pb_path, "pb")
-print(key_name)
+key_name = read_tensor_name(ckpt_path, "ckpt")
+# print(key_name)

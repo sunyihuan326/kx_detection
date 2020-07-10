@@ -58,7 +58,7 @@ class YoloTrain(object):
             self.trainable = tf.placeholder(dtype=tf.bool, name='training')
 
         with tf.name_scope("define_loss"):
-            self.model = YOLOV3(self.input_data)
+            self.model = YOLOV3(self.input_data,self.trainable)
             self.net_var = tf.global_variables()
             self.giou_loss, self.conf_loss, self.prob_loss, self.giou, self.bbox_loss_scale = self.model.compute_loss(
                 self.label_sbbox, self.label_mbbox, self.label_lbbox,
@@ -197,27 +197,26 @@ class YoloTrain(object):
                 pbar.set_description("train loss: %.2f" % train_step_loss)
 
             # 生成tflite文件
-            out_tensors = [self.model.pred_sbbox, self.model.pred_mbbox,
-                               self.model.pred_lbbox, self.model.predict_op]
-                # print("----------------------------------------------------------------")
-                # print(self.input_data.shape.as_list())
-                # print(self.trainable.shape.as_list())
-                # print("----------------------------------------------------------------")
-            tflite_model = tf.lite.TFLiteConverter.from_session(self.sess, [self.input_data],
-                                                                    out_tensors)
-            tflite_model = tflite_model.convert()
-            open("./model/converted_model.tflite", "wb").write(tflite_model)
+            # out_tensors = [self.model.pred_sbbox, self.model.pred_mbbox,
+            #                    self.model.pred_lbbox, self.model.predict_op]
+            #     # print("----------------------------------------------------------------")
+            #     # print(self.input_data.shape.as_list())
+            #     # print(self.trainable.shape.as_list())
+            #     # print("----------------------------------------------------------------")
+            # tflite_model = tf.lite.TFLiteConverter.from_session(self.sess, [self.input_data],
+            #                                                         out_tensors)
+            # tflite_model = tflite_model.convert()
+            # open("./model/converted_model.tflite", "wb").write(tflite_model)
 
             # 保存模型
             train_epoch_loss = np.mean(train_epoch_loss)
             ckpt_file = "./checkpoint/yolov3_train_loss=%.4f.ckpt" % train_epoch_loss
             self.saver.save(self.sess, ckpt_file, global_step=epoch)
 
-            # output = ["define_loss/pred_sbbox/concat_2", "define_loss/pred_mbbox/concat_2",
-            #           "define_loss/pred_lbbox/concat_2", "define_loss/layer_classes"]
-            output = ["define_loss/pred_sbbox/concat_2", "define_loss/pred_mbbox/concat_2", "define_loss/layer_classes"]
+            output = ["define_loss/pred_sbbox/concat_2", "define_loss/pred_mbbox/concat_2",
+                      "define_loss/pred_lbbox/concat_2", "define_loss/layer_classes"]
             constant_graph = graph_util.convert_variables_to_constants(self.sess, self.sess.graph_def, output)
-            with tf.gfile.GFile('./model/yolo_model.pb', mode='wb') as f:
+            with tf.gfile.GFile('model/yolo_model.pb', mode='wb') as f:
                 f.write(constant_graph.SerializeToString())
 
 
