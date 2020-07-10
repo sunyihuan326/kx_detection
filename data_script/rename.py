@@ -16,7 +16,7 @@ class ImageRename():
         self.root_path = root_path
         self.target = target
 
-    def rename0(self,say):
+    def rename0(self, say):
         '''
         将文件夹中排序命名
         :return:
@@ -34,7 +34,7 @@ class ImageRename():
                 try:
                     # 修改命名，规则为：i_日期_烤箱/其他说明_类别名.jpg
                     dst = os.path.join(os.path.abspath(self.root_path),
-                                       filename + "_200511" + "_{}".format(say) + self.target + '.jpg')
+                                       filename + "_200608" + "_{}".format(say) + self.target + '.jpg')
                     os.rename(src, dst)
                     print('converting %s to %s ...' % (src, dst))
                 except:
@@ -87,9 +87,9 @@ class ImageRename():
 
 
 if __name__ == '__main__':
-    path = "E:/WLS_originalData/二期数据/第二轮202005/X5/taro/top"
-    target = "taro"
+    path = "/Users/sunyihuan/Desktop/6.8/ZG1/蔓越莓/橙黄色/"
+    target = "cranberrycookies"
 
     newname = ImageRename(path, target)
-    # newname.change_jpg_name()
-    newname.rename0("X5_top_")
+    newname.rename0("ZG1_cheng_gyz_")
+    # newname.rename0("X5_top_")
