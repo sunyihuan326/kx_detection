@@ -315,6 +315,11 @@ class YOLOV3(object):
         self.diou = tf.expand_dims(self.bbox_diou(pred_xywh, label_xywh), axis=-1)  # diou
         self.ciou = tf.expand_dims(self.bbox_ciou(pred_xywh, label_xywh), axis=-1)  # ciou
 
+        ciou_loss = tf.where(tf.math.greater(respond_bbox, 0.5), self.ciou, tf.zeros_like(self.ciou))
+
+        self.ciou = tf.square(ciou_loss * respond_bbox) * 0.07
+        self.ciou = tf.reduce_sum(self.ciou) / batch_size
+
         input_size = tf.cast(input_size, tf.float32)
 
         self.bbox_loss_scale = 2.0 - 1.0 * label_xywh[:, :, :, :, 2:3] * label_xywh[:, :, :, :, 3:4] / (input_size ** 2)
