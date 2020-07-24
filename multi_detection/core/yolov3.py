@@ -15,7 +15,7 @@ import math
 class YOLOV3(object):
     """Implement tensoflow yolov3 here"""
 
-    def __init__(self, input_data,trainable):
+    def __init__(self, input_data, trainable):
 
         self.trainable = trainable
         self.classes = utils.read_class_names(cfg.YOLO.CLASSES)
@@ -51,6 +51,7 @@ class YOLOV3(object):
         # out = tf.layers.dense(out, 400, activation=tf.nn.relu)
         out = tf.layers.dense(out, self.layer_nums)  # layer 输出
 
+        input_data = common.yolo_maxpool_block(input_data)  # spp amxpool_block
         input_data = common.convolutional(input_data, (1, 1, 1024, 512), self.trainable, 'conv52')
         input_data = common.convolutional(input_data, (3, 3, 512, 1024), self.trainable, 'conv53')
         input_data = common.convolutional(input_data, (1, 1, 1024, 512), self.trainable, 'conv54')
@@ -213,47 +214,58 @@ class YOLOV3(object):
         :param boxes2:
         :return:
         '''
-        exchange = False
-        if boxes1.shape[0] > boxes2.shape[0]:
-            boxes1, boxes2 = boxes2, boxes1
-            exchange = True
+        pre_xy = boxes1[..., 0:2]
+        pre_wh = boxes1[..., 2:4]
+        yi_true_xy = boxes2[..., 0:2]
+        yi_true_wh = boxes2[..., 2:4]
 
-        w1 = boxes1[..., 2] - boxes1[..., 0]
-        h1 = boxes1[..., 3] - boxes1[..., 1]
-        w2 = boxes2[..., 2] - boxes2[..., 0]
-        h2 = boxes2[..., 3] - boxes2[..., 1]
+        # top dowm left right
+        pre_lt = pre_xy - pre_wh / 2
+        pre_rb = pre_xy + pre_wh / 2
+        truth_lt = yi_true_xy - yi_true_wh / 2
+        truth_rb = yi_true_xy + yi_true_wh / 2
 
-        area1 = w1 * h1
-        area2 = w2 * h2
+        # left top of intersection : [batch_size, 13, 13, 3,2]
+        intersection_left_top = tf.maximum(pre_lt, truth_lt)
+        intersection_right_bottom = tf.minimum(pre_rb, truth_rb)
+        # width and height of intersection : [batch_size, 13, 13, 3, 2]
+        intersection_wh = tf.maximum(intersection_right_bottom - intersection_left_top, 0.0)
+        # area of intersection : [batch_size, 13, 13, 3, 1]
+        intersection_area = intersection_wh[..., 0:1] * intersection_wh[..., 1:2]
+        # left top of union
+        combine_left_top = tf.minimum(pre_lt, truth_lt)
+        # right bottom of union
+        combine_right_bottom = tf.maximum(pre_rb, truth_rb)
+        # width and height of union
+        combine_wh = tf.maximum(combine_right_bottom - combine_left_top, 0.0)
 
-        center_x1 = (boxes1[..., 2] + boxes1[..., 0]) / 2  # （x1max +x1min）/2
-        center_y1 = (boxes1[..., 3] + boxes1[..., 1]) / 2  # (y1max+y1min)/2
-        center_x2 = (boxes2[..., 2] + boxes2[..., 0]) / 2
-        center_y2 = (boxes2[..., 3] + boxes2[..., 1]) / 2
+        # diagonal line of union : [batch_size, 13, 13, 3, 1]
+        C = tf.square(combine_wh[..., 0:1]) + tf.square(combine_wh[..., 1:2])
+        # diagonal line  of center point:[batch_size, 13, 13, 3, 1]
+        D = tf.square(yi_true_xy[..., 0:1] - pre_xy[..., 0:1]) + tf.square(yi_true_xy[..., 1:2] - pre_xy[..., 1:2])
 
-        inter_max_xy = tf.minimum(boxes1[..., 2:], boxes2[..., 2:])  # min((x1max,y1max ),(x2max,y2max)) ->返回较小一组
-        inter_min_xy = tf.maximum(boxes1[..., :2], boxes2[..., :2])  # max((x1min,y1min ),(x2min,y2min))->返回较大的一组
-        out_max_xy = tf.maximum(boxes1[..., 2:], boxes2[..., 2:])
-        out_min_xy = tf.minimum(boxes1[..., :2], boxes2[..., :2])
+        # area of box : [batch_size, 13, 13, 3, 1]
+        pre_area = pre_wh[..., 0:1] * pre_wh[..., 1:2]
+        true_area = yi_true_wh[..., 0:1] * yi_true_wh[..., 1:2]
 
-        inter = tf.clip_by_value((inter_max_xy - inter_min_xy), clip_value_min=1e-5, clip_value_max=10000)
-        inter_area = inter[..., 0] * inter[..., 1]
-        inter_diag = (center_x2 - center_x1) ** 2 + (center_y2 - center_y1) ** 2
-        outer = tf.clip_by_value((out_max_xy - out_min_xy), clip_value_min=1e-5, clip_value_max=10000)
-        outer_diag = tf.maximum((outer[..., 0] ** 2) + (outer[..., 1] ** 2), 1e-5)
-        union = tf.maximum(area1 + area2 - inter_area, 1e-5)
-        u = (inter_diag) / outer_diag
-        iou = inter_area / union
-        arctan = tf.atan(w2 / tf.maximum(h2, 1e-5)) - tf.atan(w1 / tf.maximum(h1, 1e-5))
-        v = (4 / (math.pi ** 2)) * tf.pow(tf.atan(w2 / tf.maximum(h2, 1e-5)) - tf.atan(tf.maximum(h1, 1e-5)), 2)
-        alpha = v / tf.maximum((1 - iou + v), 1e-5)
-        # w_temp = 2 * w1
-        # ar = (8 / (math.pi ** 2)) * arctan * ((w1 - w_temp) * h1)
-        cious = iou - u - alpha * v
-        cious = tf.clip_by_value(cious, clip_value_min=-1.0, clip_value_max=1.0)
-        if exchange:
-            cious = cious.T
-        return cious
+        # iou : [batch_size, 13, 13, 3, 1]
+        iou = intersection_area / tf.maximum(pre_area + true_area - intersection_area, 1e-5)
+
+        pi = 3.14159265358979323846
+
+        # [batch_size, 13, 13, 3, 1]
+        v = 4 / (pi * pi) * tf.square(
+            tf.subtract(
+                tf.math.atan(yi_true_wh[..., 0:1] / yi_true_wh[..., 1:2]),
+                tf.math.atan(pre_wh[..., 0:1] / pre_wh[..., 1:2])
+            )
+        )
+
+        # trade-off
+        # alpha
+        alpha = v / (1.0 - iou + v)
+        ciou_loss = 1.0 - iou + D / C + alpha * v
+        return ciou_loss
 
     def bbox_iou(self, boxes1, boxes2):
         '''

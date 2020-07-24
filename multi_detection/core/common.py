@@ -80,5 +80,18 @@ def upsample(input_data, name, method="deconv"):
 
     return output
 
+def yolo_maxpool_block(inputs):
+    '''
+    spp
+    inputs:[N, 13, 13, 512]
+    return:[N, 13, 13, 2048]
+    '''
+    max_5 = tf.nn.max_pool(inputs, [1, 5, 5, 1], [1, 1, 1, 1], 'SAME')
+    max_9 = tf.nn.max_pool(inputs, [1, 9, 9, 1], [1, 1, 1, 1], 'SAME')
+    max_13 = tf.nn.max_pool(inputs, [1, 13, 13, 1], [1, 1, 1, 1], 'SAME')
+    # concat
+    net = tf.concat([max_13, max_9, max_5, inputs], -1)
+    return net
+
 
 
