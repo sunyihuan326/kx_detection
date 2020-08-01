@@ -1,17 +1,17 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
+# @Time    : 2020/7/27
+# @Author  : sunyihuan
+# @File    : major_print.py
 
-"""
-预测一张图片结果
-@File    : ckpt_predict.py
-@Time    : 2019/8/19 15:45
-@Author  : sunyihuan
-"""
+'''
+直接输出大类结果
+'''
 
 import cv2
 import numpy as np
 import tensorflow as tf
 import multi_detection.core.utils as utils
-from multi_detection.food_correct_utils import correct_bboxes,get_potatoml
+from multi_detection.food_correct_utils import correct_bboxes, cls_major_result
 
 
 class YoloPredict(object):
@@ -24,7 +24,7 @@ class YoloPredict(object):
         self.num_classes = 22  # 种类数
         self.score_threshold = 0.45
         self.iou_threshold = 0.5
-        self.weight_file ="E:/ckpt_dirs/Food_detection/multi_food3/20200604_22class/yolov3_train_loss=4.9799.ckpt-158"   # ckpt文件地址
+        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food3/20200604_22class/yolov3_train_loss=4.9799.ckpt-158"  # ckpt文件地址
         # self.weight_file = "./checkpoint/yolov3_train_loss=4.7681.ckpt-80"
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
@@ -72,8 +72,9 @@ class YoloPredict(object):
         image = cv2.imread(image_path)  # 图片读取
         bboxes_pr, layer_n = self.predict(image)  # 预测结果
         print(bboxes_pr)
-        bboxes_pr,layer_n=correct_bboxes(bboxes_pr,layer_n)
-        print(bboxes_pr)
+        bboxes_pr, layer_n = correct_bboxes(bboxes_pr, layer_n)
+        major_pre = cls_major_result(int(bboxes_pr[0][-1]))
+        print(major_pre)
         print(layer_n)
         if self.write_image:
             image = utils.draw_bbox(image, bboxes_pr, show_label=self.show_label)
@@ -85,7 +86,7 @@ if __name__ == '__main__':
     import time
 
     start_time = time.time()
-    img_path = "C:/Users/sunyihuan/Desktop/test_img/danta_1288.jpg" # 图片地址
+    img_path = "C:/Users/sunyihuan/Desktop/test_img/kaorou_930.jpg"  # 图片地址
     Y = YoloPredict()
     end_time0 = time.time()
 

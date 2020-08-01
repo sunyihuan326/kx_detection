@@ -60,17 +60,9 @@ def PSAlgorithm(rgb_img, increment):
     return img_out
 
 
-path = 'C:/Users/sunyihuan/Desktop/12.jpg'
-increment = 0.3  # 范围-1到1
-
-#  run : python Saturation.py (path) (increment)
 if __name__ == "__main__":
-    len = len(sys.argv)
-    if len >= 2:
-        path = sys.argv[1]
-        if len >= 3:
-            increment = float(sys.argv[2])
-    print(increment)
+    path = 'C:/Users/sunyihuan/Desktop/test_img/22.jpg'
+    increment = -0.2  # 范围-1到1
 
     img = cv2.imread(path)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)

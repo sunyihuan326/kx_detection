@@ -64,7 +64,7 @@ class ImageRename():
 
         :return:
         '''
-        for k in ["kaopan","xizhi"]:
+        for k in ["kaojia","xizhi"]:
             path_dir = self.root_path + "/" + k
             for b in ["bottom", "middle", "top"]:
                 path_name = path_dir + "/" + b
@@ -77,7 +77,7 @@ class ImageRename():
                         filename = str(i + 1)
                         try:
                             dst = os.path.join(os.path.abspath(path_name),
-                                               filename + "_200723" + "_X1_" + "{}".format(k) + "_{}_".format(
+                                               filename + "_200723" + "_X5_bai_" + "{}".format(k) + "_{}_".format(
                                                    b) + self.target + '.jpg')
                             os.rename(src, dst)
                             print('converting %s to %s ...' % (src, dst))
@@ -87,8 +87,8 @@ class ImageRename():
 
 
 if __name__ == '__main__':
-    path = "/Volumes/SYH/Joyoung/3660摄像头补图202007/X1/xiaotudou"
-    target = "potatos"
+    path = "E:/WLS_originalData/3660数据补采（含标注）/X5/yumi/zheng/Bai"
+    target = "cornone"
 
     newname = ImageRename(path, target)
     newname.rename()

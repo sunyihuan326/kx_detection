@@ -39,17 +39,17 @@ def he_foods(pre):
     :param pre:
     :return:
     '''
-    if pre in [8, 9] and classes_id[classes[i]] in [8, 9]:  # 合并蛋挞
-        rigth_label = True
-    elif pre in [12, 14] and classes_id[classes[i]] in [12, 14]:  # 合并四分之一披萨、六分之一披萨
-        rigth_label = True
-    elif pre in [18, 19] and classes_id[classes[i]] in [18, 19]:  # 合并中土豆、大土豆
-        rigth_label = True
-    elif pre in [22, 23] and classes_id[classes[i]] in [22, 23]:  # 合并中红薯、大红薯
-        rigth_label = True
-    else:
-        rigth_label = False
-    # rigth_label = False
+    # if pre in [8, 9] and classes_id[classes[i]] in [8, 9]:  # 合并蛋挞
+    #     rigth_label = True
+    # elif pre in [12, 14] and classes_id[classes[i]] in [12, 14]:  # 合并四分之一披萨、六分之一披萨
+    #     rigth_label = True
+    # elif pre in [18, 19] and classes_id[classes[i]] in [18, 19]:  # 合并中土豆、大土豆
+    #     rigth_label = True
+    # elif pre in [22, 23] and classes_id[classes[i]] in [22, 23]:  # 合并中红薯、大红薯
+    #     rigth_label = True
+    # else:
+    #     rigth_label = False
+    rigth_label = False
     return rigth_label
 
 
@@ -59,7 +59,7 @@ class YoloTest(object):
         self.num_classes = 39  # 种类数
         self.score_threshold = 0.45
         self.iou_threshold = 0.5
-        self.weight_file =  "E:/ckpt_dirs/Food_detection/multi_food7/20200629/yolov3_train_loss=3.9421.ckpt-90"    # ckpt文件地址
+        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food7/20200801/yolov3_train_loss=10.0749.ckpt-27"  # ckpt文件地址
         # self.weight_file = "./checkpoint/yolov3_train_loss=4.7681.ckpt-80"
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
@@ -186,8 +186,9 @@ if __name__ == '__main__':
                     "nofood": 9, "peanuts": 10, "porkchops": 14, "potatocut": 15, "potatol": 16,
                     "potatom": 16, "potatos": 17, "sweetpotatocut": 18, "sweetpotatol": 19, "sweetpotatom": 19,
                     "pizzafour": 11, "pizzaone": 12, "pizzasix": 11, "roastedchicken": 21,
-                    "pizzatwo": 13, "sweetpotatos": 20, "toast": 22, "chestnut": 23, "cornone": 24, "corntwo": 25, "drumsticks": 26,
-                    "taro":27, "steamedbread": 28, "eggplant": 29, "eggplant_cut_sauce": 30, "bread": 31,
+                    "pizzatwo": 13, "sweetpotatos": 20, "toast": 22, "chestnut": 23, "cornone": 24, "corntwo": 25,
+                    "drumsticks": 26,
+                    "taro": 27, "steamedbread": 28, "eggplant": 29, "eggplant_cut_sauce": 30, "bread": 31,
                     "container_nonhigh": 32,
                     "container": 33, "duck": 21, "fish": 34, "hotdog": 35, "redshrimp": 36,
                     "shrimp": 37, "strand": 38}
@@ -217,19 +218,19 @@ if __name__ == '__main__':
     # 需要修改
     classes_id = classes_id39  #######
     classes = classes_label46  #######
-    mode = "multi7_0629"  #######
+    mode = "multi7_0801"  #######
     tag = ""
-    img_dir = "E:/check_2_phase/JPGImages_2"  # 文件夹地址
-    save_dir = "E:/check_2_phase/detection2_{0}{1}".format(mode, tag)  # 图片保存地址
+    img_dir = "E:/check_2_phase/JPGImages"  # 文件夹地址
+    save_dir = "E:/check_2_phase/detection_{0}{1}".format(mode, tag)  # 图片保存地址
     if not os.path.exists(save_dir): os.mkdir(save_dir)
 
-    layer_error_dir = "E:/check_2_phase/layer_error2_{0}{1}".format(mode, tag)  # 预测结果错误保存地址
+    layer_error_dir = "E:/check_2_phase/layer_error_{0}{1}".format(mode, tag)  # 预测结果错误保存地址
     if not os.path.exists(layer_error_dir): os.mkdir(layer_error_dir)
 
-    fooderror_dir = "E:/check_2_phase/food_error2_{0}{1}".format(mode, tag)  # 食材预测结果错误保存地址
+    fooderror_dir = "E:/check_2_phase/food_error_{0}{1}".format(mode, tag)  # 食材预测结果错误保存地址
     if not os.path.exists(fooderror_dir): os.mkdir(fooderror_dir)
 
-    no_result_dir = "E:/check_2_phase/no_result2_{0}{1}".format(mode, tag)  # 无任何输出结果保存地址
+    no_result_dir = "E:/check_2_phase/no_result_{0}{1}".format(mode, tag)  # 无任何输出结果保存地址
     if not os.path.exists(no_result_dir): os.mkdir(no_result_dir)
 
     start_time = time.time()
@@ -555,9 +556,17 @@ if __name__ == '__main__':
     food_conf = confusion_matrix(y_pred=food_img_pre, y_true=food_img_true)
 
     sheet2 = workbook.add_sheet("food_confusion_matrix")
-    for i in range(2):
-        sheet2.write(i + 1, 0, classes[i])
-        sheet2.write(0, i + 1, classes[i])
+    classes_ = ["beefsteak", "cartooncookies", "chickenwings", "chiffoncake6", "chiffoncake8",
+                "cookies", "cranberrycookies", "cupcake", "eggtart", "nofood",
+                "peanuts", "pizzacut", "pizzaone", "pizzatwo", "porkchops",
+                "potatocut", "potatol", "potatos", "sweetpotatocut", "sweetpotatol",
+                "sweetpotatos", "roastedchicken", "toast", "chestnut", "cornone",
+                "corntwo", "drumsticks", "taro", "steamedbread", "eggplant",
+                "eggplant_cut_sauce", "bread", "container_nonhigh", "container",
+                "fish", "hotdog", "redshrimp", "shrimp", "strand"]
+    for i in range(len(classes_)):
+        sheet2.write(i + 1, 0, classes_[i])
+        sheet2.write(0, i + 1, classes_[i])
     for i in range(food_conf.shape[0]):
         for j in range(food_conf.shape[1]):
             sheet2.write(i + 1, j + 1, str(food_conf[i, j]))
@@ -573,7 +582,7 @@ if __name__ == '__main__':
     sheet1.write(55, 4, round((layer_jpgs_acc / jpgs_count_all) * 100, 2))
     sheet1.write(55, 5, round((food_jpgs_acc / jpgs_count_all) * 100, 2))
 
-    workbook.save("E:/check_2_phase/all_he2_{0}{1}.xls".format(mode, tag))
+    workbook.save("E:/check_2_phase/all_he_{0}{1}.xls".format(mode, tag))
 
     end_time = time.time()
     print("all jpgs time:", end_time - end0_time)

@@ -318,7 +318,7 @@ class YOLOV3(object):
         ciou_loss = tf.where(tf.math.greater(respond_bbox, 0.5), self.ciou, tf.zeros_like(self.ciou))
 
         self.ciou = tf.square(ciou_loss * respond_bbox) * 0.07
-        self.ciou = tf.reduce_sum(self.ciou) / batch_size
+        self.ciou_loss = tf.reduce_sum(self.ciou) / batch_size
 
         input_size = tf.cast(input_size, tf.float32)
 
@@ -326,7 +326,6 @@ class YOLOV3(object):
 
         giou_loss = respond_bbox * self.bbox_loss_scale * (1 - self.giou)  # giou loss
         diou_loss = respond_bbox * self.bbox_loss_scale * (1 - self.diou)  # diou loss
-        ciou_loss = respond_bbox * self.bbox_loss_scale * (1 - self.ciou)
 
         iou = self.bbox_iou(pred_xywh[:, :, :, :, np.newaxis, :], bboxes[:, np.newaxis, np.newaxis, np.newaxis, :, :])
         max_iou = tf.expand_dims(tf.reduce_max(iou, axis=-1), axis=-1)
@@ -345,12 +344,11 @@ class YOLOV3(object):
 
         giou_loss = tf.reduce_mean(tf.reduce_sum(giou_loss, axis=[1, 2, 3, 4]))  # giou loss
         diou_loss = tf.reduce_mean(tf.reduce_sum(diou_loss, axis=[1, 2, 3, 4]))  # diou loss
-        ciou_loss = tf.reduce_mean(tf.reduce_sum(ciou_loss, axis=[1, 2, 3, 4]))  # ciou loss
         # giou_loss = tf.reduce_mean(tf.reduce_sum(bbox_loss_scale, axis=[1, 2, 3, 4]))
         conf_loss = tf.reduce_mean(tf.reduce_sum(conf_loss, axis=[1, 2, 3, 4]))
         prob_loss = tf.reduce_mean(tf.reduce_sum(prob_loss, axis=[1, 2, 3, 4]))
 
-        return diou_loss, conf_loss, prob_loss, tf.reduce_sum(self.ciou, axis=[1, 2, 3, 4]), tf.reduce_sum(
+        return self.ciou_loss, conf_loss, prob_loss, tf.reduce_sum(self.ciou, axis=[1, 2, 3, 4]), tf.reduce_sum(
             self.bbox_loss_scale)
 
     def compute_loss(self, label_sbbox, label_mbbox, label_lbbox, true_sbbox, true_mbbox, true_lbbox):

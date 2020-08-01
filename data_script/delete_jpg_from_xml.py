@@ -1,0 +1,60 @@
+# -*- coding: utf-8 -*-
+# @Time    : 2020/7/29
+# @Author  : sunyihuan
+# @File    : delete_jpg_from_xml.py
+
+'''
+若图片不存在xml文件，则删除该图片
+若xml中jpg图片已不存在，则删除该图片
+'''
+
+import os
+
+
+def delete_xmljpg_diff(img_dir, xml_dir):
+    '''
+    删除多余的xml文件和jpg文件
+    :param img_dir: 图片地址
+    :param xml_dir: xml文件标注地址
+    :return:
+    '''
+    xml_name_list = os.listdir(xml_dir)
+    img_name_list = os.listdir(img_dir)
+
+    # jpg中有,xml中没有
+    print("图片总数：", len(img_name_list))
+    print("未标注图片名称：")
+    for i in img_name_list:
+        try:
+            if not i.endswith(".jpg"):
+                os.remove(img_dir + "/" + i)
+            if str(i.split(".jpg")[0] + ".xml") not in xml_name_list:
+                print(img_dir + "/" + i)
+                os.remove(img_dir + "/" + i)
+        except:
+            print(img_dir + "/" + i)
+
+    # xml中有，jpg中没有的
+    print("已标注总数：", len(xml_name_list))
+    print("已标注，但图片已删除名称：")
+    for i in xml_name_list:
+        try:
+            if not i.endswith(".xml"):
+                os.remove(img_dir + "/" + i)
+            if str(i.split(".xml")[0] + ".jpg") not in img_name_list:
+                print(xml_dir + "/" + i)
+                os.remove(xml_dir + "/")
+        except:
+            print(xml_dir + "/" + i)
+
+
+if __name__ == "__main__":
+    xml_root = "E:/DataSets/2020_two_phase_KXData/202005bu/Annotations"
+    img_root = "E:/DataSets/2020_two_phase_KXData/202005bu/JPGImages"
+    for c in ["bread", "chestnut", "container", "cornone", "corntwo"
+        , "drumsticks", "duck", "eggplant", "eggplant_cut_sauce", "fish"
+        , "hotdog", "redshrimp", "strand", "taro"]:
+        print(c)
+        img_dir = img_root + "/" + c
+        xml_dir = xml_root + "/" + c
+        delete_xmljpg_diff(img_dir, xml_dir)

@@ -240,9 +240,17 @@ def get_potatoml(bboxes_pr, layer_n):
             else:
                 return bboxes_pr, layer_n
 
+
 def correct_bboxes(bboxes_pr, layer_n):
     '''
-    最新修改时间：202003/2/27
+    最新修改时间：2020/7/13
+    by：sunyihuan
+    修改目的：类别和数量控制输出分数，尽量避免出现识别错误直接跳转，
+    处理说明：1、无任何检测框，直接输出
+             2、仅检测到1个框，对低于0.5分的nofood置信度设置为0.75
+             3、检测到多个框，但是同一个标签，针对鸡翅排骨做数量现置（小于3个）置信度设置为0.75，其余的直接输出结果
+             4、检测到多个框，但是标签不一致：（1）先对大小土豆、大小红薯处理，若出现大，则为大
+                                            （2）若标签不在一个大类中，置信度降分处理，若在一个大类，直接输出
 
     bboxes_pr结果矫正
     :param bboxes_pr: 模型预测结果，格式为[x_min, y_min, x_max, y_max, probability, cls_id]
@@ -250,35 +258,25 @@ def correct_bboxes(bboxes_pr, layer_n):
     :return:
     '''
     num_label = len(bboxes_pr)
-    # 未检测食材
+    # 未检测食材，直接输出
     if num_label == 0:
         return bboxes_pr, layer_n
 
     # 检测到一个食材
-    elif num_label == 1:
-        if bboxes_pr[0][4] < 0.45:
-            if bboxes_pr[0][5] == 9:  # 低分nofood
+    elif num_label == 1:  # 小于0.5的nofood输出，其他删除
+        if bboxes_pr[0][4] < 0.5:
+            if bboxes_pr[0][5] == 8:  # 低分nofood
                 bboxes_pr[0][4] = 0.75
-            elif bboxes_pr[0][5] == 10:  # 低分花生米
-                bboxes_pr[0][4] = 0.85
-            elif bboxes_pr[0][5] == 21:  # 低分整鸡
-                bboxes_pr[0][4] = 0.75
-            else:
-                del bboxes_pr[0]
-
-        # else:
-        #    if bboxes_pr[0][4] < 0.9 and bboxes_pr[0][4] >= 0.6:
-        #        bboxes_pr[0][4] = 0.9
+            # else:
+            #     del bboxes_pr[0]
 
         return bboxes_pr, layer_n
 
     # 检测到多个食材
     else:
-        new_bboxes_pr = []
-        for i in range(len(bboxes_pr)):
-            if bboxes_pr[i][4] >= 0.45:
-                new_bboxes_pr.append(bboxes_pr[i])
 
+        # 判断标签类别是否为同一个
+        new_bboxes_pr = bboxes_pr
         new_num_label = len(new_bboxes_pr)
         if new_num_label == 0:
             return new_bboxes_pr, layer_n
@@ -292,13 +290,19 @@ def correct_bboxes(bboxes_pr, layer_n):
                 same_label = False
 
         sumProb = 0.
+
         # 多个食材，同一标签
-        if same_label:
-            # new_bboxes_pr[0][4] = 0.98
+        if same_label:  # 多个检测框，同一个标签，直接输出结果
+            if new_bboxes_pr[0][-1] in [2, 13]:  # 若类别为鸡翅、排骨，判断数量是否小于3，若小于3降低score分值
+                if len(new_bboxes_pr) < 3:
+                    for i in range(len(new_bboxes_pr)):
+                        new_bboxes_pr[:][-2] = 0.75
             return new_bboxes_pr, layer_n
+
         # 多个食材，非同一标签
         else:
-            problist = list(map(lambda x: x[4], new_bboxes_pr))
+            new_bboxes_pr = sorted(new_bboxes_pr, key=lambda x: x[4], reverse=True)
+
             labellist = list(map(lambda x: x[5], new_bboxes_pr))
 
             labeldict = {}
@@ -307,56 +311,79 @@ def correct_bboxes(bboxes_pr, layer_n):
                 # 按同种食材label数量降序排列
             s_labeldict = sorted(labeldict.items(), key=lambda x: x[1], reverse=True)
 
-            n_name = len(s_labeldict)
             name1 = s_labeldict[0][0]
-            num_name1 = s_labeldict[0][1]
             name2 = s_labeldict[1][0]
-            num_name2 = s_labeldict[1][1]
 
-            # 优先处理食材特例
-            if n_name == 2:
-                # 如果鸡翅中检测到了排骨，默认单一食材为鸡翅
-                # if (name1 == 2 and name2 == 16) or (name1 == 16 and name2 == 2):
-                if (name1 == 2 and name2 == 13) or (name1 == 13 and name2 == 2):
-                    if int(s_labeldict[0][0])==13:  #如果鸡翅数量比排骨多，直接判断为鸡翅
-                        for i in range(new_num_label):
-                            new_bboxes_pr[i][5] = 13
-                        return new_bboxes_pr, layer_n
-                    else:
-                        for i in range(new_num_label):
-                            new_bboxes_pr[i][5] = 2
-                        return new_bboxes_pr, layer_n
-                # 如果对土豆中检测到了大土豆，默认单一食材为大土豆
+            n_nums = len(s_labeldict)
+
+            if n_nums == 2:
+                # 如果土豆中检测到了大土豆，默认单一食材为大土豆
                 # if (name1 == 17 and name2 == 18) or (name1 == 18 and name2 == 17):
                 if (name1 == 15 and name2 == 16) or (name1 == 16 and name2 == 15):
                     for i in range(new_num_label):
                         new_bboxes_pr[i][5] = 15
-                    return new_bboxes_pr, layer_n
+                    # return new_bboxes_pr, layer_n
                 # 如果红薯中检测到了大红薯，默认单一食材为大红薯
                 # if (name1 == 21 and name2 == 22) or (name1 == 22 and name2 == 21):
                 if (name1 == 19 and name2 == 18) or (name1 == 18 and name2 == 19):
                     for i in range(new_num_label):
                         new_bboxes_pr[i][5] = 18
-                    return new_bboxes_pr, layer_n
-                # 如果对切红薯中检测到了中红薯，默认单一食材为对切红薯
-                # if (name1 == 21 and name2 == 23) or (name1 == 23 and name2 == 21):
-                #     for i in range(new_num_label):
-                #         new_bboxes_pr[i][5] = 21
-                #     return new_bboxes_pr, layer_n
 
-            # 数量最多label对应的食材占比0.7以上
-            if num_name1 / new_num_label > 0.7:
-                name1_bboxes_pr = []
-                for i in range(new_num_label):
-                    if name1 == new_bboxes_pr[i][5]:
-                        name1_bboxes_pr.append(new_bboxes_pr[i])
+            CL_es = [[10, 11, 12], [14, 15, 16], [17, 18, 19], [1, 4, 5], [2, 13], [3, 6], [20], [0], [7], [9],
+                     [21], [8]]  # 12大类，分别为：披萨、土豆、红薯、饼干、肉类、蛋糕、烤鸡、牛排、蛋挞、花生米、吐司、空
+            c = int(s_labeldict[0][0])
+            cl_es = []
+            for i in range(len(CL_es)):
+                if c in CL_es[i]:
+                    cl_es = CL_es[i]
+                    break
+            CL_type = True  # 判断其余标签和第一个标签是否在一个大类中
+            for k in range(len(s_labeldict) - 1):
+                if s_labeldict[k + 1][0] not in cl_es:
+                    CL_type = False
+                    break
 
-                name1_bboxes_pr[0][4] = 0.95
-                return name1_bboxes_pr, layer_n
-
-            # 按各个label的probability降序排序
-            else:
-                new_bboxes_pr = sorted(new_bboxes_pr, key=lambda x: x[4], reverse=True)
+            if CL_type:  # 如果是同一大类，直接输出
+                return new_bboxes_pr, layer_n
+            else:  # 不是同一大类，置信度乘以0.9
                 for i in range(len(new_bboxes_pr)):
                     new_bboxes_pr[i][4] = new_bboxes_pr[i][4] * 0.9
-                return new_bboxes_pr, layer_n
+                nnew_bboxes_pr = []
+                for i in range(len(new_bboxes_pr)):
+                    if new_bboxes_pr[i][4] > 0.45:
+                        nnew_bboxes_pr.append(new_bboxes_pr[i])
+                return nnew_bboxes_pr, layer_n
+
+
+def cls_major_result(pre_cls):
+    '''
+    :param  pre_cls:小类类别结果
+    直接输出大类结果
+    以22分类classes计算
+    2020年7月27日修改，by：sunyihuan
+    :return:  大类结果
+    大类结果对应为：
+    0：蛋挞
+    1：红薯
+    2：鸡翅
+    3：排骨
+    4：土豆
+    5：吐司
+    6：牛排
+    7：烤鸡
+    8：披萨
+    9：蛋糕
+    10：饼干
+    11：花生米
+    12：空
+    '''
+    pre = pre_cls  # 模型预测结果
+    clse = [[7], [17, 18, 19], [2], [13], [14, 15, 16], [21], [0], [20], [10, 11, 12], [3, 6], [1, 4, 5], [9],
+            [8]]  # 12大类，分别为：蛋挞、红薯、鸡翅、排骨、土豆、吐司、牛排、烤鸡、披萨、蛋糕、饼干、花生米空
+
+    cls_major = 0
+    for k in range(len(clse)):
+        if pre in clse[k]:
+            cls_major = k
+            break
+    return cls_major

@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
-# @Time    : 2020/5/21
+# @Time    : 2020/7/15
 # @Author  : sunyihuan
-# @File    : cnn_hot.py
-
-
-"""
-卷积热力图
-
-"""
+# @File    : cnn_hot_dir.py
+'''
+画出文件夹下所有图片的热力图
+'''
 
 import tensorflow as tf
 from tensorflow.python import pywrap_tensorflow
@@ -15,6 +12,8 @@ from tensorflow.python import pywrap_tensorflow
 import numpy as np
 import cv2
 import multi_detection.core.utils as utils
+import os
+from tqdm import tqdm
 
 
 class YoloPredict(object):
@@ -134,26 +133,31 @@ class get_cam(object):
 
 
 if __name__ == "__main__":
-    img_path = "C:/Users/sunyihuan/Desktop/test_img/1_190923kaopan_EggTart_xiao.jpg"
     Y = YoloPredict()
 
-    heatmap = get_cam(img_path, Y).cam("l")
+    img_dir = "C:/Users/sunyihuan/Desktop/test_all/cupcake"
+    cam_dir = "C:/Users/sunyihuan/Desktop/test_all/cupcake_cam"
+    for img_name in os.listdir(img_dir):
+        if img_name.endswith(".jpg"):
+            img_path = img_dir + "/" + img_name
+            heatmap = get_cam(img_path, Y).cam("l")
 
-    heatmap = np.mean(heatmap, axis=-1)
-    heatmap = np.maximum(heatmap, 0)
+            heatmap = np.mean(heatmap, axis=-1)
+            heatmap = np.maximum(heatmap, 0)
+            try:
+                if np.max(heatmap) == 0:
+                    print("heatmap values all zero!!!!!!!!!!!!!!!!!!!!!!!!")
+                heatmap /= np.max(heatmap)
 
-    if np.max(heatmap) == 0:
-        print("heatmap values all zero!!!!!!!!!!!!!!!!!!!!!!!!")
-    heatmap /= np.max(heatmap)
+                img = cv2.imread(img_path)
 
-    img = cv2.imread(img_path)
+                heatmap = cv2.resize(heatmap, (img.shape[1], img.shape[0]))
 
-    heatmap = cv2.resize(heatmap, (img.shape[1], img.shape[0]))
+                heatmap = np.uint8(255 * heatmap)
 
-    heatmap = np.uint8(255 * heatmap)
+                heatmap = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)
 
-    heatmap = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)
-
-    superimposed_img = heatmap * 0.4 + img
-
-    cv2.imwrite('cam_l.jpg', superimposed_img)
+                superimposed_img = heatmap * 0.4 + img
+                cv2.imwrite('{0}/{1}_cam_l.jpg'.format(cam_dir, img_name.split(".jpg")[0]), superimposed_img)
+            except:
+                print(img_path)

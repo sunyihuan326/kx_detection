@@ -31,25 +31,26 @@ def he_foods(pre):
     :param pre:
     :return:
     '''
-    if pre in [8, 9] and classes_id[classes[i]] in [8, 9]:  # 合并蛋挞
-        rigth_label = True
-    elif pre in [12, 14] and classes_id[classes[i]] in [12, 14]:  # 合并四分之一披萨、六分之一披萨
-        rigth_label = True
-    elif pre in [18, 19] and classes_id[classes[i]] in [18, 19]:  # 合并中土豆、大土豆
-        rigth_label = True
-    elif pre in [22, 23] and classes_id[classes[i]] in [22, 23]:  # 合并中红薯、大红薯
-        rigth_label = True
-    else:
-        rigth_label = False
+    # if pre in [8, 9] and classes_id[classes[i]] in [8, 9]:  # 合并蛋挞
+    #     rigth_label = True
+    # elif pre in [12, 14] and classes_id[classes[i]] in [12, 14]:  # 合并四分之一披萨、六分之一披萨
+    #     rigth_label = True
+    # elif pre in [18, 19] and classes_id[classes[i]] in [18, 19]:  # 合并中土豆、大土豆
+    #     rigth_label = True
+    # elif pre in [22, 23] and classes_id[classes[i]] in [22, 23]:  # 合并中红薯、大红薯
+    #     rigth_label = True
+    # else:
+    #     rigth_label = False
+    rigth_label = False
     return rigth_label
 
 class YoloTest(object):
     def __init__(self):
-        self.input_size = 416  # 输入图片尺寸（默认正方形）
-        self.num_classes = 30  # 种类数
-        self.score_threshold = 0.1
+        self.input_size = 320  # 输入图片尺寸（默认正方形）
+        self.num_classes = 22  # 种类数
+        self.score_threshold = 0.45
         self.iou_threshold = 0.5
-        self.weight_file = "E:/ckpt_dirs/Food_detection/local/20191216/yolov3_train_loss=4.7698.ckpt-80"  # ckpt文件地址
+        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food3/20200716/yolov3_train_loss=5.0290.ckpt-178"   # ckpt文件地址
         # self.weight_file = "./checkpoint/yolov3_train_loss=6.2933.ckpt-36"
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
@@ -111,42 +112,40 @@ if __name__ == '__main__':
     end0_time = time.time()
     print("model loading time:", end0_time - start_time)
 
-    classes = ["Beefsteak", "CartoonCookies", "Cookies", "CupCake", "Pizzafour",
-               "Pizzatwo", "Pizzaone", "Pizzasix", "ChickenWings", "ChiffonCake6",
-               "ChiffonCake8", "CranberryCookies", "eggtarts", "eggtartl", "nofood",
-               "Peanuts", "PorkChops", "PotatoCut", "Potatol", "Potatom",
-               "Potatos", "RoastedChicken", "SweetPotatoCut", "SweetPotatol", "SweetPotatom",
-               "SweetPotatoS", "Toast"]
+    classes = ["beefsteak", "cartooncookies", "chickenwings", "chiffoncake6",
+             "cookies", "cranberrycookies", "cupcake", "eggtart", "nofood", "peanuts",
+             "pizzacut", "pizzaone", "pizzatwo", "porkchops", "potatocut",
+             "potatol", "potatos", "sweetpotatocut", "sweetpotatol", "sweetpotatos",
+             "roastedchicken", "toast", "potatom", "sweetpotatom", "chiffoncake8", ]
     # classes = ["CartoonCookies"]
     #
-    classes_id = {"CartoonCookies": 1, "Cookies": 5, "CupCake": 7, "Beefsteak": 0, "ChickenWings": 2,
-                  "ChiffonCake6": 3, "ChiffonCake8": 4, "CranberryCookies": 6, "eggtarts": 8, "eggtartl": 9,
-                  "nofood": 10, "Peanuts": 11, "PorkChops": 16, "PotatoCut": 17, "Potatol": 18,
-                  "Potatom": 19, "Potatos": 20, "SweetPotatoCut": 21, "SweetPotatol": 22, "SweetPotatom": 23,
-                  "Pizzafour": 12, "Pizzaone": 13, "Pizzasix": 14, "RoastedChicken": 25,
-                  "Pizzatwo": 15, "SweetPotatoS": 24, "Toast": 26, "sweetpotato_others": 27, "pizza_others": 28,
-                  "potato_others": 29 }
+    classes_id = {"beefsteak": 0, "cartooncookies": 1, "chickenwings": 2, "chiffoncake6": 3, "chiffoncake8": 24,
+                    "cookies": 4, "cranberrycookies": 5, "cupcake": 6, "eggtart": 7, "nofood": 8, "peanuts": 9,
+                    "pizzacut": 10, "pizzaone": 11, "pizzatwo": 12, "porkchops": 13, "potatocut": 14,
+                    "potatol": 15, "potatos": 16, "sweetpotatocut": 17, "sweetpotatol": 18, "sweetpotatos": 19,
+                    "roastedchicken": 20, "toast": 21, "potatom": 22, "sweetpotatom": 23, }
+
     new_classes = {v: k for k, v in classes_id.items()}
 
     jpgs_count_all = 0
     layer_jpgs_acc = 0
     food_jpgs_acc = 0
 
-    jpg_root_dir = "E:/check_2_phase/JPGImages"
+    jpg_root_dir = "E:/WLS_originalData/3660camera_data202007/X3_original"
     workbook = xlwt.Workbook(encoding='utf-8')
     sheet1 = workbook.add_sheet("test score")
     for i in tqdm(range(len(classes))):
         c = classes[i].lower()
         sheet1.write(0, i, "{}_score".format(c))
         jpg_i = 0
-        for l_num, l in enumerate(["bottom", "middle", "top", "others"]):
-            for jpg_num, jpg in enumerate(os.listdir(jpg_root_dir + "/" + c + "/" + l)):
+        if c not in ["nofood","potatom", "sweetpotatom"]:
+            for jpg_num, jpg in enumerate(os.listdir(jpg_root_dir + "/" + c)):
                 if jpg.endswith(".jpg"):
                     jpg_i += 1
-                    image_path = jpg_root_dir + "/" + c + "/" + l + "/" + jpg  # 图片地址
+                    image_path = jpg_root_dir + "/" + c + "/" + jpg  # 图片地址
                     image = cv2.imread(image_path)  # 图片读取
                     bboxes_pr, layer_n = Y.predict(image)  # 预测每一张结果并保存
-                    # bboxes_pr, layer_n = correct_bboxes(bboxes_pr, layer_n)  # 矫正输出结果
+                    bboxes_pr, layer_n = correct_bboxes(bboxes_pr, layer_n)  # 矫正输出结果
                     if len(bboxes_pr) == 0:  # 无任何输出结果，score为0
                         score = 0
                     else:
@@ -156,4 +155,21 @@ if __name__ == '__main__':
                                 scores_b.append(b[-2])
                         score = max(scores_b)
                     sheet1.write(jpg_i + 1, i, score)
-    workbook.save(jpg_root_dir+"/all_he_score.xls")
+        # for l_num, l in enumerate(["bottom", "middle", "top", "others"]):#有分层数据
+        #     for jpg_num, jpg in enumerate(os.listdir(jpg_root_dir + "/" + c + "/" + l)):
+        #         if jpg.endswith(".jpg"):
+        #             jpg_i += 1
+        #             image_path = jpg_root_dir + "/" + c + "/" + l + "/" + jpg  # 图片地址
+        #             image = cv2.imread(image_path)  # 图片读取
+        #             bboxes_pr, layer_n = Y.predict(image)  # 预测每一张结果并保存
+        #             bboxes_pr, layer_n = correct_bboxes(bboxes_pr, layer_n)  # 矫正输出结果
+        #             if len(bboxes_pr) == 0:  # 无任何输出结果，score为0
+        #                 score = 0
+        #             else:
+        #                 scores_b = [0]
+        #                 for b in bboxes_pr:
+        #                     if b[-1] == classes_id[classes[i]]:  # 若有正确结果，添加score得分
+        #                         scores_b.append(b[-2])
+        #                 score = max(scores_b)
+        #             sheet1.write(jpg_i + 1, i, score)
+    workbook.save(jpg_root_dir+"/all_he_score0716.xls")

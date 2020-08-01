@@ -21,15 +21,15 @@ def copy_val2jpg_dir(txt_root, all_jpg_dir, save_dir):
     :param save_dir: 要保存图片地址
     :return:
     '''
-    layer_data = "E:/DataSets/2020_two_phase_KXData/only2phase_data/layer_data/val"
-    val_b_list = os.listdir(layer_data + "/bottom")
-    val_m_list = os.listdir(layer_data + "/middle")
-    val_t_list = os.listdir(layer_data + "/top")
-    val_o_list = os.listdir(layer_data + "/others")
 
     for txt in os.listdir(txt_root):
         if "_val" in txt:
             save_name = save_dir + "/" + txt.split("_val")[0]
+            layer_data = "E:/DataSets/2020_two_phase_KXData/202005bu/layer_data/{}".format(txt.split("_val")[0])
+            val_b_list = os.listdir(layer_data + "/bottom")
+            val_m_list = os.listdir(layer_data + "/middle")
+            val_t_list = os.listdir(layer_data + "/top")
+            val_o_list = os.listdir(layer_data + "/others")
             os.mkdir(save_name)
             save_b_name = save_name + "/bottom"
             save_m_name = save_name + "/middle"
@@ -53,8 +53,8 @@ def copy_val2jpg_dir(txt_root, all_jpg_dir, save_dir):
                     print(jpg_name)
 
 
-txt_root = "E:/DataSets/2020_two_phase_KXData/only2phase_data/ImageSets/Main"
-all_jpg_dir = "E:/DataSets/2020_two_phase_KXData/only2phase_data/JPGImages"
-save_dir = "E:/DataSets/2020_two_phase_KXData/only2phase_data/JPGImages46"
+txt_root = "E:/DataSets/2020_two_phase_KXData/202005bu/ImageSets/Main"
+all_jpg_dir = "E:/DataSets/2020_two_phase_KXData/202005bu/JPGImages"
+save_dir = "E:/DataSets/2020_two_phase_KXData/202005bu/JPGImages_val"
 if os.path.exists(save_dir):shutil.rmtree(save_dir),os.mkdir(save_dir)
 copy_val2jpg_dir(txt_root, all_jpg_dir, save_dir)
