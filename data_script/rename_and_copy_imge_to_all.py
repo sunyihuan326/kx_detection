@@ -46,15 +46,16 @@ def change_jpg_name(root_path, org_str, dst_str):
 
 if __name__ == "__main__":
     classes_label22 = ["buxiugangcanju", "taocicanju"]
-    img_root = "G:/Joyoung/3660摄像头补图202007/原数据/X5/zaliangxiaomantou"
-    dst_root = "E:/WLS_originalData/3660bucai(annotation)/JPGImages/X5/steamedbread"
+    img_root = "/Volumes/SYH/Joyoung/炸锅项目/炸锅采图202007/ZG1/yu/jiyu"
+    target = "fish"
+    dst_root = "/Volumes/SYH/Joyoung/炸锅项目/炸锅采图202007/ZG1/yu"
     if not os.path.exists(dst_root): os.mkdir(dst_root)
     # for c in classes_label22:
     #     img_dirs = img_root + "/" + c
     #     dst_img_dir = dst_root + "/" + c
     # if not os.path.exists(dst_img_dir): os.mkdir(dst_img_dir)
     # rename_copy_img("{}".format(c), img_dirs, dst_root, "container")
-    for ty in ["kaojia", "xizhi"]:
+    for ty in ["tj", "xz"]:
         img_dirs_ = img_root + "/" + ty
-        rename_copy_img("{}".format(ty), img_dirs_, dst_root, "steamedbread")
+        rename_copy_img("{}".format(ty), img_dirs_, dst_root, target)
     # change_jpg_name(dst_root, "X1_", "X5_")

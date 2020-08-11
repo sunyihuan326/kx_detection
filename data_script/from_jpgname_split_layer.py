@@ -9,6 +9,7 @@
 
 import os
 import shutil
+from tqdm import tqdm
 
 
 def copy_layer_jpgs(img_dir, layer_dir):
@@ -32,18 +33,29 @@ def copy_layer_jpgs(img_dir, layer_dir):
 
     for jpgname in os.listdir(img_dir):
         if jpgname.endswith(".jpg"):
-            if "shang" in jpgname:  # “shang” 上层标签
+            if "top" in jpgname:  # “shang” 上层标签
                 shutil.copy(img_dir + "/" + jpgname, top_dir + "/" + jpgname)
-            elif "zhong" in jpgname:  # “zhong” 中层标签
+            elif "middle" in jpgname:  # “zhong” 中层标签
                 shutil.copy(img_dir + "/" + jpgname, middle_dir + "/" + jpgname)
-            elif "xia" in jpgname:  # “xia” 下层标签
+            elif "bottom" in jpgname:  # “xia” 下层标签
                 shutil.copy(img_dir + "/" + jpgname, bottom_dir + "/" + jpgname)
             else:
                 print("error")
+                print(jpgname)
 
 
 if __name__ == "__main__":
-    img_dir = "E:/已标数据备份/二期数据/第一批/X5_20200310/chestnut"
-    layer_dir = "E:/已标数据备份/二期数据/第一批/X5_20200310/layer_data/chestnut"
-    if not os.path.exists(layer_dir): os.mkdir(layer_dir)
-    copy_layer_jpgs(img_dir, layer_dir)
+    img_root = "/Volumes/SYH/Joyoung/3660摄像头补图202007/JPGImages/已标"
+    layer_root = "/Volumes/SYH/Joyoung/3660摄像头补图202007/JPGImages/已标_layer"
+    for c in tqdm(["beefsteak", "cartooncookies", "chestnut", "chickenwings", "chiffoncake6", "cookies",
+              "cornone","corntwo", "cranberrycookies", "cupcake", "eggtart", "peanuts", "pizzacut", "pizzaone",
+              "pizzatwo","porkchops","potatocut", "potatol", "potatos", "roastedchicken",
+              "steamedbread", "sweetpotatol", "sweetpotatos", "taro", "toast"]):
+        img_dir = img_root + "/" + c
+        layer_dir = layer_root + "/" + c
+        if not os.path.exists(layer_dir): os.mkdir(layer_dir)
+        copy_layer_jpgs(img_dir, layer_dir)
+    # img_dir = "E:/已标数据备份/二期数据/第一批/X5_20200310/chestnut"
+    # layer_dir = "E:/已标数据备份/二期数据/第一批/X5_20200310/layer_data/chestnut"
+    #
+    # copy_layer_jpgs(img_dir, layer_dir)

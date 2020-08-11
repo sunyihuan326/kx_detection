@@ -4,10 +4,11 @@
 
 '''
 import os
+import shutil
 
 
 class ImageRename():
-    def __init__(self, root_path, target):
+    def __init__(self, root_path, target, save_dir):
         '''
 
         :param root_path: 图片根地址
@@ -15,6 +16,7 @@ class ImageRename():
         '''
         self.root_path = root_path
         self.target = target
+        self.save_dir = save_dir
 
     def rename0(self, say):
         '''
@@ -31,14 +33,24 @@ class ImageRename():
                 #                    filename + '_s.jpg')
                 # os.rename(src, dst)
                 # #
-                try:
-                    # 修改命名，规则为：i_日期_烤箱/其他说明_类别名.jpg
-                    dst = os.path.join(os.path.abspath(self.root_path),
-                                       filename + "_200608" + "_{}".format(say) + self.target + '.jpg')
-                    os.rename(src, dst)
-                    print('converting %s to %s ...' % (src, dst))
-                except:
-                    pass
+                dst = os.path.join(os.path.abspath(self.root_path),
+                                   filename + "_200805" + "_{}".format(say) + self.target + '.jpg')
+                os.rename(src, dst)
+                print('converting %s to %s ...' % (src, dst))
+                save_name = os.path.join(os.path.abspath(self.save_dir),
+                                         filename + "_200805" + "_{}".format(say) + self.target + '.jpg')
+                shutil.copy(dst, save_name)
+                # try:
+                #     # 修改命名，规则为：i_日期_烤箱/其他说明_类别名.jpg
+                #     dst = os.path.join(os.path.abspath(self.root_path),
+                #                        filename + "_200803" + "_{}".format(say) + self.target + '.jpg')
+                #     os.rename(src, dst)
+                #     print('converting %s to %s ...' % (src, dst))
+                #     save_name = os.path.join(os.path.abspath(self.save_dir),
+                #                              filename + "_200803" + "_{}".format(say) + self.target + '.jpg')
+                #     shutil.copy(dst, save_name)
+                # except:
+                #     pass
 
     def change_jpg_name(self):
         for i, item in enumerate(os.listdir(self.root_path)):
@@ -64,7 +76,7 @@ class ImageRename():
 
         :return:
         '''
-        for k in ["kaojia","xizhi"]:
+        for k in ["kaojia", "xizhi"]:
             path_dir = self.root_path + "/" + k
             for b in ["bottom", "middle", "top"]:
                 path_name = path_dir + "/" + b
@@ -87,9 +99,15 @@ class ImageRename():
 
 
 if __name__ == '__main__':
-    path = "E:/WLS_originalData/3660数据补采（含标注）/X5/yumi/zheng/Bai"
-    target = "cornone"
-
-    newname = ImageRename(path, target)
-    newname.rename()
+    path = "/Volumes/SYH/Joyoung/炸锅项目/炸锅采图202007/ZG1/jichijian"
+    target = "chickenwing_top"
+    save_dir = "/Volumes/SYH/Joyoung/炸锅项目/炸锅采图202007/ZG1/jichijian"
+    for c in [""]:
+        dir_p0 = path + "/" + c
+        for k in [""]:
+            dir_p = dir_p0 + "/" + k
+            for ty in ["tj","xz"]:
+                dir_p_ = dir_p + "/" + ty
+                newname = ImageRename(dir_p_, target, save_dir)
+                newname.rename0("ZG1_{}_{}_{}_".format(c,k, ty))
     # newname.rename0("X5_top_")

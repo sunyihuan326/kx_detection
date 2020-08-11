@@ -9,7 +9,7 @@
 '''
 
 import os
-
+from tqdm import tqdm
 
 def delete_xmljpg_diff(img_dir, xml_dir):
     '''
@@ -49,11 +49,12 @@ def delete_xmljpg_diff(img_dir, xml_dir):
 
 
 if __name__ == "__main__":
-    xml_root = "E:/DataSets/2020_two_phase_KXData/202005bu/Annotations"
-    img_root = "E:/DataSets/2020_two_phase_KXData/202005bu/JPGImages"
-    for c in ["bread", "chestnut", "container", "cornone", "corntwo"
-        , "drumsticks", "duck", "eggplant", "eggplant_cut_sauce", "fish"
-        , "hotdog", "redshrimp", "strand", "taro"]:
+    xml_root = "/Volumes/SYH/Joyoung/3660摄像头补图202007/Annotations"
+    img_root = "/Volumes/SYH/Joyoung/3660摄像头补图202007/JPGImages/已标"
+    for c in tqdm(["beefsteak", "cartooncookies", "chestnut", "chickenwings", "chiffoncake6", "cookies",
+              "cornone","corntwo", "cranberrycookies", "cupcake", "eggtart", "peanuts", "pizzacut", "pizzaone",
+              "pizzatwo","porkchops","potatocut", "potatol", "potatos", "roastedchicken",
+              "steamedbread", "sweetpotatol", "sweetpotatos", "taro", "toast"]):
         print(c)
         img_dir = img_root + "/" + c
         xml_dir = xml_root + "/" + c
