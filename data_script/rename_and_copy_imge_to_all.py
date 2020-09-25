@@ -14,13 +14,14 @@ from tqdm import tqdm
 
 def rename_copy_img(c, img_dirs, dst_img_dir, target):
     i = 0
-    for l in ["bottom", "middle", "top"]:
+    # for l in ["bottom", "middle", "top"]:
+    for l in [""]:
         img_dir_name = img_dirs + "/" + l
         print(img_dir_name)
         for jpg_ in tqdm(os.listdir(img_dir_name)):
             if jpg_.endswith(".jpg"):
                 i += 1
-                name = str(i) + "_20200801_X5_" + l + "_{}".format(c) + "_{}.jpg".format(target)
+                name = str(i) + "_20200901_" + l + "_{}".format(c) + "_{}.jpg".format(target)
                 os.rename(img_dir_name + "/" + jpg_, img_dir_name + "/" + name)  # 重命名
                 shutil.copy(img_dir_name + "/" + name, dst_img_dir + "/" + name)  # 拷贝
 
@@ -45,17 +46,21 @@ def change_jpg_name(root_path, org_str, dst_str):
 
 
 if __name__ == "__main__":
-    classes_label22 = ["buxiugangcanju", "taocicanju"]
-    img_root = "/Volumes/SYH/Joyoung/炸锅项目/炸锅采图202007/ZG1/yu/jiyu"
-    target = "fish"
-    dst_root = "/Volumes/SYH/Joyoung/炸锅项目/炸锅采图202007/ZG1/yu"
+
+    img_root = "/Users/sunyihuan/Desktop/炸锅采图20200826/ZG3/zd"
+    target = "zhedang"
+    dst_root = "/Users/sunyihuan/Desktop/炸锅采图20200826/{}".format(target)
+    classes_label22 = ["caixin","hongshu", "ji", "qiezi", "tudou","ya",
+                       "yu"]
+    # classes_label22=["caixin"]
     if not os.path.exists(dst_root): os.mkdir(dst_root)
-    # for c in classes_label22:
-    #     img_dirs = img_root + "/" + c
-    #     dst_img_dir = dst_root + "/" + c
-    # if not os.path.exists(dst_img_dir): os.mkdir(dst_img_dir)
-    # rename_copy_img("{}".format(c), img_dirs, dst_root, "container")
-    for ty in ["tj", "xz"]:
-        img_dirs_ = img_root + "/" + ty
-        rename_copy_img("{}".format(ty), img_dirs_, dst_root, target)
+    for c in classes_label22:
+        img_dirs = img_root + "/" + c
+        # dst_img_dir = dst_root + "/" + c
+        for kk in ["tj", "xz"]:
+            img_dir = img_dirs + "/" + kk
+            rename_copy_img("ZG3_{}_{}".format(c, kk), img_dir, dst_root, target)
+    # for ty in ["tj", "xz"]:
+    #     img_dirs_ = img_root + "/" + ty
+    #     rename_copy_img("{}".format(ty), img_dirs_, dst_root, target)
     # change_jpg_name(dst_root, "X1_", "X5_")
