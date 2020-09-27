@@ -12,7 +12,7 @@ import cv2
 import numpy as np
 import tensorflow as tf
 import multi_detection.core.utils as utils
-
+import os
 
 class YoloPredic(object):
     '''
@@ -21,10 +21,10 @@ class YoloPredic(object):
 
     def __init__(self):
         self.input_size = 416  # 输入图片尺寸（默认正方形）
-        self.num_classes = 30  # 种类数
+        self.num_classes = 39  # 种类数
         self.score_threshold = 0.45
         self.iou_threshold = 0.5
-        self.pb_file = "E:/kx_detection/multi_detection/yolov3.pb"  # pb文件地址
+        self.pb_file = "E:/ckpt_dirs/Food_detection/multi_food3/model/yolo_model.pb"  # pb文件地址
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
 
@@ -68,7 +68,7 @@ class YoloPredic(object):
                                     np.reshape(pred_mbbox, (-1, 5 + self.num_classes)),
                                     np.reshape(pred_lbbox, (-1, 5 + self.num_classes))], axis=0)
 
-        bboxes = utils.postprocess_boxes(pred_bbox, (org_h, org_w), self.input_size, 0.2)
+        bboxes = utils.postprocess_boxes(pred_bbox, (org_h, org_w), self.input_size, self.score_threshold)
         bboxes = utils.nms(bboxes, self.iou_threshold)
 
         return bboxes, layer_n
@@ -78,13 +78,24 @@ class YoloPredic(object):
         bboxes_pr, layer_n = self.predict(image)  # 预测结果
         print(bboxes_pr)
         print(layer_n)
+        save_dir = "E:/WLS_originalData/3660camera_for_test202008/X5_detection"
+        if not os.path.exists(save_dir): os.mkdir(save_dir)
         if self.write_image:
             image = utils.draw_bbox(image, bboxes_pr, show_label=self.show_label)  # 画图
-            drawed_img_save_to_path = str(image_path).split("/")[-1]
+            drawed_img_save_to_path = save_dir +"/de"+ str(image_path).split("/")[-1]
             cv2.imwrite(drawed_img_save_to_path, image)
 
 
 if __name__ == '__main__':
-    img_path = "docs/images/404_cookies.jpg"  # 图片地址
+    img_path = "E:/WLS_originalData/3660camera_for_test202008/X5/20200820143426.jpg"  # 图片地址
     Y = YoloPredic()
     Y.result(img_path)
+
+
+    #
+    # img_dir = "E:/WLS_originalData/3660camera_for_test202008/X5"
+    # for img in os.listdir(img_dir):
+    #     if img.endswith(".jpg"):
+    #         print("img::::::::::::::::::::", img)
+    #         img_path = img_dir + "/" + img
+    #         Y.result(img_path)

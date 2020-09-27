@@ -34,31 +34,37 @@ def he_foods(pre):
     :param pre:
     :return:
     '''
-    if pre in [3, 4, 6] and classes_id39[c] in [3, 4, 6]:  # 合并戚风，纸杯蛋糕
-        rigth_label = True
-    elif pre in [10+1, 11+1, 12+1] and classes_id39[c] in [10+1, 11+1, 12+1]:  # 合并披萨
-        rigth_label = True
-    elif pre in [14+1, 15+1, 16+1] and classes_id39[c] in [14+1, 15+1, 16+1]:  # 合并土豆、土豆
-        rigth_label = True
-    elif pre in [17+1, 18+1, 19+1] and classes_id39[c] in [17+1, 18+1, 19+1]:  # 合并红薯
-        rigth_label = True
-    elif pre in [1, 4+1, 5+1] and classes_id39[c] in [1, 4, 5]:  # 合并饼干
-        rigth_label = True
-    else:
-        rigth_label = False
-
+    # if pre in [3, 4, 6] and classes_id39[c] in [3, 4, 6]:  # 合并戚风，纸杯蛋糕
+    #     rigth_label = True
+    # elif pre in [10 + 1, 11 + 1, 12 + 1] and classes_id39[c] in [10 + 1, 11 + 1, 12 + 1]:  # 合并披萨
+    #     rigth_label = True
+    # elif pre in [14 + 1, 15 + 1, 16 + 1] and classes_id39[c] in [14 + 1, 15 + 1, 16 + 1]:  # 合并土豆、土豆
+    #     rigth_label = True
+    # elif pre in [17 + 1, 18 + 1, 19 + 1] and classes_id39[c] in [17 + 1, 18 + 1, 19 + 1]:  # 合并红薯
+    #     rigth_label = True
+    # elif pre in [1, 4 + 1, 5 + 1] and classes_id39[c] in [1, 4, 5]:  # 合并饼干
+    #     rigth_label = True
+    # elif pre in [24, 25] and classes_id39[c] in [25, 24]:  # 合并玉米
+    #     rigth_label = True
+    # elif pre in [32, 33] and classes_id39[c] in [32, 33]:  # 合并器皿
+    #     rigth_label = True
+    # elif pre in [36, 37] and classes_id39[c] in [36, 37]:  # 合并虾
+    #     rigth_label = True
+    # else:
+    #     rigth_label = False
+    rigth_label = False
     return rigth_label
 
 
 class YoloPredict(object):
     def __init__(self):
         self.input_size = 416  # 输入图片尺寸（默认正方形）
-        self.num_classes = 39  # 种类数
+        self.num_classes = 40  # 种类数
         self.top_n = 10
         self.score_cls_threshold = 0.0000001
         self.score_threshold = 0.45
         self.iou_threshold = 0.5
-        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food7/20200727/yolov3_train_loss=8.0584.ckpt-104"   # ckpt文件地址
+        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food5/20200914/yolov3_train_loss=6.9178.ckpt-95"   # ckpt文件地址
         # self.weight_file = "./checkpoint/yolov3_train_loss=4.7681.ckpt-80"
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
@@ -131,7 +137,7 @@ class YoloPredict(object):
 
         return org_h, org_w, pred_bbox, bboxes, layer_n
 
-    def result(self, image_path):
+    def result(self, image_path, save_dir):
         '''
         得出预测结果并保存
         :param image_path: 图片地址
@@ -144,19 +150,27 @@ class YoloPredict(object):
         # print(bboxes_pr)
         # print(layer_n)
 
-        # if self.write_image:
-        #     image = utils.draw_bbox(image, bboxes_pr, show_label=self.show_label)
-        #     drawed_img_save_to_path = str(image_path).split("/")[-1]
-        #     drawed_img_save_to_path = str(drawed_img_save_to_path).split(".")[0] + "_" + str(
-        #         layer_n) + ".jpg"  # 图片保存地址，烤层结果在命名中
-        #     # cv2.imshow('Detection result', image)
-        #     cv2.imwrite(save_dir + "/" + drawed_img_save_to_path, image)  # 保存图片
+        if self.write_image:
+            image = utils.draw_bbox(image, bboxes, show_label=self.show_label)
+            drawed_img_save_to_path = str(image_path).split("/")[-1]
+            drawed_img_save_to_path = str(drawed_img_save_to_path).split(".")[0] + "_" + str(
+                layer_n) + ".jpg"  # 图片保存地址，烤层结果在命名中
+            # cv2.imshow('Detection result', image)
+            cv2.imwrite(save_dir + "/" + drawed_img_save_to_path, image)  # 保存图片
         return org_h, org_w, pred_bbox, bboxes, layer_n
 
 
 if __name__ == '__main__':
     start_time = time.time()
-    img_root = "E:/WLS_originalData/3660camera_data202007/all_original_data0"  # 图片文件地址
+    img_root = "E:/WLS_originalData/all_test_data/all_original_data"  # 图片文件地址
+    save_root = "E:/WLS_originalData/all_test_data/all_original_data_0914_detection5"
+    img_error_root = "E:/WLS_originalData/all_test_data/all_original_data_0914_error5"
+    img_error_detection_root = "E:/WLS_originalData/all_test_data/all_original_data_0914_error_detect5"
+    img_noresult_root = "E:/WLS_originalData/all_test_data/all_original_data_0914_noresult5"
+    if not os.path.exists(save_root): os.mkdir(save_root)
+    if not os.path.exists(img_error_root): os.mkdir(img_error_root)
+    if not os.path.exists(img_noresult_root): os.mkdir(img_noresult_root)
+    if not os.path.exists(img_error_detection_root): os.mkdir(img_error_detection_root)
     Y = YoloPredict()
     end_time0 = time.time()
     print("model loading time:", end_time0 - start_time)
@@ -172,13 +186,14 @@ if __name__ == '__main__':
     classes_id39 = {"cartooncookies": 1, "cookies": 5, "cupcake": 7, "beefsteak": 0, "chickenwings": 2,
                     "chiffoncake6": 3, "chiffoncake8": 4, "cranberrycookies": 6, "eggtart": 8,
                     "nofood": 9, "peanuts": 10, "porkchops": 14, "potatocut": 15, "potatol": 16,
-                    "potatos": 17, "sweetpotatocut": 18, "sweetpotatol": 19,"pizzacut": 11, "pizzaone": 12, "roastedchicken": 21,
+                    "potatos": 17, "sweetpotatocut": 18, "sweetpotatol": 19, "pizzacut": 11, "pizzaone": 12,
+                    "roastedchicken": 21,
                     "pizzatwo": 13, "sweetpotatos": 20, "toast": 22, "chestnut": 23, "cornone": 24, "corntwo": 25,
                     "drumsticks": 26,
                     "taro": 27, "steamedbread": 28, "eggplant": 29, "eggplant_cut_sauce": 30, "bread": 31,
                     "container_nonhigh": 32,
                     "container": 33, "duck": 21, "fish": 34, "hotdog": 35, "redshrimp": 36,
-                    "shrimp": 37, "strand": 38}
+                    "shrimp": 37, "strand": 38,"xizhi":39}
 
     all_jpg = 0
     acc_jpg = 0
@@ -191,14 +206,22 @@ if __name__ == '__main__':
     for c in clses:
         if c not in ["nofood", "sweetpotatom", "potatom"]:
             img_dir = img_root + "/" + c
-
+            save_dir = save_root + "/" + c
+            img_error_dir = img_error_root + "/" + c
+            img_noresult_dir = img_noresult_root + "/" + c
+            img_error_detect_dir = img_error_detection_root + "/" + c
+            if not os.path.exists(save_dir): os.mkdir(save_dir)
+            if not os.path.exists(img_error_dir): os.mkdir(img_error_dir)
+            if not os.path.exists(img_noresult_dir): os.mkdir(img_noresult_dir)
+            if not os.path.exists(img_error_detect_dir): os.mkdir(img_error_detect_dir)
             for img in tqdm(os.listdir(img_dir)):
                 if img.endswith("jpg"):
                     all_jpg += 1
                     img_path = img_dir + "/" + img
+
                     end_time1 = time.time()
                     try:
-                        org_h, org_w, pred_bbox, bboxes, layer_n = Y.result(img_path)
+                        org_h, org_w, pred_bbox, bboxes, layer_n = Y.result(img_path, save_dir)
                         best_bboxes_3 = Y.get_top_cls(pred_bbox, org_h, org_w, 3)  # 获取top_n类别和置信度
                         best_bboxes_5 = Y.get_top_cls(pred_bbox, org_h, org_w, 5)  # 获取top_n类别和置信度
                         best_bboxes_8 = Y.get_top_cls(pred_bbox, org_h, org_w, 9)  # 获取top_n类别和置信度
@@ -206,6 +229,7 @@ if __name__ == '__main__':
 
                         if len(bboxes) == 0:
                             noresults += 1
+                            shutil.copy(img_path, img_noresult_dir + "/" + img)
                         else:
                             bboxes_pr, layer_n = correct_bboxes(bboxes, layer_n)  # 矫正输出结果
                             # bboxes_pr, layer_n = get_potatoml(bboxes_pr, layer_n)  # 根据输出结果对中大红薯，中大土豆做输出
@@ -235,15 +259,22 @@ if __name__ == '__main__':
                                     acc_jpg += 1
                                     food_acc_major += 1
                                 else:
+                                    shutil.copy(img_path, img_error_dir + "/" + img)
                                     right_label = he_foods(pre)
                                     if right_label:  # 合并后结果正确
                                         food_acc_major += 1
+                                    else:
+                                        # 图片保存地址，烤层结果在命名中
+                                        drawed_img_save_to_path = str(img).split(".")[0] + "_" + str(
+                                            layer_n) + ".jpg"
+                                        shutil.copy(save_dir + "/" + drawed_img_save_to_path,
+                                                    img_error_detect_dir + "/" + drawed_img_save_to_path)
 
-                                # if not os.path.exists(img_dir + "/" + str(clses[pre])): os.mkdir(
-                                #     img_dir + "/" + str(clses[pre]))
-                                # shutil.move(img_path, img_dir + "/" + str(clses[pre]) + "/" + img)
+                                    # if not os.path.exists(img_dir + "/" + str(clses[pre])): os.mkdir(
+                                    #     img_dir + "/" + str(clses[pre]))
+                                    # shutil.move(img_path, img_dir + "/" + str(clses[pre]) + "/" + img)
                     except:
-                        pass
+                        print(img_path)
     print("正确数：", acc_jpg)
     print("无任何结果数：", noresults)
     print("top3正确数结果数：", food_top3_acc_nums)

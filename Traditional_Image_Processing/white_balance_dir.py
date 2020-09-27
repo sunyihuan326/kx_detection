@@ -27,8 +27,8 @@ def white_balance(img_path):
     # 1.计算三通道灰度平均值
     imgB, imgG, imgR = cv2.split(img)
 
-    KB = 1.3
-    KG = 1.2
+    KB = 1.03
+    KG = 1.03
     KR = 0.9
     # 3使用增益系数
     imgB = imgB * KB  # 向下取整
@@ -61,12 +61,16 @@ def img_dir_whiteBalance(img_dir, img_save_dir):
 
 
 if __name__ == "__main__":
-    for c in ["beefsteak", "cartooncookies", "chickenwings", "chiffoncake6", "chiffoncake8",
-              "cookies", "cranberrycookies", "cupcake", "eggtart", "peanuts",
-              "pizzacut", "pizzaone", "pizzatwo", "porkchops", "potatocut",
-              "potatol", "potatos", "sweetpotatocut", "sweetpotatol", "sweetpotatos",
-              "roastedchicken", "toast", ]:
-        img_dir = "E:/WLS_originalData/3660camera_data202007/X3_original/{}".format(c)
-        img_save_dir = "E:/WLS_originalData/3660camera_data202007/X3_white_balance1/{}_white".format(c)
-        if not os.path.exists(img_save_dir): os.mkdir(img_save_dir)
-        img_dir_whiteBalance(img_dir, img_save_dir)
+    img_dir = "C:/Users/sunyihuan/Desktop/X3_2phase"
+    img_save_dir = "C:/Users/sunyihuan/Desktop/X3_2phase_white_balance"
+    if not os.path.exists(img_save_dir): os.mkdir(img_save_dir)
+    img_dir_whiteBalance(img_dir, img_save_dir)
+    # for c in ["beefsteak", "cartooncookies", "chickenwings", "chiffoncake6", "chiffoncake8",
+    #           "cookies", "cranberrycookies", "cupcake", "eggtart", "peanuts",
+    #           "pizzacut", "pizzaone", "pizzatwo", "porkchops", "potatocut",
+    #           "potatol", "potatos", "sweetpotatocut", "sweetpotatol", "sweetpotatos",
+    #           "roastedchicken", "toast", ]:
+    #     img_dir = "E:/WLS_originalData/3660camera_data202007/X3_original/{}".format(c)
+    #     img_save_dir = "E:/WLS_originalData/3660camera_data202007/X3_white_balance1/{}_white".format(c)
+    #     if not os.path.exists(img_save_dir): os.mkdir(img_save_dir)
+    #     img_dir_whiteBalance(img_dir, img_save_dir)

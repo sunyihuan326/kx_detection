@@ -12,7 +12,7 @@ from tqdm import tqdm
 import os
 
 
-def from_txt_copy_data2all(txt_path, save_dir, jpg_typ, layer_tpy=True):
+def from_txt_copy_data2all(txt_path, save_dir, jpg_typ, layer_tpy=False):
     '''
     2020年3月20日修改
     :param txt_path:txt文件路径，全路径
@@ -40,31 +40,57 @@ def from_txt_copy_data2all(txt_path, save_dir, jpg_typ, layer_tpy=True):
         for file in tqdm(txt_files):
             img_name = file.strip().split(" ")[0]
             jpg_name = str(img_name).split("/")[-1]
-            shutil.copy(img_name, save_dir + "/" + jpg_name)
-            if layer_tpy:
-                if file.split(" ")[1] == "0":
-                    # print(layer_dir + "/bottom" + "/" + jpg_name)
-                    shutil.copy(img_name, layer_dir + "/bottom" + "/" + jpg_name)
-                elif file.split(" ")[1] == "1":
-                    shutil.copy(img_name, layer_dir + "/middle" + "/" + jpg_name)
-                elif file.split(" ")[1] == "2":
-                    shutil.copy(img_name, layer_dir + "/top" + "/" + jpg_name)
-                elif file.split(" ")[1] == "3":
-                    shutil.copy(img_name, layer_dir + "/others" + "/" + jpg_name)
-                else:
-                    print(file)
+            cls = int(file.strip().split(" ")[-1].split(",")[-1])
+            if "_hot.jpg" not in file and "_zi.jpg" not in file and "_lv.jpg" not in file:
+                shutil.copy(img_name, save_dir + "/" + jpg_name)
+                if layer_tpy:
+                    if file.split(" ")[1] == "0":
+                        # print(layer_dir + "/bottom" + "/" + jpg_name)
+                        shutil.copy(img_name, layer_dir + "/bottom" + "/" + jpg_name)
+                    elif file.split(" ")[1] == "1":
+                        shutil.copy(img_name, layer_dir + "/middle" + "/" + jpg_name)
+                    elif file.split(" ")[1] == "2":
+                        shutil.copy(img_name, layer_dir + "/top" + "/" + jpg_name)
+                    elif file.split(" ")[1] == "3":
+                        shutil.copy(img_name, layer_dir + "/others" + "/" + jpg_name)
+                    else:
+                        print(file)
+            # if cls==37:#近拷贝37
+            #     shutil.copy(img_name, save_dir + "/" + jpg_name)
+            #     if layer_tpy:
+            #         if file.split(" ")[1] == "0":
+            #             # print(layer_dir + "/bottom" + "/" + jpg_name)
+            #             shutil.copy(img_name, layer_dir + "/bottom" + "/" + jpg_name)
+            #         elif file.split(" ")[1] == "1":
+            #             shutil.copy(img_name, layer_dir + "/middle" + "/" + jpg_name)
+            #         elif file.split(" ")[1] == "2":
+            #             shutil.copy(img_name, layer_dir + "/top" + "/" + jpg_name)
+            #         elif file.split(" ")[1] == "3":
+            #             shutil.copy(img_name, layer_dir + "/others" + "/" + jpg_name)
+            #         else:
+            #             print(file)
     else:  # 拷贝xml数据
         for file in tqdm(txt_files):
             img_name = file.split(" ")[0]
             jpg_name = str(img_name).split("/")[-1]
             na = str(jpg_name.split(".jpg")[0]) + ".xml"
             xml_path = img_name.split("JPGImages")[0] + "Annotations/" + na
-
-            shutil.copy(xml_path, save_dir + "/"+na)
+            cls = int(file.strip().split(" ")[-1][-1])
+            if "_hot.jpg" not in file and "_zi.jpg" not in file and "_lv.jpg" not in file:
+                try:
+                    shutil.copy(xml_path, save_dir + "/" + na)
+                except:
+                    print(na)
+            # if cls == 37:
+            #     try:
+            #         shutil.copy(xml_path, save_dir + "/" + na)
+            #     except:
+            #         print(na)
 
 
 if __name__ == "__main__":
-    txt_path = "E:/kx_detection/multi_detection/data/dataset/X_KX_data_27_1127_val27.txt"
-    save_dir = "E:/DataSets/1127X_data/JPGImages_val"
+    txt_path = "E:/DataSets/X_3660_data/train39_zi_hot_and_old_strand.txt"
+    save_dir = "E:/DataSets/All_data_0923/JPGImages"
     if not os.path.exists(save_dir): os.mkdir(save_dir)
     from_txt_copy_data2all(txt_path, save_dir, "jpg", True)
+    from_txt_copy_data2all(txt_path, "E:/DataSets/All_data_0923/Annotations", "xml", False)

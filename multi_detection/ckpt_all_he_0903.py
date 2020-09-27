@@ -1,8 +1,8 @@
 # -*- encoding: utf-8 -*-
 
 """
-@File    : ckpt_all_he_1218.py
-@Time    : 2019/12/18 14:39
+@File    : ckpt_all_he0903.py
+@Time    : 2020/9/3 14:39
 @Author  : sunyihuan
 """
 
@@ -10,10 +10,9 @@
 ckpt文件预测某一文件夹下各类所有图片烤层结果、食材结果
 并输出各准确率至excel表格中
 
-此结果合并大蛋挞、小蛋挞；四分之一披萨、六分之一披萨
+此结果合并土豆（切开、大小土豆）、红薯（切开、大小红薯）、
+蛋糕（戚风、纸杯蛋糕）、饼干（卡通饼干、蔓越莓）、披萨（整个、半圆、切开）
 
-
-说明：correct_bboxes使用李志鹏12月17日修订版
 '''
 
 import cv2
@@ -39,20 +38,18 @@ def he_foods(pre):
     :param pre:
     :return:
     '''
-    if pre in [3, 4] and classes_id39[c] in [3, 4]:  # 合并戚风
+    if pre in [3, 4, 6] and classes_id39[c] in [3, 4, 6]:  # 合并戚风，纸杯蛋糕
         rigth_label = True
-    # if pre in [3, 4, 6] and classes_id39[c] in [3, 4, 6]:  # 合并戚风，纸杯蛋糕
-    #     rigth_label = True
-    # elif pre in [10 + 1, 11 + 1, 12 + 1] and classes_id39[c] in [10 + 1, 11 + 1, 12 + 1]:  # 合并披萨
-    #     rigth_label = True
-    # elif pre in [14 + 1, 15 + 1, 16 + 1] and classes_id39[c] in [14 + 1, 15 + 1, 16 + 1]:  # 合并土豆、土豆
-    #     rigth_label = True
-    # elif pre in [17 + 1, 18 + 1, 19 + 1] and classes_id39[c] in [17 + 1, 18 + 1, 19 + 1]:  # 合并红薯
-    #     rigth_label = True
-    # elif pre in [1, 6] and classes_id39[c] in [1, 6]:  # 合并卡通饼干、蔓越莓饼干
-    #     rigth_label = True
-    # elif pre in [24, 25] and classes_id39[c] in [25, 24]:  # 合并玉米
-    #     rigth_label = True
+    elif pre in [10 + 1, 11 + 1, 12 + 1] and classes_id39[c] in [10 + 1, 11 + 1, 12 + 1]:  # 合并披萨
+        rigth_label = True
+    elif pre in [14 + 1, 15 + 1, 16 + 1] and classes_id39[c] in [14 + 1, 15 + 1, 16 + 1]:  # 合并土豆、土豆
+        rigth_label = True
+    elif pre in [17 + 1, 18 + 1, 19 + 1] and classes_id39[c] in [17 + 1, 18 + 1, 19 + 1]:  # 合并红薯
+        rigth_label = True
+    elif pre in [1, 6] and classes_id39[c] in [1, 6]:  # 合并卡通饼干、蔓越莓饼干
+        rigth_label = True
+    elif pre in [24, 25] and classes_id39[c] in [25, 24]:  # 合并玉米
+        rigth_label = True
     elif pre in [32, 33] and classes_id39[c] in [32, 33]:  # 合并器皿
         rigth_label = True
     elif pre in [36, 37] and classes_id39[c] in [36, 37]:  # 合并虾
@@ -66,10 +63,10 @@ def he_foods(pre):
 class YoloTest(object):
     def __init__(self):
         self.input_size = 416  # 输入图片尺寸（默认正方形）
-        self.num_classes = 40  # 种类数
+        self.num_classes = 39  # 种类数
         self.score_threshold = 0.45
         self.iou_threshold = 0.5
-        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food5/20200914/yolov3_train_loss=6.9178.ckpt-95"   # ckpt文件地址
+        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food5/20200903/yolov3_train_loss=12.8362.ckpt-10"  # ckpt文件地址
         # self.weight_file = "./checkpoint/yolov3_train_loss=4.7681.ckpt-80"
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
@@ -150,41 +147,13 @@ class YoloTest(object):
 if __name__ == '__main__':
 
     classes_label22 = ["beefsteak", "cartooncookies", "chickenwings", "chiffoncake6", "chiffoncake8",
-                       "cookies", "cranberrycookies", "cupcake", "eggtartl", "eggtarts",
-                       "nofood", "peanuts", "pizzafour", "pizzaone", "pizzasix",
-                       "pizzatwo", "porkchops", "potatocut", "potatol", "potatom",
-                       "potatos", "sweetpotatocut", "sweetpotatol", "sweetpotatom", "sweetpotatos",
+                       "cookies", "cranberrycookies", "cupcake", "eggtart", "nofood", "peanuts",
+                       "pizzacut", "pizzaone", "pizzatwo", "porkchops", "potatocut",
+                       "potatol", "potatos", "sweetpotatocut", "sweetpotatol", "sweetpotatos",
                        "roastedchicken", "toast", ]
     # classes_label22 = ["chiffoncake6", "chiffoncake8", ]
-
-    classes_label46 = ["beefsteak", "cartooncookies", "chickenwings", "chiffoncake6", "chiffoncake8",
-                       "cookies", "cranberrycookies", "cupcake", "eggtart", "peanuts",
-                       "pizzacut", "pizzaone", "pizzatwo", "porkchops", "potatocut", "potatol",
-                       "potatos", "sweetpotatocut", "sweetpotatol", "sweetpotatos",
-                       "roastedchicken", "toast", "chestnut", "cornone", "corntwo", "drumsticks", "taro",
-                       "steamedbread", "eggplant", "eggplant_cut_sauce", "bread", "container_nonhigh",
-                       "container", "fish", "hotdog", "redshrimp",
-                       "shrimp", "strand"]
-    classes_label18 = ["chestnut", "cornone", "corntwo", "drumsticks", "taro",
-                       "steamedbread", "eggplant", "eggplant_cut_sauce", "bread",
-                       "container_nonhigh", "container", "duck", "fish", "hotdog",
-                       "redshrimp", "shrimp", "strand"]
-
     # classes = ["RoastedChicken"]
 
-    # ab_classes = ["Pizzafour", "Pizzatwo", "Pizzaone", "Pizzasix",
-    #               "PotatoCut", "Potatol", "Potatom",
-    #               "RoastedChicken",
-    #               "SweetPotatoCut", "SweetPotatol", "SweetPotatom", "SweetPotatoS",
-    #               "Toast"]
-    # classes_id = {"CartoonCookies": 1, "Cookies": 5, "CupCake": 7, "Beefsteak": 0, "ChickenWings": 2,
-    #               "ChiffonCake6": 3, "ChiffonCake8": 4, "CranberryCookies": 6, "eggtarts": 8, "eggtartl": 9,
-    #               "nofood": 10, "Peanuts": 11, "PorkChops": 16, "PotatoCut": 17, "Potatol": 18,
-    #               "Potatom": 19, "Potatos": 20, "SweetPotatoCut": 21, "SweetPotatol": 22, "SweetPotatom": 23,
-    #               "Pizzafour": 12, "Pizzaone": 13, "Pizzasix": 14, "RoastedChicken": 25,
-    #               "Pizzatwo": 15, "SweetPotatoS": 24, "Toast": 26, "sweetpotato_others": 27, "pizza_others": 28,
-    #               "potato_others": 29, "chestnut": 30, "cornone": 31, "corntwo": 32, "drumsticks": 33,
-    #               "taro": 34, "steamedbread": 35,}
     classes_id18 = {"chestnut": 1, "cornone": 2, "corntwo": 3, "drumsticks": 4, "taro": 5,
                     "nofood": 0, "steamedbread": 6, "eggplant": 7, "eggplant_cut_sauce": 8, "bread": 9,
                     "container_nonhigh": 10, "container": 11, "duck": 12, "fish": 13, "hotdog": 14,
@@ -192,54 +161,32 @@ if __name__ == '__main__':
     classes_id39 = {"cartooncookies": 1, "cookies": 5, "cupcake": 7, "beefsteak": 0, "chickenwings": 2,
                     "chiffoncake6": 3, "chiffoncake8": 4, "cranberrycookies": 6, "eggtart": 8,
                     "nofood": 9, "peanuts": 10, "porkchops": 14, "potatocut": 15, "potatol": 16,
-                    "potatom": 16, "potatos": 17, "sweetpotatocut": 18, "sweetpotatol": 19,
-                    "pizzacut": 11, "pizzaone": 12, "roastedchicken": 21,
+                    "potatos": 17, "sweetpotatocut": 18, "sweetpotatol": 19, "pizzacut": 11, "pizzaone": 12,
+                    "roastedchicken": 21,
                     "pizzatwo": 13, "sweetpotatos": 20, "toast": 22, "chestnut": 23, "cornone": 24, "corntwo": 25,
                     "drumsticks": 26,
                     "taro": 27, "steamedbread": 28, "eggplant": 29, "eggplant_cut_sauce": 30, "bread": 31,
                     "container_nonhigh": 32,
                     "container": 33, "duck": 21, "fish": 34, "hotdog": 35, "redshrimp": 36,
-                    "shrimp": 37, "strand": 38, "xizhi": 39}
-    classes_id46 = {"cartooncookies": 1, "cookies": 5, "cupcake": 7, "beefsteak": 0, "chickenwings": 2,
-                    "chiffoncake6": 3, "chiffoncake8": 4, "cranberrycookies": 6, "eggtarts": 8, "eggtartl": 9,
-                    "nofood": 10, "peanuts": 11, "porkchops": 16, "potatocut": 17, "potatol": 18,
-                    "potatom": 19, "potatos": 20, "sweetpotatocut": 21, "sweetpotatol": 22, "sweetpotatom": 23,
-                    "pizzafour": 12, "pizzaone": 13, "pizzasix": 14, "roastedchicken": 25,
-                    "pizzatwo": 15, "sweetpotatos": 24, "toast": 26, "sweetpotato_others": 27, "pizza_others": 28,
-                    "potato_others": 29, "chestnut": 30, "cornone": 31, "corntwo": 32, "drumsticks": 33,
-                    "taro": 34, "steamedbread": 35, "eggplant": 36, "eggplant_cut_sauce": 37, "bread": 38,
-                    "container_nonhigh": 39,
-                    "container": 40, "duck": 25, "fish": 41, "hotdog": 42, "redshrimp": 43,
-                    "shrimp": 44, "strand": 45}
-    classes_id22 = {"cartooncookies": 1, "cookies": 4, "cupcake": 6, "beefsteak": 0, "chickenwings": 2,
-                    "chiffoncake6": 3, "chiffoncake8": 3, "cranberrycookies": 5, "eggtarts": 7, "eggtartl": 7,
-                    "nofood": 8, "peanuts": 9, "porkchops": 13, "potatocut": 14, "potatol": 15,
-                    "potatom": 15, "potatos": 16, "sweetpotatocut": 17, "sweetpotatol": 18, "sweetpotatom": 18,
-                    "pizzafour": 10, "pizzaone": 11, "pizzasix": 10, "roastedchicken": 20,
-                    "pizzatwo": 12, "sweetpotatos": 19, "toast": 21}
-    classes_id23 = {"cartooncookies": 1, "cookies": 5, "cupcake": 7, "beefsteak": 0, "chickenwings": 2,
-                    "chiffoncake6": 3, "chiffoncake8": 4, "cranberrycookies": 6, "eggtarts": 8, "eggtartl": 8,
-                    "nofood": 9, "peanuts": 10, "porkchops": 14, "potatocut": 15, "potatol": 16,
-                    "potatom": 16, "potatos": 17, "sweetpotatocut": 18, "sweetpotatol": 19, "sweetpotatom": 19,
-                    "pizzafour": 11, "pizzaone": 12, "pizzasix": 11, "roastedchicken": 21,
-                    "pizzatwo": 13, "sweetpotatos": 20, "toast": 22}
+                    "shrimp": 37, "strand": 38}
+
     # 需要修改
     classes_id = classes_id39  #######
-    classes = classes_label46  #######
-    mode = "multi5_0914"  #######
+    classes = classes_label22  #######
+    mode = "multi5_0903"  #######
     tag = ""
-    img_dir = "E:/WLS_originalData/all_test_data/JPGImages_val"  # 文件夹地址
-    # img_dir = "E:/check_2_phase/JPGImages_2"  # 文件夹地址
-    save_dir = "E:/WLS_originalData/all_test_data/detection2_{0}{1}".format(mode, tag)  # 图片保存地址
+    # img_dir = "E:/WLS_originalData/all_test_data/JPGImages_val"  # 文件夹地址
+    img_dir = "E:/check_2_phase/JPGImages_he"  # 文件夹地址
+    save_dir = "E:/check_2_phase/detection_he_{0}{1}".format(mode, tag)  # 图片保存地址
     if not os.path.exists(save_dir): os.mkdir(save_dir)
 
-    layer_error_dir = "E:/WLS_originalData/all_test_data/layer_error2_{0}{1}".format(mode, tag)  # 预测结果错误保存地址
+    layer_error_dir = "E:/check_2_phase/layer_error_he_{0}{1}".format(mode, tag)  # 预测结果错误保存地址
     if not os.path.exists(layer_error_dir): os.mkdir(layer_error_dir)
 
-    fooderror_dir = "E:/WLS_originalData/all_test_data/food_error2_{0}{1}".format(mode, tag)  # 食材预测结果错误保存地址
+    fooderror_dir = "E:/check_2_phase/food_error_he_{0}{1}".format(mode, tag)  # 食材预测结果错误保存地址
     if not os.path.exists(fooderror_dir): os.mkdir(fooderror_dir)
 
-    no_result_dir = "E:/WLS_originalData/all_test_data/no_result2_{0}{1}".format(mode, tag)  # 无任何输出结果保存地址
+    no_result_dir = "E:/check_2_phase/no_result_he_{0}{1}".format(mode, tag)  # 无任何输出结果保存地址
     if not os.path.exists(no_result_dir): os.mkdir(no_result_dir)
 
     start_time = time.time()
@@ -591,7 +538,7 @@ if __name__ == '__main__':
     sheet1.write(55, 4, round((layer_jpgs_acc / jpgs_count_all) * 100, 2))
     sheet1.write(55, 5, round((food_jpgs_acc / jpgs_count_all) * 100, 2))
 
-    workbook.save("E:/WLS_originalData/all_test_data/all_he_{0}{1}.xls".format(mode, tag))
+    workbook.save("E:/check_2_phase/all_he_he_{0}{1}.xls".format(mode, tag))
 
     end_time = time.time()
     print("all jpgs time:", end_time - end0_time)

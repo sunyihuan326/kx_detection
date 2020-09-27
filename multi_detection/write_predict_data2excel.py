@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2020/6/5
 # @Author  : sunyihuan
-# @File    : read_predict_data.py
+# @File    : write_predict_data2excel.py
 '''
 读取文件夹下所有图片的预测数据
 长、宽、类别等
@@ -17,7 +17,7 @@ from multi_detection.food_correct_utils import correct_bboxes
 import xlwt
 
 # gpu限制
-gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.2)
+gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.5)
 config = tf.ConfigProto(gpu_options=gpu_options)
 
 
@@ -27,11 +27,11 @@ class YoloPredict(object):
     '''
 
     def __init__(self):
-        self.input_size = 320  # 输入图片尺寸（默认正方形）
-        self.num_classes = 22  # 种类数
-        self.score_threshold = 0.3
+        self.input_size = 416  # 输入图片尺寸（默认正方形）
+        self.num_classes = 40  # 种类数
+        self.score_threshold = 0.45
         self.iou_threshold = 0.5
-        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food3/20200604_22class/yolov3_train_loss=4.9799.ckpt-158"  # ckpt文件地址
+        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food5/20200914/yolov3_train_loss=6.9178.ckpt-95"  # ckpt文件地址
         # self.weight_file = "./checkpoint/yolov3_train_loss=4.7681.ckpt-80"
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
@@ -97,7 +97,7 @@ class YoloPredict(object):
 
 if __name__ == '__main__':
     start_time = time.time()
-    img_dir = "C:/Users/sunyihuan/Desktop/X5_test/X6_0610/chiffoncake6"  # 图片文件地址
+    img_dir = "C:/Users/sunyihuan/Desktop/JPGImages_chiffon4"  # 图片文件地址
     Y = YoloPredict()
     end_time0 = time.time()
     print("model loading time:", end_time0 - start_time)
@@ -132,4 +132,4 @@ if __name__ == '__main__':
                 sheet.write(i + 1, 4, int(bboxes_pr[0][3]))
                 sheet.write(i + 1, 5, pre)
                 sheet.write(i + 1, 6, int(layer_n[0]))
-    wk.save("C:/Users/sunyihuan/Desktop/X5_test/X6_0610/chiffoncake6/chiffon_predict.xls")
+    wk.save("C:/Users/sunyihuan/Desktop/JPGImages_chiffon4/chiffon_predict.xls")

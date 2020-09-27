@@ -9,9 +9,9 @@ import colorsys
 from PIL import Image
 
 # 输入文件
-filename = "C:/Users/sunyihuan/Desktop/test_img/20200704102554.jpg"
+filename = "C:/Users/sunyihuan/Desktop/test_img/1_20200730_X1_bottom_kaojia_chiffoncake8.jpg"
 # 目标色值
-target_hue = 0.5
+target_hue = 0.1
 
 # 读入图片，转化为 RGB 色值
 image = Image.open(filename).convert('RGB')

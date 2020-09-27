@@ -39,18 +39,26 @@ def copy_layer_jpgs(img_dir, layer_dir):
                 shutil.copy(img_dir + "/" + jpgname, middle_dir + "/" + jpgname)
             elif "bottom" in jpgname:  # “xia” 下层标签
                 shutil.copy(img_dir + "/" + jpgname, bottom_dir + "/" + jpgname)
+            elif "chazi" in jpgname:  # “chazi” 下层标签
+                shutil.copy(img_dir + "/" + jpgname, others_dir + "/" + jpgname)
             else:
                 print("error")
                 print(jpgname)
 
 
 if __name__ == "__main__":
-    img_root = "/Volumes/SYH/Joyoung/3660摄像头补图202007/JPGImages/已标"
-    layer_root = "/Volumes/SYH/Joyoung/3660摄像头补图202007/JPGImages/已标_layer"
-    for c in tqdm(["beefsteak", "cartooncookies", "chestnut", "chickenwings", "chiffoncake6", "cookies",
-              "cornone","corntwo", "cranberrycookies", "cupcake", "eggtart", "peanuts", "pizzacut", "pizzaone",
-              "pizzatwo","porkchops","potatocut", "potatol", "potatos", "roastedchicken",
-              "steamedbread", "sweetpotatol", "sweetpotatos", "taro", "toast"]):
+    img_root = "E:/DataSets/X_3660_data/bu/20200902/JPGImages"
+    layer_root = "E:/DataSets/X_3660_data/bu/20200902/layer_data"
+    # cls_list = ["beefsteak", "bread", "cartooncookies", "chestnut", "chickenwings",
+    #             "chiffoncake6", "chiffoncake8", "container", "container_nonhigh", "cookies",
+    #             "cornone", "corntwo", "cranberrycookies", "cupcake", "drumsticks",
+    #             "eggplant", "eggplant_cut_sauce", "eggtart", "fish", "hotdog",
+    #             "peanuts", "pizzacut", "pizzaone", "pizzatwo", "porkchops",
+    #             "potatocut", "potatol", "potatos", "redshrimp", "roastedchicken",
+    #             "shrimp", "steamedbread", "strand", "sweetpotatocut", "sweetpotatol",
+    #             "sweetpotatos", "taro", "toast", "duck"]
+    cls_list= ["cranberrycookies"]
+    for c in tqdm(cls_list):
         img_dir = img_root + "/" + c
         layer_dir = layer_root + "/" + c
         if not os.path.exists(layer_dir): os.mkdir(layer_dir)

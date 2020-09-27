@@ -10,12 +10,11 @@
 '''
 import os
 import shutil
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix, accuracy_score
 import numpy as np
 
 gt_txt_root = "E:/kx_detection/multi_detection/mAP/ground-truth"
 pre_txt_root = "E:/kx_detection/multi_detection/mAP/predicted"
-
 
 # CLASSES = ["beefsteak", "cartooncookies", "chickenwings", "chiffoncake", "cookies",
 #            "cranberrycookies", "cupcake", "eggtart", "nofood", "peanuts",
@@ -132,7 +131,10 @@ def get_accuracy(error_write=True):
                         no_result[true_cc] += 1
 
     matrix = confusion_matrix(y_pred=class_pre, y_true=class_true)
+    accuracy_s = accuracy_score(class_true, class_pre)
+
     print(matrix)
+    print("准确率：：：：：：", accuracy_s)
     print("no_result:", no_result)
     return error_c, error_noresults
 

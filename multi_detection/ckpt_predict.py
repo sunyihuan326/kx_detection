@@ -20,11 +20,11 @@ class YoloPredict(object):
     '''
 
     def __init__(self):
-        self.input_size = 320  # 输入图片尺寸（默认正方形）
-        self.num_classes = 22  # 种类数
+        self.input_size = 416  # 输入图片尺寸（默认正方形）
+        self.num_classes = 40  # 种类数
         self.score_threshold = 0.45
         self.iou_threshold = 0.5
-        self.weight_file ="E:/ckpt_dirs/Food_detection/multi_food3/20200604_22class/yolov3_train_loss=4.9799.ckpt-158"   # ckpt文件地址
+        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food5/20200914/yolov3_train_loss=6.9178.ckpt-95" # ckpt文件地址
         # self.weight_file = "./checkpoint/yolov3_train_loss=4.7681.ckpt-80"
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
@@ -82,14 +82,13 @@ class YoloPredict(object):
 
 
 if __name__ == '__main__':
-    import time
-
-    start_time = time.time()
-    img_path = "C:/Users/sunyihuan/Desktop/test_img/danta_1288.jpg" # 图片地址
+    img_path = "C:/Users/sunyihuan/Desktop/test_img/20200926115104.jpg"  # 图片地址
     Y = YoloPredict()
-    end_time0 = time.time()
-
-    print("model loading time:", end_time0 - start_time)
     Y.result(img_path)
-    end_time1 = time.time()
-    print("predict time:", end_time1 - end_time0)
+    import os
+
+    # img_dir = "E:/WLS_originalData/3660camera_data202007/all_original_data1/chiffoncake6/cornone"
+    # for img in os.listdir(img_dir):
+    #     if img.endswith(".jpg"):
+    #         img_path = img_dir + "/" + img
+    #         Y.result(img_path)

@@ -38,12 +38,12 @@ class process(object):
 
         self.layer_root = self.data_root + "/layer_data"
 
-    def split_data(self, classes, train_percent, test_percent):
+    def split_data(self, classes, test_percent, val_percent):
         '''
         按类别名称将每一类分为test、train
         :param clasees: 类别名称，格式为list
-        :param train_percent: train集的占比，一般为0.7-0.9
         :param test_percent: test集的占比，一般为0.1-0.2
+        :param val_percent: val集的占比，一般为0.1-0.2
         :return:
         '''
         if not os.path.exists(self.data_root):
@@ -63,11 +63,12 @@ class process(object):
 
             random.shuffle(total_xml)  # 打乱total_xml
             num = len(total_xml)
-            tr = int(num * train_percent)  # train集数量
-            train = total_xml[:tr]  # train集列表数据内容
+
             te = int(num * test_percent)  # test集数量
-            test = total_xml[tr:tr + te]  # test集列表数据内容
-            val = num - tr - te  # val集数量
+            test = total_xml[:te]  # test集列表数据内容
+            val = int(num * val_percent)  # val集数量
+            val_list = total_xml[:te + val]  # val集列表数据内容
+            tr = num - val - te  # val集数量
             print(c)
             print("train size:", tr)
             print("test size:", te)
@@ -79,12 +80,12 @@ class process(object):
             for x in total_xml:
                 if str(x).endswith("jpg"):
                     name = x[:-4] + '\n'
-                    if x in train:
-                        ftrain.write(name)
-                    elif x in test:
+                    if x in test:
                         ftest.write(name)
-                    else:
+                    elif x in val_list:
                         fval.write(name)
+                    else:
+                        ftrain.write(name)
 
             ftrain.close()
             ftest.close()
@@ -198,15 +199,21 @@ class process(object):
 
 
 if __name__ == "__main__":
-    data_root = "E:/DataSets/2020_two_phase_KXData/202005bu"
+    data_root = "E:/DataSets/X_3660_data/bu/20200924"
     dprocess = process(data_root)
-    classes = ["bread", "chestnut", "container", "cornone", "corntwo", "drumsticks",
-               "duck", "eggplant", "eggplant_cut_sauce", "fish",
-               "hotdog", "redshrimp", "strand", "taro"]
-    train_percent = 0.8
+    # classes = ["beefsteak", "bread", "cartooncookies", "chestnut", "chickenwings",
+    #             "chiffoncake6", "chiffoncake8", "container", "container_nonhigh", "cookies",
+    #             "cornone", "corntwo", "cranberrycookies", "cupcake", "drumsticks",
+    #             "eggplant", "eggplant_cut_sauce", "eggtart", "fish", "hotdog",
+    #             "peanuts", "pizzacut", "pizzaone", "pizzatwo", "porkchops",
+    #             "potatocut", "potatol", "potatos", "redshrimp", "roastedchicken",
+    #             "shrimp", "steamedbread", "strand", "sweetpotatocut", "sweetpotatol",
+    #             "sweetpotatos", "taro", "toast"]
+    classes =[""]
+    val_percent = 0
     test_percent = 0.1
-    dprocess.split_data(classes, train_percent, test_percent)
-    dprocess.train_all_txt(["train", "test", "val"])
-    dprocess.copy2dir(classes, "xml")
-    dprocess.copy2dir(classes, "jpg")
+    # dprocess.split_data(classes, test_percent, val_percent)
+    # dprocess.train_all_txt(["train", "test", "val"])
+    # dprocess.copy2dir(classes, "xml")
+    # dprocess.copy2dir(classes, "jpg")
     dprocess.copy_layer2split_dir(classes)

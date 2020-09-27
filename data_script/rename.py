@@ -4,11 +4,10 @@
 
 '''
 import os
-import shutil
-
+from tqdm import tqdm
 
 class ImageRename():
-    def __init__(self, root_path, target, save_dir):
+    def __init__(self, root_path, target):
         '''
 
         :param root_path: 图片根地址
@@ -16,7 +15,6 @@ class ImageRename():
         '''
         self.root_path = root_path
         self.target = target
-        self.save_dir = save_dir
 
     def rename0(self, say):
         '''
@@ -33,35 +31,25 @@ class ImageRename():
                 #                    filename + '_s.jpg')
                 # os.rename(src, dst)
                 # #
-                dst = os.path.join(os.path.abspath(self.root_path),
-                                   filename + "_200805" + "_{}".format(say) + self.target + '.jpg')
-                os.rename(src, dst)
-                print('converting %s to %s ...' % (src, dst))
-                save_name = os.path.join(os.path.abspath(self.save_dir),
-                                         filename + "_200805" + "_{}".format(say) + self.target + '.jpg')
-                shutil.copy(dst, save_name)
-                # try:
-                #     # 修改命名，规则为：i_日期_烤箱/其他说明_类别名.jpg
-                #     dst = os.path.join(os.path.abspath(self.root_path),
-                #                        filename + "_200803" + "_{}".format(say) + self.target + '.jpg')
-                #     os.rename(src, dst)
-                #     print('converting %s to %s ...' % (src, dst))
-                #     save_name = os.path.join(os.path.abspath(self.save_dir),
-                #                              filename + "_200803" + "_{}".format(say) + self.target + '.jpg')
-                #     shutil.copy(dst, save_name)
-                # except:
-                #     pass
+                try:
+                    # 修改命名，规则为：i_日期_烤箱/其他说明_类别名.jpg
+                    dst = os.path.join(os.path.abspath(self.root_path),
+                                       filename + "_200924" + "_{}".format(say) + self.target + '.xml')
+                    os.rename(src, dst)
+                    print('converting %s to %s ...' % (src, dst))
+                except:
+                    pass
 
     def change_jpg_name(self):
         for i, item in enumerate(os.listdir(self.root_path)):
-            if item.endswith('.jpg'):
+            if item.endswith('.xml'):
                 src = os.path.join(os.path.abspath(self.root_path), item)
                 try:
                     # 修改命名，规则为：i_日期_炸锅型号/其他说明_类别名.jpg
                     # tj:托架、xz:锡纸、gyz:硅油纸、jk:净空、cp:瓷盘
                     # qh:浅红、zh:正红、ch:橙红、sh:深红
-                    if "cornone" in src:
-                        dst = src.replace("cornone", "corntwo")
+                    if "hot.xml" in src:
+                        dst = src.replace("hot.xml", "zi.xml")
                         os.rename(src, dst)
                         print('converting %s to %s ...' % (src, dst))
                     else:
@@ -99,15 +87,12 @@ class ImageRename():
 
 
 if __name__ == '__main__':
-    path = "/Volumes/SYH/Joyoung/炸锅项目/炸锅采图202007/ZG1/jichijian"
-    target = "chickenwing_top"
-    save_dir = "/Volumes/SYH/Joyoung/炸锅项目/炸锅采图202007/ZG1/jichijian"
-    for c in [""]:
-        dir_p0 = path + "/" + c
-        for k in [""]:
-            dir_p = dir_p0 + "/" + k
-            for ty in ["tj","xz"]:
-                dir_p_ = dir_p + "/" + ty
-                newname = ImageRename(dir_p_, target, save_dir)
-                newname.rename0("ZG1_{}_{}_{}_".format(c,k, ty))
-    # newname.rename0("X5_top_")
+    path_root = "E:/DataSets/X_3660_data/bu/20200924/Annotations"
+    cls_list = [""]
+
+    for cc in tqdm(cls_list):
+        img_path = path_root + "/" + cc
+        for bb in ["",]:
+            img_p = img_path + "/" + bb
+            newname = ImageRename(img_p, "size4_chiffoncake6")
+            newname.rename0("{}_".format(bb))

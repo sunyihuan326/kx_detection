@@ -61,8 +61,8 @@ def PSAlgorithm(rgb_img, increment):
 
 
 if __name__ == "__main__":
-    path = 'C:/Users/sunyihuan/Desktop/test_img/22.jpg'
-    increment = -0.2  # 范围-1到1
+    path = 'C:/Users/sunyihuan/Desktop/test_img/1_20200730_X1_bottom_kaojia_chiffoncake8.jpg'
+    increment = 0.2  # 范围-1到1
 
     img = cv2.imread(path)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)

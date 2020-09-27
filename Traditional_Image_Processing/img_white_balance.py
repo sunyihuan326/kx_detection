@@ -11,7 +11,7 @@ import cv2
 import numpy as np
 import time
 
-img_path = "C:/Users/sunyihuan/Desktop/test_img/21.jpg"
+img_path = "C:/Users/sunyihuan/Desktop/test_img/1_20200730_X1_bottom_kaojia_chiffoncake8.jpg"
 
 start_time = time.time()  # 开始时间
 img = cv2.imread(img_path, 1)
@@ -44,9 +44,9 @@ imgB, imgG, imgR = cv2.split(img)
 # KB = (imgB + imgG + imgR) / (2.7 * imgB)
 # KG = (imgB + imgG + imgR) / (2.8 * imgG)
 # KR = (imgB + imgG + imgR) / (3 * imgR)
-KB=1.7
-KG=1.4
-KR=1.0
+KB=0.9
+KG=0.9
+KR=1.1
 # 3使用增益系数
 imgB = imgB * KB  # 向下取整
 imgG = imgG * KG
@@ -62,6 +62,6 @@ dst[:, :, 2] = imgR
 
 end_time = time.time()  # 结束时间
 print("总耗时：", end_time - start_time)
-cv2.imwrite("C:/Users/sunyihuan/Desktop/test_img/21——————.jpg", dst)
+cv2.imwrite("C:/Users/sunyihuan/Desktop/test_img/1_20200730_X1_bottom_kaojia_chiffoncake8.jpg", dst)
 cv2.imshow('222', dst)
 cv2.waitKey(0)

@@ -20,7 +20,7 @@ def rename_copy_img(c, img_dirs, dst_img_dir, target):
         for jpg_ in tqdm(os.listdir(img_dir_name)):
             if jpg_.endswith(".jpg"):
                 i += 1
-                name = str(i) + "_20200801_X5_" + l + "_{}".format(c) + "_{}.jpg".format(target)
+                name = str(i) + "_20200831_" + l + "_{}".format(c) + "_{}.jpg".format(target)
                 os.rename(img_dir_name + "/" + jpg_, img_dir_name + "/" + name)  # 重命名
                 shutil.copy(img_dir_name + "/" + name, dst_img_dir + "/" + name)  # 拷贝
 
@@ -46,16 +46,18 @@ def change_jpg_name(root_path, org_str, dst_str):
 
 if __name__ == "__main__":
     classes_label22 = ["buxiugangcanju", "taocicanju"]
-    img_root = "/Volumes/SYH/Joyoung/炸锅项目/炸锅采图202007/ZG1/yu/jiyu"
-    target = "fish"
-    dst_root = "/Volumes/SYH/Joyoung/炸锅项目/炸锅采图202007/ZG1/yu"
+    img_root = "G:/Joyoung/3660补充08/X3/xia"
+    target = "shrimp"
+    dst_root = "G:/Joyoung/3660补充08/JPGImages/{}".format(target)
     if not os.path.exists(dst_root): os.mkdir(dst_root)
     # for c in classes_label22:
     #     img_dirs = img_root + "/" + c
     #     dst_img_dir = dst_root + "/" + c
     # if not os.path.exists(dst_img_dir): os.mkdir(dst_img_dir)
     # rename_copy_img("{}".format(c), img_dirs, dst_root, "container")
-    for ty in ["tj", "xz"]:
+    for ty in ["WTmingxia","WTzhaoxia","YTmingxia","YTzhaoxia"]:
         img_dirs_ = img_root + "/" + ty
-        rename_copy_img("{}".format(ty), img_dirs_, dst_root, target)
+        for kk in ["kaopan","xizhi"]:
+            img_dirs = img_dirs_ + "/" + kk
+            rename_copy_img("X3_{}_{}".format(ty, kk), img_dirs, dst_root, target)
     # change_jpg_name(dst_root, "X1_", "X5_")

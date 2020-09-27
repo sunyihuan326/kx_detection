@@ -6,6 +6,8 @@
 根据标签框结果，生成xml文件
 '''
 from xml.dom.minidom import *
+import os
+from PIL import Image
 
 
 def generate_xml(img_size, bboxes, save_dir, xml_name):
@@ -57,7 +59,7 @@ def generate_xml(img_size, bboxes, save_dir, xml_name):
     for i in range(len(bboxes)):
         object = doc.createElement('object')
         name = doc.createElement('name')
-        name.appendChild(doc.createTextNode("fish"))
+        name.appendChild(doc.createTextNode("nofood"))
         object.appendChild(name)
         pose = doc.createElement('pose')
         pose.appendChild(doc.createTextNode("Unspecified"))
@@ -93,7 +95,14 @@ def generate_xml(img_size, bboxes, save_dir, xml_name):
 
 
 if __name__ == "__main__":
-    bboxes = [[1, 0, 1, 0, 0.9, 2], [10, 3, 1, 0, 0.9, 2]]
-    save_dir = ""
-    xml_name = "test_00.xml"
-    generate_xml((800, 800, 3), bboxes, save_dir, xml_name)
+    img_root = "E:/已标数据备份/二期数据/3660摄像头8月补充/JPGImages/nofood"
+    xml_root = "E:/已标数据备份/二期数据/3660摄像头8月补充/Annotations/nofood"
+    for img in os.listdir(img_root):
+        if img.endswith("jpg") or img.endswith("png"):
+            img_name = img_root + "/" + img
+            xml_name = img.split(".")[0]
+
+            image = Image.open(img_name)
+            org_h, org_w = image.size
+            bboxes = [[1, 1, int(org_h) - 1, int(org_w) - 1, 1, 10]]
+            generate_xml((org_h, org_w, 3), bboxes, xml_root, xml_name)

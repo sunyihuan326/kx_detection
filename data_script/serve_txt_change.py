@@ -29,15 +29,17 @@ def change_txt(txt_path, src_txtpath, file_path, typ):
     train_all_list = []
     for txt_file_one in txt_files:
         img_path_name = txt_file_one
-        print(img_path_name.split("JPGImages")[1])
+        # print(img_path_name.split("JPGImages")[1])
         txt_file_name = file_path
         if typ == "serve":
             txt_file_name += img_path_name.split("JPGImages")[1]
             train_all_list.append(txt_file_name)  # 读取一个插入一个
         else:  # .jpg前的字段需要更改
-            jpg_name = str(img_path_name.split("JPGImages")[1]).split(".jpg")[0] + "_resize.jpg" + \
+            jpg_name = str(img_path_name.split("JPGImages")[1]).split(".jpg")[0] + "_{}.jpg".format(typ) + \
                        str(img_path_name.split("JPGImages")[1]).split(".jpg")[1]
+            print(jpg_name)
             txt_file_name += jpg_name
+            train_all_list.append(txt_file_name)
 
     file = open(src_txtpath, "w")
     for i in train_all_list:
@@ -70,10 +72,11 @@ def replace_txt_path(txt_path, src_txtpath, file_path, target_path):
 
 
 if __name__ == "__main__":
-    txt_path = "E:/DataSets/2020_two_phase_KXData/202005bu/val39.txt"
-    new_txt_name = "E:/DataSets/2020_two_phase_KXData/202005bu/serve_val39.txt"
-    # file_path = "E:/DataSets/2020_two_phase_KXData/only2phase_data" + "/JPGImages"
-    file_path = "E:/DataSets/2020_two_phase_KXData/202005bu/JPGImages"
-    target_path = "/home/sunyihuan/sunyihuan_algorithm/data/KX_data/2020_two_phase_KXData/202005bu/JPGImages"
-
+    txt_path = "E:/DataSets/X_3660_data/bu/20200924/train40_huang_hong_zi_lv.txt"
+    new_txt_name = "E:/DataSets/X_3660_data/bu/20200924/serve_3660train40_huang_hong_zi_lv.txt"
+    file_path = "E:/DataSets/X_3660_data/bu/20200924/JPGImages"
+    # file_path = "E:/DataSets/X_3660_data/202008_bu/JPGImages"
+    # change_txt(txt_path, new_txt_name, file_path, "zi")
+    target_path = "/home/sunyihuan/sunyihuan_algorithm/data/KX_data/3660_202008/bu/20200924/JPGImages"
+    #
     replace_txt_path(txt_path, new_txt_name, file_path, target_path)

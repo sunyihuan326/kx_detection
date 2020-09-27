@@ -23,9 +23,9 @@ def copy_val2jpg_dir(txt_root, all_jpg_dir, save_dir):
     '''
 
     for txt in os.listdir(txt_root):
-        if "_val" in txt:
-            save_name = save_dir + "/" + txt.split("_val")[0]
-            layer_data = "E:/DataSets/2020_two_phase_KXData/202005bu/layer_data/{}".format(txt.split("_val")[0])
+        if "_test" in txt:
+            save_name = save_dir + "/" + txt.split("_test")[0]
+            layer_data = "E:/已标数据备份/二期数据/3660摄像头补采数据集/JPGImages_layerdata/{}".format(txt.split("_test")[0])
             val_b_list = os.listdir(layer_data + "/bottom")
             val_m_list = os.listdir(layer_data + "/middle")
             val_t_list = os.listdir(layer_data + "/top")
@@ -53,8 +53,8 @@ def copy_val2jpg_dir(txt_root, all_jpg_dir, save_dir):
                     print(jpg_name)
 
 
-txt_root = "E:/DataSets/2020_two_phase_KXData/202005bu/ImageSets/Main"
-all_jpg_dir = "E:/DataSets/2020_two_phase_KXData/202005bu/JPGImages"
-save_dir = "E:/DataSets/2020_two_phase_KXData/202005bu/JPGImages_val"
+txt_root = "E:/DataSets/X_3660_data/ImageSets/Main"
+all_jpg_dir = "E:/DataSets/X_3660_data/JPGImages"
+save_dir = "E:/DataSets/X_3660_data/JPGImages_test"
 if os.path.exists(save_dir):shutil.rmtree(save_dir),os.mkdir(save_dir)
 copy_val2jpg_dir(txt_root, all_jpg_dir, save_dir)

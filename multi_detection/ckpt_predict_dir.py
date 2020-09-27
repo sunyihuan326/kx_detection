@@ -18,8 +18,8 @@ import shutil
 from tqdm import tqdm
 
 # gpu限制
-gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.2)
-config = tf.ConfigProto(gpu_options=gpu_options)
+config = tf.ConfigProto()
+config.gpu_options.per_process_gpu_memory_fraction = 0.4
 
 
 class YoloPredict(object):
@@ -28,11 +28,11 @@ class YoloPredict(object):
     '''
 
     def __init__(self):
-        self.input_size = 320  # 输入图片尺寸（默认正方形）
-        self.num_classes = 22  # 种类数
+        self.input_size = 416  # 输入图片尺寸（默认正方形）
+        self.num_classes = 40  # 种类数
         self.score_threshold = 0.45
         self.iou_threshold = 0.5
-        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food3/20200604_22class/yolov3_train_loss=4.9799.ckpt-158"  # ckpt文件地址
+        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food5/20200927/yolov3_train_loss=7.5123.ckpt-106"  # ckpt文件地址
         # self.weight_file = "./checkpoint/yolov3_train_loss=4.7681.ckpt-80"
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
@@ -80,7 +80,7 @@ class YoloPredict(object):
 
         return bboxes, layer_n
 
-    def result(self, image_path, save_dir="F:/20200720_data_test_detect"):
+    def result(self, image_path, save_dir="E:/WLS_originalData/3660camera_data202007/all_original_data_detect"):
         image = cv2.imread(image_path)  # 图片读取
         # image = utils.white_balance(image)  # 图片白平衡处理
         bboxes_pr, layer_n = self.predict(image)  # 预测结果
@@ -98,33 +98,70 @@ class YoloPredict(object):
 
 if __name__ == '__main__':
     start_time = time.time()
-    img_root = "F:/20200720_data_test"  # 图片文件地址
+    img_root = "E:/WLS_originalData/temp_test/0914_X5_0927"  # 图片文件地址
+    save_root = "E:/WLS_originalData/temp_test/0914_X5_0927_detection"
+    if not os.path.exists(save_root): os.mkdir(save_root)
     Y = YoloPredict()
     end_time0 = time.time()
     print("model loading time:", end_time0 - start_time)
+    # cls = ["beefsteak", "cartooncookies", "chickenwings", "chiffoncake6", "chiffoncake8",
+    #        "cookies", "cranberrycookies", "cupcake", "eggtart", "peanuts",
+    #        "pizzacut", "pizzaone", "pizzatwo", "porkchops", "potatocut", "potatol",
+    #        "potatos", "sweetpotatocut", "sweetpotatol", "sweetpotatos",
+    #        "roastedchicken", "toast", "chestnut", "cornone", "corntwo", "drumsticks", "taro",
+    #        "steamedbread", "eggplant", "eggplant_cut_sauce", "bread", "container_nonhigh",
+    #        "container", "fish", "hotdog", "redshrimp",
+    #        "shrimp", "strand"]
+    # cls = ["cornone", "eggplant", "fish", "nofood", "potatol", "roastedchicken", "shrimp", "toast"]
+    # cls = ["container",  "fish", "nofood", "roastedchicken", "shrimp", "toast"]
+    cls=[""]
 
-    for c in ["qifeng", "zhibei", "eggtart", "peanuts", "toast",]:
+    classes_id39 = {"cartooncookies": 1, "cookies": 5, "cupcake": 7, "beefsteak": 0, "chickenwings": 2,
+                    "chiffoncake6": 3, "chiffoncake8": 4, "cranberrycookies": 6, "eggtart": 8,
+                    "nofood": 9, "peanuts": 10, "porkchops": 14, "potatocut": 15, "potatol": 16,
+                    "potatom": 16, "potatos": 17, "sweetpotatocut": 18, "sweetpotatol": 19,
+                    "pizzacut": 11, "pizzaone": 12, "roastedchicken": 21,
+                    "pizzatwo": 13, "sweetpotatos": 20, "toast": 22, "chestnut": 23, "cornone": 24, "corntwo": 25,
+                    "drumsticks": 26,
+                    "taro": 27, "steamedbread": 28, "eggplant": 29, "eggplant_cut_sauce": 30, "bread": 31,
+                    "container_nonhigh": 32,
+                    "container": 33, "duck": 21, "fish": 34, "hotdog": 35, "redshrimp": 36,
+                    "shrimp": 37, "strand": 38,"xizhi":39}
+
+    # cls=[""]
+    new_classes = {v: k for k, v in classes_id39.items()}
+    for c in cls:
         img_dir = img_root + "/" + c
-        classes = ["beefsteak", "cartooncookies", "chickenwings", "chiffoncake6", "cookies",
-                   "cranberrycookies", "cupcake", "eggtart", "nofood", "peanuts",
-                   "pizzacut", "pizzaone", "pizzatwo", "porkchops", "potatocut",
-                   "potatol", "potatos", "sweetpotatocut", "sweetpotatol", "sweetpotatos",
-                   "roastedchicken", "toast", "potatom", "sweetpotatom", "chiffoncake8"]
+        save_dir = save_root + "/" + c
         for img in tqdm(os.listdir(img_dir)):
             if img.endswith("jpg"):
                 img_path = img_dir + "/" + img
                 end_time1 = time.time()
-                bboxes_p, layer_ = Y.result(img_path)
+                bboxes_p, layer_ = Y.result(img_path, save_dir)
                 bboxes_pr, layer_n = correct_bboxes(bboxes_p, layer_)  # 矫正输出结果
-                bboxes_pr, layer_n = get_potatoml(bboxes_pr, layer_n)  # 根据输出结果对中大红薯，中大土豆做输出
                 print(bboxes_pr)
                 if len(bboxes_pr) == 0:
                     if not os.path.exists(img_dir + "/noresult"): os.mkdir(img_dir + "/noresult")
                     shutil.move(img_path, img_dir + "/noresult" + "/" + img)
                 else:
                     pre = int(bboxes_pr[0][-1])
-                    if not os.path.exists(img_dir + "/" + classes[pre]): os.mkdir(img_dir + "/" + classes[pre])
-                    shutil.move(img_path, img_dir + "/" + classes[pre] + "/" + img)
+                    if not os.path.exists(img_dir + "/" + new_classes[pre]): os.mkdir(img_dir + "/" + new_classes[pre])
+                    shutil.move(img_path, img_dir + "/" + new_classes[pre] + "/" + img)
+    end_time1=time.time()
+    print("all data time:", end_time1 - end_time0)
+                # try:
+                #     bboxes_p, layer_ = Y.result(img_path, save_dir)
+                #     bboxes_pr, layer_n = correct_bboxes(bboxes_p, layer_)  # 矫正输出结果
+                #     print(bboxes_pr)
+                #     if len(bboxes_pr) == 0:
+                #         if not os.path.exists(img_dir + "/noresult"): os.mkdir(img_dir + "/noresult")
+                #         shutil.move(img_path, img_dir + "/noresult" + "/" + img)
+                #     else:
+                #         pre = int(bboxes_pr[0][-1])
+                #         if not os.path.exists(img_dir + "/" + new_classes[pre]): os.mkdir(img_dir + "/" +new_classes[pre])
+                #         shutil.move(img_path, img_dir + "/" + new_classes[pre] + "/" + img)
+                # except:
+                #     print(img_path)
                 # if pre==3:
                 #     if not os.path.exists(img_dir + "/" +"chiffoncake6"): os.mkdir(img_dir + "/" + "chiffoncake6")
                 #     shutil.move(img_path, img_dir + "/" + "chiffoncake6"+ "/" + img)

@@ -53,16 +53,20 @@ def check_labelname(inputpath, label_name='Potatom'):
 
 
 if __name__ == '__main__':
-    # inputpath = "/Volumes/SYH/Joyoung/3660摄像头补图202007/Annotations"  # 这是xml文件的文件夹的绝对地址
-    # for c in ["beefsteak", "cartooncookies", "chestnut", "chickenwings", "chiffoncake6", "chiffoncake8", "cookies",
-    #           "cornone",
-    #           "corntwo", "cranberrycookies", "cupcake", "eggtart", "peanuts", "pizzacut", "pizzaone", "pizzatwo",
-    #           "porkchops",
-    #           "potatocut", "potatol", "potatos", "roastedchicken", "steamedbread", "sweetpotatol", "sweetpotatos",
-    #           "taro", "toast"]:
-    #     input_dir = inputpath + "/" + c
-    #     changesku(input_dir, c)
-    #     check_labelname(input_dir, c)
-    inputpath = "/Volumes/SYH/Joyoung/3660摄像头补图202007/Annotations/cookies0"  # 这是xml文件的文件夹的绝对地址
-    changesku(inputpath, "cookies")
-    check_labelname(inputpath, "cookies")
+    inputpath = "E:/DataSets/X_3660_data/bu/20200907/Annotations"  # 这是xml文件的文件夹的绝对地址
+    # cls_list = ["beefsteak", "bread", "cartooncookies", "chestnut", "chickenwings",
+    #             "chiffoncake6", "chiffoncake8", "container", "container_nonhigh", "cookies",
+    #             "cornone", "corntwo", "cranberrycookies", "cupcake", "drumsticks",
+    #             "eggplant", "eggplant_cut_sauce", "eggtart", "fish", "hotdog",
+    #             "peanuts", "pizzacut", "pizzaone", "pizzatwo", "porkchops",
+    #             "potatocut", "potatol", "potatos", "redshrimp", "roastedchicken",
+    #             "shrimp", "steamedbread", "strand", "sweetpotatocut", "sweetpotatol",
+    #             "sweetpotatos", "taro", "toast"]
+    cls_list = ["shrimp", "drumsticks", "cornone"]
+    for c in cls_list:
+        input_dir = inputpath + "/" + c
+        changesku(input_dir, c)
+    # check_labelname(input_dir, c)
+    # inputpath = inputpath + "/duck"  # 这是xml文件的文件夹的绝对地址
+    # changesku(inputpath, "roastedchicken")
+    # check_labelname(inputpath, "cookies")

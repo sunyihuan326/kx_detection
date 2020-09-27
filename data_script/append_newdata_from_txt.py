@@ -5,11 +5,17 @@
 '''
 将txt2中，新的数据添加到txt1中，即，set(txt1+txt2)
 '''
+import random
 
 
 def append_data_from_txt(train_txt, test_txt, new_txt):
     '''
+    by：孙义环
+    修改日期：2020年8月18日
+
     将两个txt文件中的数据合并，并去重
+    仅合并test_txt中的一半
+
     :param train_txt: train.txt文件地址
     :param test_txt: test.txt文件地址
     :param new_txt:合并后txt文件地址
@@ -21,11 +27,12 @@ def append_data_from_txt(train_txt, test_txt, new_txt):
     print(len(train_txt_files))
     test_txt_file = open(test_txt, "r")
     test_txt_files = test_txt_file.readlines()
+    random.shuffle(test_txt_files)  # 打乱
     print(len(test_txt_files))
 
-    print(len(train_txt_files)+len(test_txt_files))
+    print(len(train_txt_files) + len(test_txt_files))
 
-    all_txt_list = list(set(train_txt_files) | set(test_txt_files))
+    all_txt_list = list(set(train_txt_files) | set(test_txt_files[:int(len(test_txt_files) / 2)]))
 
     print(len(all_txt_list))
 
@@ -35,7 +42,9 @@ def append_data_from_txt(train_txt, test_txt, new_txt):
 
 
 if __name__ == "__main__":
-    train_txt = "E:/DataSets/X_data_27classes/train23.txt"
-    test_txt = "E:/DataSets/X_data_27classes/20200522data/train23.txt"
-    new_txt="E:/DataSets/X_data_27classes/train23.txt"
-    append_data_from_txt(train_txt, test_txt,new_txt)
+    root = "E:/DataSets/X_3660_data/bu/20200924"
+    train_txt = "{}/train40_huang_hong_zi_lv.txt".format(root)
+    test_txt = "{}/train40_lv.txt".format(root)
+    # test_txt = "E:/ckpt_dirs/Food_detection/multi_food5/serve_train39_new.txt"
+    new_txt = "{}/train40_huang_hong_zi_lv.txt".format(root)
+    append_data_from_txt(train_txt, test_txt, new_txt)

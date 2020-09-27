@@ -243,6 +243,21 @@ def get_potatoml(bboxes_pr, layer_n):
 
 def correct_bboxes(bboxes_pr, layer_n):
     '''
+    最新修改时间：2020/8/26
+    by：sunyihuan
+              针对39分类
+    修改目的：类别和数量控制输出分数，尽量避免出现识别错误直接跳转，
+    处理说明：1、无任何检测框，直接输出
+             2、仅检测到1个框，对低于0.5分的nofood置信度设置为0.75
+             3、检测到多个框，但是同一个标签，针对鸡翅、卡通饼干、曲奇、蔓越莓、排骨、蛋挞做数量现置（小于3个）置信度设置为0.75，其余的直接输出结果
+             4、检测到多个框，但是标签不一致：（1）先对大小土豆、大小红薯处理，若出现大，则为大
+                                            （2）若出现两个种类，排骨、鸡翅，判断为鸡翅
+                                            （3）若出现两个种类，排骨、串，判断为串
+                                            （4）若出现两个种类，鱼、切开茄子，判断为切开茄子
+                                            （5）若出现两个种类，曲奇、鸡翅，判断为曲奇
+                                            （6）若标签不在一个大类中，置信度降分处理，若在一个大类，直接输出
+
+
     最新修改时间：2020/7/13
     by：sunyihuan
     修改目的：类别和数量控制输出分数，尽量避免出现识别错误直接跳转，
@@ -293,10 +308,10 @@ def correct_bboxes(bboxes_pr, layer_n):
 
         # 多个食材，同一标签
         if same_label:  # 多个检测框，同一个标签，直接输出结果
-            if new_bboxes_pr[0][-1] in [2, 13]:  # 若类别为鸡翅、排骨，判断数量是否小于3，若小于3降低score分值
+            if new_bboxes_pr[0][-1] in [2, 1, 5, 6, 8, 14]:  # 若类别为鸡翅、卡通饼干、曲奇、蔓越莓、排骨、蛋挞，判断数量是否小于3，若小于3降低score分值
                 if len(new_bboxes_pr) < 3:
                     for i in range(len(new_bboxes_pr)):
-                        new_bboxes_pr[:][-2] = 0.75
+                        new_bboxes_pr[:][-2] = 0.8
             return new_bboxes_pr, layer_n
 
         # 多个食材，非同一标签
@@ -319,18 +334,41 @@ def correct_bboxes(bboxes_pr, layer_n):
             if n_nums == 2:
                 # 如果土豆中检测到了大土豆，默认单一食材为大土豆
                 # if (name1 == 17 and name2 == 18) or (name1 == 18 and name2 == 17):
-                if (name1 == 15 and name2 == 16) or (name1 == 16 and name2 == 15):
+                if (name1 == 16 and name2 == 17) or (name1 == 17 and name2 == 16):
                     for i in range(new_num_label):
-                        new_bboxes_pr[i][5] = 15
+                        new_bboxes_pr[i][5] = 16
                     # return new_bboxes_pr, layer_n
                 # 如果红薯中检测到了大红薯，默认单一食材为大红薯
                 # if (name1 == 21 and name2 == 22) or (name1 == 22 and name2 == 21):
-                if (name1 == 19 and name2 == 18) or (name1 == 18 and name2 == 19):
+                if (name1 == 19 and name2 == 20) or (name1 == 20 and name2 == 19):
                     for i in range(new_num_label):
-                        new_bboxes_pr[i][5] = 18
+                        new_bboxes_pr[i][5] = 19
 
-            CL_es = [[10, 11, 12], [14, 15, 16], [17, 18, 19], [1, 4, 5], [2, 13], [3, 6], [20], [0], [7], [9],
-                     [21], [8]]  # 12大类，分别为：披萨、土豆、红薯、饼干、肉类、蛋糕、烤鸡、牛排、蛋挞、花生米、吐司、空
+                # 如果出现串、排骨，判断为串
+                if (name1 == 14 and name2 == 38) or (name1 == 38 and name2 == 14):
+                    for i in range(new_num_label):
+                        new_bboxes_pr[i][5] = 38
+                # 如果出现鸡翅、排骨，判断为鸡翅
+                if (name1 == 14 and name2 == 2) or (name1 == 2 and name2 == 14):
+                    for i in range(new_num_label):
+                        new_bboxes_pr[i][5] = 2
+                # 如果出现鱼、切开茄子，判断为切开茄子
+                if (name1 == 30 and name2 == 34) or (name1 == 34 and name2 == 30):
+                    for i in range(new_num_label):
+                        new_bboxes_pr[i][5] = 30
+                # 如果出现曲奇、鸡翅，判断为曲奇
+                if (name1 == 5 and name2 == 2) or (name1 == 2 and name2 == 5):
+                    for i in range(new_num_label):
+                        new_bboxes_pr[i][5] = 5
+
+            # 12大类，分别为：披萨、土豆、红薯、饼干、肉类、蛋糕、烤鸡、牛排、蛋挞、花生米、吐司、空
+            # CL_es = [[10, 11, 12], [14, 15, 16], [17, 18, 19], [1, 4, 5], [2, 13], [3, 6], [20], [0], [7], [9],
+            #          [21], [8]]
+
+            # 24大类，分别为：披萨、土豆、红薯、饼干、肉类、蛋糕、烤鸡、牛排、蛋挞、花生米、吐司、空、板栗、玉米、鸡腿、芋头、小馒头、茄子、面包、容器、鱼、热狗、虾、串
+            CL_es = [[13, 11, 12], [17, 15, 16], [20, 18, 19], [1, 6, 5], [2, 14], [3, 4, 7], [21], [0], [8], [10],
+                     [22], [9], [23], [24, 25], [26], [27], [28], [29, 30], [31], [32, 33], [34], [35], [36, 37], [38]]
+
             c = int(s_labeldict[0][0])
             cl_es = []
             for i in range(len(CL_es)):
@@ -378,8 +416,9 @@ def cls_major_result(pre_cls):
     12：空
     '''
     pre = pre_cls  # 模型预测结果
-    clse = [[7], [17, 18, 19], [2], [13], [14, 15, 16], [21], [0], [20], [10, 11, 12], [3, 6], [1, 4, 5], [9],
-            [8]]  # 12大类，分别为：蛋挞、红薯、鸡翅、排骨、土豆、吐司、牛排、烤鸡、披萨、蛋糕、饼干、花生米空
+    # 24大类，分别为：披萨、土豆、红薯、饼干、肉类、蛋糕、烤鸡、牛排、蛋挞、花生米、吐司、空、板栗、玉米、鸡腿、芋头、小馒头、茄子、面包、容器、鱼、热狗、虾、串
+    clse = [[13, 11, 12], [17, 15, 16], [20, 18, 19], [1, 6, 5], [2, 14], [3, 4, 7], [21], [0], [8], [10],
+            [22], [9], [23], [24, 25], [26], [27], [28], [29, 30], [31], [32, 33], [34], [35], [36, 37], [38]]
 
     cls_major = 0
     for k in range(len(clse)):
