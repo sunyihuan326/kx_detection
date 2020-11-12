@@ -204,29 +204,29 @@ def check_txt(txt_path):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--data_path",
-                        default="E:/DataSets/X_3660_data/bu/20200924")
+                        default="E:/DataSets/X_3660_data/bu/serve_data/20201109")
     parser.add_argument("--train_annotation",
-                        default="E:/DataSets/X_3660_data/bu/20200924/train40.txt")
+                        default="E:/DataSets/X_3660_data/bu/serve_data/20201109/train41.txt")
     parser.add_argument("--test_annotation",
-                        default="E:/DataSets/X_3660_data/bu/20200924/test40.txt")
-    # parser.add_argument("--val_annotation",
-    #                     default="E:/DataSets/X_3660_data/val39.txt")
+                        default="E:/DataSets/X_3660_data/bu/serve_data/202011041030/test41.txt")
+    parser.add_argument("--val_annotation",
+                        default="E:/DataSets/X_3660_data/val39.txt")
     flags = parser.parse_args()
     #
     if os.path.exists(flags.train_annotation): os.remove(flags.train_annotation)
-    if os.path.exists(flags.test_annotation): os.remove(flags.test_annotation)
-    # if os.path.exists(flags.val_annotation): os.remove(flags.val_annotation)
+    # if os.path.exists(flags.test_annotation): os.remove(flags.test_annotation)
+    if os.path.exists(flags.val_annotation): os.remove(flags.val_annotation)
     # # #
     num1 = convert_voc_annotation(flags.data_path, 'train',
                                   flags.train_annotation, False)
-    num2 = convert_voc_annotation(flags.data_path, 'test',
-                                  flags.test_annotation, False)
-    # num3 = convert_voc_annotation(flags.data_path, 'val',
-    #                               flags.val_annotation, False)
+    # num2 = convert_voc_annotation(flags.data_path, 'test',
+    #                               flags.test_annotation, False)
+    num3 = convert_voc_annotation(flags.data_path, 'val',
+                                  flags.val_annotation, False)
     # print(
     #     '=> The number of image for train is: %d\tThe number of image for test is:%d\tThe number of image for val is:%d' % (
     #         num1, num2, num3))
     #
-    check_txt(flags.test_annotation)
+    # check_txt(flags.test_annotation)
     check_txt(flags.train_annotation)
-    # check_txt(flags.val_annotation)
+    check_txt(flags.val_annotation)

@@ -61,10 +61,10 @@ def delete_xmljpg_diff(img_dir, xml_dir, cut_save_dir):
 
 
 if __name__ == "__main__":
-    xml_root = "E:/DataSets/All_data_0923/Annotations"
-    img_root = "E:/DataSets/All_data_0923/JPGImages"
-    cut_save_dir = "E:/DataSets/All_data_0923/cut"
-    if not os.path.exists(cut_save_dir): os.mkdir(cut_save_dir)
+    xml_root = "E:/DataSets/X_3660_data/bu/serve_data/20201109/Annotations"
+    img_root = "E:/DataSets/X_3660_data/bu/serve_data/20201109/JPGImages"
+    cut_save_root = "E:/DataSets/X_3660_data/bu/serve_data/20201109/cut"
+    if not os.path.exists(cut_save_root): os.mkdir(cut_save_root)
     # cls_list = ["beefsteak", "bread", "cartooncookies", "chestnut", "chickenwings",
     #             "chiffoncake6", "chiffoncake8", "container", "container_nonhigh", "cookies",
     #             "cornone", "corntwo", "cranberrycookies", "cupcake", "drumsticks",
@@ -73,9 +73,11 @@ if __name__ == "__main__":
     #             "potatocut", "potatol", "potatos", "redshrimp", "roastedchicken",
     #             "shrimp", "steamedbread", "strand", "sweetpotatocut", "sweetpotatol",
     #             "sweetpotatos", "taro", "toast", "duck"]
-    cls_list = [""]
+    cls_list = os.listdir(img_root)
     for c in tqdm(cls_list):
         print(c)
         img_dir = img_root + "/" + c
         xml_dir = xml_root + "/" + c
+        cut_save_dir=cut_save_root + "/" + c
+        if not os.path.exists(cut_save_dir): os.mkdir(cut_save_dir)
         delete_xmljpg_diff(img_dir, xml_dir, cut_save_dir)

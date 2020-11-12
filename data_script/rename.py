@@ -5,6 +5,7 @@
 '''
 import os
 import shutil
+from tqdm import tqdm
 
 
 class ImageRename():
@@ -34,12 +35,12 @@ class ImageRename():
                 # os.rename(src, dst)
                 # #
                 dst = os.path.join(os.path.abspath(self.root_path),
-                                   filename + "_200805" + "_{}".format(say) + self.target + '.jpg')
+                                   filename + "_202011120900" + "_{}".format(say) + self.target + '.jpg')
                 os.rename(src, dst)
                 print('converting %s to %s ...' % (src, dst))
-                save_name = os.path.join(os.path.abspath(self.save_dir),
-                                         filename + "_200805" + "_{}".format(say) + self.target + '.jpg')
-                shutil.copy(dst, save_name)
+                # save_name = os.path.join(os.path.abspath(self.save_dir),
+                #                          filename + "_2001010" + "_{}".format(say) + self.target + '.jpg')
+                # shutil.copy(dst, save_name)
                 # try:
                 #     # 修改命名，规则为：i_日期_烤箱/其他说明_类别名.jpg
                 #     dst = os.path.join(os.path.abspath(self.root_path),
@@ -99,15 +100,16 @@ class ImageRename():
 
 
 if __name__ == '__main__':
-    path = "/Volumes/SYH/Joyoung/炸锅项目/炸锅采图202007/ZG1/jichijian"
-    target = "chickenwing_top"
-    save_dir = "/Volumes/SYH/Joyoung/炸锅项目/炸锅采图202007/ZG1/jichijian"
-    for c in [""]:
-        dir_p0 = path + "/" + c
-        for k in [""]:
-            dir_p = dir_p0 + "/" + k
-            for ty in ["tj","xz"]:
-                dir_p_ = dir_p + "/" + ty
-                newname = ImageRename(dir_p_, target, save_dir)
-                newname.rename0("ZG1_{}_{}_{}_".format(c,k, ty))
-    # newname.rename0("X5_top_")
+    path = "F:/serve_data/202011120900/JPGImages"
+    target = "nofood"
+    save_dir = "F:/serve_data/202011120900/JPGImages"
+    # dir_p0 = path + "/" + c
+    for c in tqdm(os.listdir(path)):
+        dir_path = path + "/" + c
+
+        newname = ImageRename(dir_path, c, dir_path)
+        newname.rename0("")
+    # for c in ["",]:
+    #     dir_p0 = path + "/" + c
+    #     newname = ImageRename(dir_p0, c, save_dir + "/" + c)
+    #     newname.rename0("")

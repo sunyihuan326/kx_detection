@@ -42,9 +42,9 @@ def append_data_from_txt(train_txt, test_txt, new_txt):
 
 
 if __name__ == "__main__":
-    root = "E:/DataSets/X_3660_data/bu/20200924"
-    train_txt = "{}/train40_huang_hong_zi_lv.txt".format(root)
-    test_txt = "{}/train40_lv.txt".format(root)
+    root = "E:/DataSets/X_3660_data/bu/20201020"
+    train_txt = "{}/train41_huang_hong_zi_lv.txt".format(root)
+    test_txt = "{}/train41_lv.txt".format(root)
     # test_txt = "E:/ckpt_dirs/Food_detection/multi_food5/serve_train39_new.txt"
-    new_txt = "{}/train40_huang_hong_zi_lv.txt".format(root)
+    new_txt = "{}/train41_huang_hong_zi_lv.txt".format(root)
     append_data_from_txt(train_txt, test_txt, new_txt)

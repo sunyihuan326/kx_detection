@@ -72,11 +72,11 @@ def replace_txt_path(txt_path, src_txtpath, file_path, target_path):
 
 
 if __name__ == "__main__":
-    txt_path = "E:/DataSets/X_3660_data/bu/20200924/train40_huang_hong_zi_lv.txt"
-    new_txt_name = "E:/DataSets/X_3660_data/bu/20200924/serve_3660train40_huang_hong_zi_lv.txt"
-    file_path = "E:/DataSets/X_3660_data/bu/20200924/JPGImages"
-    # file_path = "E:/DataSets/X_3660_data/202008_bu/JPGImages"
-    # change_txt(txt_path, new_txt_name, file_path, "zi")
-    target_path = "/home/sunyihuan/sunyihuan_algorithm/data/KX_data/3660_202008/bu/20200924/JPGImages"
-    #
+    txt_path = "E:/DataSets/X_3660_data/bu/20201020/train41_huang_hong_zi_lv.txt"
+    new_txt_name = "E:/DataSets/X_3660_data/bu/20201020/serve_3660train41_huang_hong_zi_lv.txt"
+    file_path = "E:/DataSets/X_3660_data/bu/20201020/JPGImages"
+
+    change_txt(txt_path, new_txt_name, file_path, "lv")
+    target_path = "/home/sunyihuan/sunyihuan_algorithm/data/KX_data/3660_202008/bu/20201020/JPGImages"
+    # #
     replace_txt_path(txt_path, new_txt_name, file_path, target_path)

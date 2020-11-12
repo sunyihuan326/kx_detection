@@ -68,10 +68,10 @@ def img_dir_aug(img_dir, xml_dir, img_save_dir, xml_save_dir):
 
 
 if __name__ == "__main__":
-    img_dir = "E:/DataSets/X_3660_data/bu/20200924/JPGImages"
-    xml_dir = "E:/DataSets/X_3660_data/bu/20200924/Annotations"
-    img_save_dir = "E:/DataSets/X_3660_data/bu/20200924/JPGImages_aug"
-    xml_save_dir = "E:/DataSets/X_3660_data/bu/20200924/Annotations"
+    img_dir = "E:/DataSets/X_3660_data/bu/20201020/JPGImages"
+    xml_dir = "E:/DataSets/X_3660_data/bu/20201020/Annotations"
+    img_save_dir = "E:/DataSets/X_3660_data/bu/20201020/JPGImages_aug"
+    xml_save_dir = "E:/DataSets/X_3660_data/bu/20201020/Annotations"
     if not os.path.exists(img_save_dir): os.mkdir(img_save_dir)
     if not os.path.exists(xml_save_dir): os.mkdir(xml_save_dir)
     img_dir_aug(img_dir, xml_dir, img_save_dir, xml_save_dir)

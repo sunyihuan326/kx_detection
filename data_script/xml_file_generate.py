@@ -95,8 +95,8 @@ def generate_xml(img_size, bboxes, save_dir, xml_name):
 
 
 if __name__ == "__main__":
-    img_root = "E:/已标数据备份/二期数据/3660摄像头8月补充/JPGImages/nofood"
-    xml_root = "E:/已标数据备份/二期数据/3660摄像头8月补充/Annotations/nofood"
+    img_root = "E:/DataSets/X_3660_data/bu/20201020/JPGImages"
+    xml_root = "E:/DataSets/X_3660_data/bu/20201020/Annotations"
     for img in os.listdir(img_root):
         if img.endswith("jpg") or img.endswith("png"):
             img_name = img_root + "/" + img

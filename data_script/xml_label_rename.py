@@ -53,7 +53,7 @@ def check_labelname(inputpath, label_name='Potatom'):
 
 
 if __name__ == '__main__':
-    inputpath = "E:/DataSets/X_3660_data/bu/20200907/Annotations"  # 这是xml文件的文件夹的绝对地址
+    inputpath = "F:/serve_data/202011120900/Annotations"  # 这是xml文件的文件夹的绝对地址
     # cls_list = ["beefsteak", "bread", "cartooncookies", "chestnut", "chickenwings",
     #             "chiffoncake6", "chiffoncake8", "container", "container_nonhigh", "cookies",
     #             "cornone", "corntwo", "cranberrycookies", "cupcake", "drumsticks",
@@ -62,10 +62,10 @@ if __name__ == '__main__':
     #             "potatocut", "potatol", "potatos", "redshrimp", "roastedchicken",
     #             "shrimp", "steamedbread", "strand", "sweetpotatocut", "sweetpotatol",
     #             "sweetpotatos", "taro", "toast"]
-    cls_list = ["shrimp", "drumsticks", "cornone"]
+    cls_list = ["potatol", ]
     for c in cls_list:
         input_dir = inputpath + "/" + c
-        changesku(input_dir, c)
+        changesku(input_dir, "potatol")
     # check_labelname(input_dir, c)
     # inputpath = inputpath + "/duck"  # 这是xml文件的文件夹的绝对地址
     # changesku(inputpath, "roastedchicken")

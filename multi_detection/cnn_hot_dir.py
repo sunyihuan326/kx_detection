@@ -22,13 +22,13 @@ class YoloPredict(object):
     '''
 
     def __init__(self):
-        self.input_size = 320  # 输入图片尺寸（默认正方形）
-        self.num_classes = 22  # 种类数
+        self.input_size = 416  # 输入图片尺寸（默认正方形）
+        self.num_classes = 40  # 种类数
         self.top_n = 3
         self.score_cls_threshold = 0.001
         self.score_threshold = 0.45
         self.iou_threshold = 0.5
-        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food3/20200604_22class/yolov3_train_loss=4.9799.ckpt-158"  # ckpt文件地址
+        self.weight_file = self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food5/20200914/yolov3_train_loss=6.9178.ckpt-95"   # ckpt文件地址
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
 
@@ -135,12 +135,12 @@ class get_cam(object):
 if __name__ == "__main__":
     Y = YoloPredict()
 
-    img_dir = "C:/Users/sunyihuan/Desktop/test_all/cupcake"
-    cam_dir = "C:/Users/sunyihuan/Desktop/test_all/cupcake_cam"
+    img_dir = "F:/chiffon10_0929/chiffoncake8"
+    cam_dir ="F:/chiffon10_0929/chiffoncake8_cam"
     for img_name in os.listdir(img_dir):
         if img_name.endswith(".jpg"):
             img_path = img_dir + "/" + img_name
-            heatmap = get_cam(img_path, Y).cam("l")
+            heatmap = get_cam(img_path, Y).cam("s")
 
             heatmap = np.mean(heatmap, axis=-1)
             heatmap = np.maximum(heatmap, 0)
@@ -158,6 +158,6 @@ if __name__ == "__main__":
                 heatmap = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)
 
                 superimposed_img = heatmap * 0.4 + img
-                cv2.imwrite('{0}/{1}_cam_l.jpg'.format(cam_dir, img_name.split(".jpg")[0]), superimposed_img)
+                cv2.imwrite('{0}/{1}_cam_s.jpg'.format(cam_dir, img_name.split(".jpg")[0]), superimposed_img)
             except:
                 print(img_path)

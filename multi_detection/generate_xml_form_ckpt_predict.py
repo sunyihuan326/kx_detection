@@ -116,11 +116,13 @@ class YoloPredict(object):
     '''
 
     def __init__(self):
-        self.input_size = 320  # 输入图片尺寸（默认正方形）
-        self.num_classes = 22  # 种类数
+        self.input_size = 416  # 输入图片尺寸（默认正方形）
+        self.num_classes = 40  # 种类数
+        self.score_cls_threshold = 0.001
         self.score_threshold = 0.45
         self.iou_threshold = 0.5
-        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food3/20200717/yolov3_train_loss=4.9898.ckpt-197"  # ckpt文件地址
+        self.top_n = 5
+        self.weight_file ="E:/ckpt_dirs/Food_detection/multi_food5/20201111/yolov3_train_loss=6.4953.ckpt-112"  # ckpt文件地址
         # self.weight_file = "./checkpoint/yolov3_train_loss=4.7681.ckpt-80"
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
@@ -140,6 +142,32 @@ class YoloPredict(object):
 
             self.layer_num = graph.get_tensor_by_name("define_loss/layer_classes:0")
 
+    def get_top_cls(self, pred_bbox, org_h, org_w, top_n):
+        '''
+        获取top_n，类别和得分
+        :param pred_bbox:所有框
+        :param org_h:高
+        :param org_w:宽
+        :param top_n:top数
+        :return:按置信度前top_n个，输出类别、置信度，
+        例如
+        [(18, 0.9916), (19, 0.0105), (15, 0.0038), (1, 0.0018), (5, 0.0016), (13, 0.0011)]
+        '''
+        bboxes = utils.postprocess_boxes(pred_bbox, (org_h, org_w), self.input_size, self.score_cls_threshold)
+        classes_in_img = list(set(bboxes[:, 5]))
+        best_bboxes = {}
+        for cls in classes_in_img:
+            cls_mask = (bboxes[:, 5] == cls)
+            cls_bboxes = bboxes[cls_mask]
+            best_score = 0
+            for i in range(len(cls_bboxes)):
+                if cls_bboxes[i][-2] > best_score:
+                    best_score = cls_bboxes[i][-2]
+            if int(cls) not in best_bboxes.keys():
+                best_bboxes[int(cls)] = round(best_score, 4)
+        best_bboxes = sorted(best_bboxes.items(), key=lambda best_bboxes: best_bboxes[1], reverse=True)
+        return best_bboxes[:top_n]
+
     def predict(self, image):
         org_image = np.copy(image)
         org_h, org_w, org_c = org_image.shape
@@ -158,16 +186,17 @@ class YoloPredict(object):
         pred_bbox = np.concatenate([np.reshape(pred_sbbox, (-1, 5 + self.num_classes)),
                                     np.reshape(pred_mbbox, (-1, 5 + self.num_classes)),
                                     np.reshape(pred_lbbox, (-1, 5 + self.num_classes))], axis=0)
+        best_bboxes = self.get_top_cls(pred_bbox, org_h, org_w, self.top_n)  # 获取top_n类别和置信度
 
         bboxes = utils.postprocess_boxes(pred_bbox, (org_h, org_w), self.input_size, self.score_threshold)
         bboxes = utils.nms(bboxes, self.iou_threshold)
 
-        return org_h, org_w, org_c, bboxes, layer_n
+        return org_h, org_w, org_c, bboxes, layer_n, best_bboxes
 
     def result(self, image_path):
         image = cv2.imread(image_path)  # 图片读取
-        org_h, org_w, org_c, bboxes_pr, layer_n = self.predict(image)  # 预测结果
-        bboxes_pr, layer_n = correct_bboxes(bboxes_pr, layer_n)
+        org_h, org_w, org_c, bboxes_pr, layer_n , best_bboxes= self.predict(image)  # 预测结果
+        bboxes_pr, layer_n, best_bboxes = correct_bboxes(bboxes_pr, layer_n, best_bboxes)
         print(bboxes_pr)
         print(layer_n)
         return org_h, org_w, org_c, bboxes_pr, layer_n
@@ -182,10 +211,10 @@ if __name__ == '__main__':
 
     start_time = time.time()
     Y = YoloPredict()
-    img_root = "E:/WLS_originalData/3660bucai(annotation)/JPGImages/X1"
+    img_root = "F:/serve_data/202011120900/JPGImages"
     # cls_list = ["potatos", "chestnut", "chickenwings", "porkchops"]
-    cls_list = ["chiffoncake8"]
-    xml_root = "E:/WLS_originalData/3660bucai(annotation)/Annotations"
+    cls_list = os.listdir(img_root)
+    xml_root = "F:/serve_data/202011120900/Annotations"
     for c in cls_list:
         img_dir = img_root + "/" + c
         xml_dir = xml_root + "/" + c
@@ -195,5 +224,6 @@ if __name__ == '__main__':
         for img in tqdm(os.listdir(img_dir)):
             if img.endswith(".jpg"):
                 img_path = img_dir + "/" + img
+
                 org_h, org_w, org_c, bboxes_pr, layer_n = Y.result(img_path)
                 generate_xml((org_w, org_h, org_c), bboxes_pr, xml_dir, img.split(".jpg")[0], c)
