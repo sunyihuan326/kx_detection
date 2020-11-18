@@ -91,6 +91,7 @@ class YoloPredict(object):
                                     np.reshape(pred_lbbox, (-1, 5 + self.num_classes))], axis=0)
 
         best_bboxes = self.get_top_cls(pred_bbox, org_h, org_w, self.top_n)  # 获取top_n类别和置信度
+
         bboxes = utils.postprocess_boxes(pred_bbox, (org_h, org_w), self.input_size, self.score_threshold)
         bboxes = utils.nms(bboxes, self.iou_threshold)
         layer_n = layer_[0]  # 烤层结果
