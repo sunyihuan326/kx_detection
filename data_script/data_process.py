@@ -199,7 +199,7 @@ class process(object):
 
 
 if __name__ == "__main__":
-    data_root = "E:/DataSets/X_3660_data/bu/serve_data/20201109"
+    data_root = "E:/DataSets/X_3660_data/bu/serve_data/202011120900"
     dprocess = process(data_root)
     # classes = ["beefsteak", "bread", "cartooncookies", "chestnut", "chickenwings",
     #             "chiffoncake6", "chiffoncake8", "container", "container_nonhigh", "cookies",
@@ -210,7 +210,7 @@ if __name__ == "__main__":
     #             "shrimp", "steamedbread", "strand", "sweetpotatocut", "sweetpotatol",
     #             "sweetpotatos", "taro", "toast"]
     classes =os.listdir(data_root+"/JPGImages")
-    val_percent = 0.1
+    val_percent = 0
     test_percent = 0
     dprocess.split_data(classes, test_percent, val_percent)
     dprocess.train_all_txt(["train", "test", "val"])

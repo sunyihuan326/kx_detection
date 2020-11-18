@@ -31,10 +31,10 @@ class YoloPredict(object):
         self.input_size = 416  # 输入图片尺寸（默认正方形）
         self.num_classes = 40  # 种类数
         self.score_cls_threshold = 0.001
-        self.score_threshold = 0.4
+        self.score_threshold = 0.8
         self.iou_threshold = 0.5
         self.top_n = 5
-        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food5/20201111/yolov3_train_loss=6.4953.ckpt-112"  # ckpt文件地址
+        self.weight_file ="E:/ckpt_dirs/Food_detection/multi_food5/20201116/yolov3_train_loss=6.4928.ckpt-118"  # ckpt文件地址
         # self.weight_file = "./checkpoint/yolov3_train_loss=4.7681.ckpt-80"
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
@@ -129,8 +129,8 @@ class YoloPredict(object):
 if __name__ == '__main__':
     start_time = time.time()
 
-    img_root = "F:/serve_data/202011120900/JPGImages"  # 图片文件地址
-    save_root = "F:/serve_data/202011120900/JPGImages_detection"
+    img_root = "F:/serve_data/tt_noresults"  # 图片文件地址
+    save_root = "F:/serve_data/tt_noresults_detection"
     if not os.path.exists(save_root): os.mkdir(save_root)
     Y = YoloPredict()
     end_time0 = time.time()
@@ -150,14 +150,14 @@ if __name__ == '__main__':
     classes_id39 = {"cartooncookies": 1, "cookies": 5, "cupcake": 7, "beefsteak": 0, "chickenwings": 2,
                     "chiffoncake6": 3, "chiffoncake8": 4, "cranberrycookies": 6, "eggtart": 8,
                     "nofood": 9, "peanuts": 10, "porkchops": 14, "potatocut": 15, "potatol": 16,
-                    "potatom": 16, "potatos": 17, "sweetpotatocut": 18, "sweetpotatol": 19,
+                     "potatos": 17, "sweetpotatocut": 18, "sweetpotatol": 19,
                     "pizzacut": 11, "pizzaone": 12, "roastedchicken": 21,
                     "pizzatwo": 13, "sweetpotatos": 20, "toast": 22, "chestnut": 23, "cornone": 24, "corntwo": 25,
                     "drumsticks": 26,
                     "taro": 27, "steamedbread": 28, "eggplant": 29, "eggplant_cut_sauce": 30, "bread": 31,
                     "container_nonhigh": 32,
                     "container": 33, "duck": 21, "fish": 34, "hotdog": 35, "redshrimp": 36,
-                    "shrimp": 37, "strand": 38, "xizhi": 39, "chiffon_4": 101, "small_fish": 40,"sweetpotatom":41}
+                    "shrimp": 37, "strand": 38, "xizhi": 39, "chiffon_4": 101, "potatom": 40,"sweetpotatom":41}
 
     # cls=[""]
     new_classes = {v: k for k, v in classes_id39.items()}

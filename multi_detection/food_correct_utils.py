@@ -301,7 +301,6 @@ def correct_bboxes(bboxes_pr, layer_n, best_bboxes):
         bb = list(bb)
         best_bboxes_.append(list(bb))
     best_bboxes = best_bboxes_
-    print("best_bboxes:::::::::::",best_bboxes)
 
     num_label = len(bboxes_pr)
     reduce_score_typ = True  # 判断其余标签和第一个标签是否在一个大类中

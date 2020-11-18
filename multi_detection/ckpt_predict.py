@@ -26,7 +26,7 @@ class YoloPredict(object):
         self.score_threshold = 0.4
         self.iou_threshold = 0.5
         self.top_n = 5
-        self.weight_file ="E:/ckpt_dirs/Food_detection/multi_food5/20201111/yolov3_train_loss=6.4953.ckpt-112" # ckpt文件地址
+        self.weight_file ="E:/ckpt_dirs/Food_detection/multi_food5/20200914/yolov3_train_loss=6.9178.ckpt-95" # ckpt文件地址
         # self.weight_file = "./checkpoint/yolov3_train_loss=4.7681.ckpt-80"
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
@@ -117,7 +117,7 @@ class YoloPredict(object):
 
 
 if __name__ == '__main__':
-    img_path = "C:/Users/sunyihuan/Desktop/test_img/20201111135446_00000012_0.48519_0.jpg"  # 图片地址
+    img_path = "C:/Users/sunyihuan/Desktop/test_img/20201118085613_00000016_0.9892_2_0.jpg"  # 图片地址
     Y = YoloPredict()
     Y.result(img_path)
     import os

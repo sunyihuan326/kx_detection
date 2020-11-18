@@ -32,7 +32,7 @@ def he_foods(pre):
     :param pre:
     :return:
     '''
-    if pre in [3, 4,42] and classes_id39[c] in [3,4, 42]:  # 合并戚风
+    if pre in [3, 4,101] and classes_id39[c] in [3,4, 101]:  # 合并戚风
         rigth_label = True
     # if pre in [3, 4, 6] and classes_id39[c] in [3, 4, 6]:  # 合并虾
     #     rigth_label = True
@@ -60,9 +60,11 @@ class YoloTest(object):
     def __init__(self):
         self.input_size = 416  # 输入图片尺寸（默认正方形）
         self.num_classes = 40  # 种类数
+        self.score_cls_threshold = 0.001
         self.score_threshold = 0.6
         self.iou_threshold = 0.5
-        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food5/20201111/yolov3_train_loss=6.4953.ckpt-112"  # ckpt文件地址
+        self.top_n = 5
+        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food5/20201116/yolov3_train_loss=6.4928.ckpt-118"  # ckpt文件地址
         # self.weight_file = "./checkpoint/yolov3_train_loss=4.7681.ckpt-80"
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
@@ -85,7 +87,31 @@ class YoloTest(object):
 
             # 输出烤层结果
             self.layer_num = graph.get_tensor_by_name("define_loss/layer_classes:0")
-
+    def get_top_cls(self, pred_bbox, org_h, org_w, top_n):
+        '''
+        获取top_n，类别和得分
+        :param pred_bbox:所有框
+        :param org_h:高
+        :param org_w:宽
+        :param top_n:top数
+        :return:按置信度前top_n个，输出类别、置信度，
+        例如
+        [(18, 0.9916), (19, 0.0105), (15, 0.0038), (1, 0.0018), (5, 0.0016), (13, 0.0011)]
+        '''
+        bboxes = utils.postprocess_boxes(pred_bbox, (org_h, org_w), self.input_size, self.score_cls_threshold)
+        classes_in_img = list(set(bboxes[:, 5]))
+        best_bboxes = {}
+        for cls in classes_in_img:
+            cls_mask = (bboxes[:, 5] == cls)
+            cls_bboxes = bboxes[cls_mask]
+            best_score = 0
+            for i in range(len(cls_bboxes)):
+                if cls_bboxes[i][-2] > best_score:
+                    best_score = cls_bboxes[i][-2]
+            if int(cls) not in best_bboxes.keys():
+                best_bboxes[int(cls)] = round(best_score, 4)
+        best_bboxes = sorted(best_bboxes.items(), key=lambda best_bboxes: best_bboxes[1], reverse=True)
+        return best_bboxes[:top_n]
     def predict(self, image):
         '''
         预测结果
@@ -111,11 +137,11 @@ class YoloTest(object):
         pred_bbox = np.concatenate([np.reshape(pred_sbbox, (-1, 5 + self.num_classes)),
                                     np.reshape(pred_mbbox, (-1, 5 + self.num_classes)),
                                     np.reshape(pred_lbbox, (-1, 5 + self.num_classes))], axis=0)
-
+        best_bboxes = self.get_top_cls(pred_bbox, org_h, org_w, self.top_n)  # 获取top_n类别和置信度
         bboxes = utils.postprocess_boxes(pred_bbox, (org_h, org_w), self.input_size, self.score_threshold)
         bboxes = utils.nms(bboxes, self.iou_threshold)
 
-        return bboxes, layer_n[0]
+        return bboxes, layer_n[0], best_bboxes
 
     def result(self, image_path, save_dir):
         '''
@@ -126,7 +152,7 @@ class YoloTest(object):
         '''
         image = cv2.imread(image_path)  # 图片读取
         # image = utils.white_balance(image)  # 图片白平衡处理
-        bboxes_pr, layer_n = self.predict(image)  # 预测结果
+        bboxes_pr, layer_n, best_bboxes = self.predict(image)  # 预测结果
         # print(bboxes_pr)
         # print(layer_n)
 
@@ -137,7 +163,7 @@ class YoloTest(object):
                 layer_n) + ".jpg"  # 图片保存地址，烤层结果在命名中
             # cv2.imshow('Detection result', image)
             cv2.imwrite(save_dir + "/" + drawed_img_save_to_path, image)  # 保存图片
-        return bboxes_pr, layer_n
+        return bboxes_pr, layer_n, best_bboxes
 
 
 if __name__ == '__main__':
@@ -192,7 +218,7 @@ if __name__ == '__main__':
                     "drumsticks": 26,
                     "taro": 27, "steamedbread": 28, "eggplant": 29, "eggplant_cut_sauce": 30, "bread": 31,
                     "container_nonhigh": 32, "container": 33, "duck": 21, "fish": 34, "hotdog": 35, "redshrimp": 36,
-                    "shrimp": 37, "strand": 38, "xizhi": 39,"small_fish":40,"chiffon4":42}
+                    "shrimp": 37, "strand": 38, "xizhi": 39,"small_fish":40,"chiffon4":101}
     classes_id46 = {"cartooncookies": 1, "cookies": 5, "cupcake": 7, "beefsteak": 0, "chickenwings": 2,
                     "chiffoncake6": 3, "chiffoncake8": 4, "cranberrycookies": 6, "eggtarts": 8, "eggtartl": 9,
                     "nofood": 10, "peanuts": 11, "porkchops": 16, "potatocut": 17, "potatol": 18,
@@ -219,7 +245,7 @@ if __name__ == '__main__':
     # 需要修改
     classes_id = classes_id39  #######
     classes = classes_label46  #######    仅2期：classes_label18，所有：classes_label46
-    mode = "1111_112"  #######
+    mode = "1116_118"  #######
     tag = ""
     img_dir = "F:/test_from_yejing_202010/TXKX_all_20201019_rename_all"  # 文件夹地址
     # img_dir = "E:/check_2_phase/JPGImages_2"  # 文件夹地址
@@ -314,7 +340,7 @@ if __name__ == '__main__':
             if file.endswith("jpg"):
                 all_jpgs += 1  # 统计总jpg图片数量
                 image_path = img_dirs + "/bottom" + "/" + file
-                bboxes_pr, layer_n = Y.result(image_path, save_c_dir)  # 预测每一张结果并保存
+                bboxes_pr, layer_n, best_bboxes = Y.result(image_path, save_c_dir)  # 预测每一张结果并保存
 
                 layer_img_true.append(0)  # 烤层真实结果
                 layer_img_pre.append(layer_n)  # 烤层预测结果
@@ -326,7 +352,7 @@ if __name__ == '__main__':
                     layer_acc += 1  # 烤层正确+1
                     c_layer_right_list.append(str(c) + "/b" + file)  # 正确将名字写入c_layer_right_list中
 
-                bboxes_pr, layer_n = correct_bboxes(bboxes_pr, layer_n)  # 矫正输出结果
+                bboxes_pr, layer_n, best_bboxes = correct_bboxes(bboxes_pr, layer_n, best_bboxes)  # 矫正输出结果
                 if len(bboxes_pr) == 0:  # 无任何结果返回，输出并统计+1
                     error_noresults += 1
                     shutil.copy(image_path, noresult_dir + "/" + file)
@@ -368,7 +394,7 @@ if __name__ == '__main__':
             if file.endswith("jpg"):
                 all_jpgs += 1  # 统计总jpg图片数量
                 image_path = img_dirs + "/middle" + "/" + file
-                bboxes_pr, layer_n = Y.result(image_path, save_c_dir)  # 预测每一张结果并保存
+                bboxes_pr, layer_n, best_bboxes = Y.result(image_path, save_c_dir)  # 预测每一张结果并保存
 
                 layer_img_true.append(1)  # 烤层真实结果
                 layer_img_pre.append(layer_n)  # 烤层预测结果
@@ -380,7 +406,7 @@ if __name__ == '__main__':
                     layer_acc += 1  # 烤层正确+1
                     c_layer_right_list.append(str(c) + "/m" + file)  # 正确将名字写入c_layer_right_list中
 
-                bboxes_pr, layer_n = correct_bboxes(bboxes_pr, layer_n)  # 矫正输出结果
+                bboxes_pr, layer_n, best_bboxes = correct_bboxes(bboxes_pr, layer_n, best_bboxes)  # 矫正输出结果
                 if len(bboxes_pr) == 0:  # 无任何结果返回，输出并统计+1
                     error_noresults += 1
                     shutil.copy(image_path, noresult_dir + "/" + file)
@@ -422,7 +448,7 @@ if __name__ == '__main__':
             if file.endswith("jpg"):
                 all_jpgs += 1  # 统计总jpg图片数量
                 image_path = img_dirs + "/top" + "/" + file
-                bboxes_pr, layer_n = Y.result(image_path, save_c_dir)  # 预测每一张结果并保存
+                bboxes_pr, layer_n, best_bboxes = Y.result(image_path, save_c_dir)  # 预测每一张结果并保存
 
                 layer_img_true.append(2)  # 烤层真实结果
                 layer_img_pre.append(layer_n)  # 烤层预测结果
@@ -434,12 +460,12 @@ if __name__ == '__main__':
                     layer_acc += 1  # 烤层正确+1
                     c_layer_right_list.append(str(c) + "/t" + file)  # 正确将名字写入c_layer_right_list中
 
-                bboxes_pr, layer_n = correct_bboxes(bboxes_pr, layer_n)  # 矫正输出结果
+                bboxes_pr, layer_n, best_bboxes = correct_bboxes(bboxes_pr, layer_n, best_bboxes)  # 矫正输出结果
                 if len(bboxes_pr) == 0:  # 无任何结果返回，输出并统计+1
                     error_noresults += 1
                     shutil.copy(image_path, noresult_dir + "/" + file)
                 else:
-                    bboxes_pr, layer_n = correct_bboxes(bboxes_pr, layer_n)  # 矫正输出结果
+                    bboxes_pr, layer_n, best_bboxes = correct_bboxes(bboxes_pr, layer_n, best_bboxes)  # 矫正输出结果
                     if len(bboxes_pr) == 0:
                         error_noresults += 1
                         shutil.copy(image_path, noresult_dir + "/" + file)
@@ -482,7 +508,7 @@ if __name__ == '__main__':
             if file.endswith("jpg"):
                 all_jpgs += 1  # 统计总jpg图片数量
                 image_path = img_dirs + "/others" + "/" + file
-                bboxes_pr, layer_n = Y.result(image_path, save_c_dir)  # 预测每一张结果并保存
+                bboxes_pr, layer_n, best_bboxes = Y.result(image_path, save_c_dir)  # 预测每一张结果并保存
 
                 layer_img_true.append(3)  # 烤层真实结果
                 layer_img_pre.append(layer_n)  # 烤层预测结果
@@ -494,7 +520,7 @@ if __name__ == '__main__':
                     layer_acc += 1  # 烤层正确+1
                     c_layer_right_list.append(str(c) + "/o" + file)  # 正确将名字写入c_layer_right_list中
 
-                bboxes_pr, layer_n = correct_bboxes(bboxes_pr, layer_n)  # 矫正输出结果
+                bboxes_pr, layer_, best_bboxesn = correct_bboxes(bboxes_pr, layer_n, best_bboxes)  # 矫正输出结果
                 if len(bboxes_pr) == 0:  # 无任何结果返回，输出并统计+1
                     error_noresults += 1
                     shutil.copy(image_path, noresult_dir + "/" + file)
