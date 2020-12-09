@@ -9,7 +9,7 @@
 import os
 import shutil
 
-img_root = "F:/serve_data/202011101703"
+img_root = "C:/Users/sunyihuan/Desktop/test_img/t0"
 for c in os.listdir(img_root):
     for c_img in os.listdir(img_root + "/" + c):
-        shutil.move(img_root + "/" + c + "/" + c_img, img_root + "/" + c_img)
+        shutil.move(img_root + "/" + c + "/" + c_img, img_root)

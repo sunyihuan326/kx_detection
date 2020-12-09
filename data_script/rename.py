@@ -35,7 +35,7 @@ class ImageRename():
                 # os.rename(src, dst)
                 # #
                 dst = os.path.join(os.path.abspath(self.root_path),
-                                   filename + "_202011120900" + "_{}".format(say) + self.target + '.jpg')
+                                   filename + "_202012030843" + "_{}".format(say) + self.target + '.jpg')
                 os.rename(src, dst)
                 print('converting %s to %s ...' % (src, dst))
                 # save_name = os.path.join(os.path.abspath(self.save_dir),
@@ -100,16 +100,9 @@ class ImageRename():
 
 
 if __name__ == '__main__':
-    path = "F:/serve_data/202011120900/JPGImages"
-    target = "nofood"
-    save_dir = "F:/serve_data/202011120900/JPGImages"
-    # dir_p0 = path + "/" + c
-    for c in tqdm(os.listdir(path)):
-        dir_path = path + "/" + c
-
-        newname = ImageRename(dir_path, c, dir_path)
+    path = "F:/serve_data/202012030843"
+    for g in os.listdir(path):
+        target = g
+        dir_path = path + "/" + g
+        newname = ImageRename(dir_path, g, dir_path)
         newname.rename0("")
-    # for c in ["",]:
-    #     dir_p0 = path + "/" + c
-    #     newname = ImageRename(dir_p0, c, save_dir + "/" + c)
-    #     newname.rename0("")

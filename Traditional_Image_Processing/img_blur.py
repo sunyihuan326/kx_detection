@@ -2,12 +2,15 @@
 # @Time    : 2020/10/26
 # @Author  : sunyihuan
 # @File    : img_blur.py
+'''
+图片随机区域模糊
+
+'''
 from PIL import Image, ImageFilter
 import random
 
 
 class MyGaussianBlur(ImageFilter.Filter):
-    name = "GaussianBlur"
 
     def __init__(self, radius=1, bounds=None):
         self.radius = radius

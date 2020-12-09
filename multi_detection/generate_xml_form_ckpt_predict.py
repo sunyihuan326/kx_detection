@@ -122,7 +122,7 @@ class YoloPredict(object):
         self.score_threshold = 0.45
         self.iou_threshold = 0.5
         self.top_n = 5
-        self.weight_file ="E:/ckpt_dirs/Food_detection/multi_food5/20201111/yolov3_train_loss=6.4953.ckpt-112"  # ckpt文件地址
+        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food5/20201123/yolov3_train_loss=6.5091.ckpt-128"  # ckpt文件地址
         # self.weight_file = "./checkpoint/yolov3_train_loss=4.7681.ckpt-80"
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
@@ -195,7 +195,7 @@ class YoloPredict(object):
 
     def result(self, image_path):
         image = cv2.imread(image_path)  # 图片读取
-        org_h, org_w, org_c, bboxes_pr, layer_n , best_bboxes= self.predict(image)  # 预测结果
+        org_h, org_w, org_c, bboxes_pr, layer_n, best_bboxes = self.predict(image)  # 预测结果
         bboxes_pr, layer_n, best_bboxes = correct_bboxes(bboxes_pr, layer_n, best_bboxes)
         print(bboxes_pr)
         print(layer_n)
@@ -211,19 +211,19 @@ if __name__ == '__main__':
 
     start_time = time.time()
     Y = YoloPredict()
-    img_root = "F:/serve_data/202011120900/JPGImages"
+    img_root = "F:/serve_data/202012030843/JPGImages"
     # cls_list = ["potatos", "chestnut", "chickenwings", "porkchops"]
     cls_list = os.listdir(img_root)
-    xml_root = "F:/serve_data/202011120900/Annotations"
+    xml_root = "F:/serve_data/202012030843/Annotations"
     for c in cls_list:
-        img_dir = img_root + "/" + c
-        xml_dir = xml_root + "/" + c
-        if not os.path.exists(xml_dir):
-            print("1")
-            os.mkdir(xml_dir)
-        for img in tqdm(os.listdir(img_dir)):
-            if img.endswith(".jpg"):
-                img_path = img_dir + "/" + img
+        if c !="chips":
+            img_dir = img_root + "/" + c
+            xml_dir = xml_root + "/" + c
+            if not os.path.exists(xml_dir):
+                os.mkdir(xml_dir)
+            for img in tqdm(os.listdir(img_dir)):
+                if img.endswith(".jpg"):
+                    img_path = img_dir + "/" + img
 
-                org_h, org_w, org_c, bboxes_pr, layer_n = Y.result(img_path)
-                generate_xml((org_w, org_h, org_c), bboxes_pr, xml_dir, img.split(".jpg")[0], c)
+                    org_h, org_w, org_c, bboxes_pr, layer_n = Y.result(img_path)
+                    generate_xml((org_w, org_h, org_c), bboxes_pr, xml_dir, img.split(".jpg")[0], c)

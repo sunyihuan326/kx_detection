@@ -8,7 +8,6 @@
 @Author  : sunyihuan
 """
 
-
 def change_txt(txt_path, src_txtpath, file_path, typ):
     '''
     更改txt文件中的图片地址

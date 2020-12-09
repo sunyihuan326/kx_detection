@@ -31,10 +31,10 @@ class YoloPredict(object):
         self.input_size = 416  # 输入图片尺寸（默认正方形）
         self.num_classes = 40  # 种类数
         self.score_cls_threshold = 0.001
-        self.score_threshold = 0.8
+        self.score_threshold = 0.6
         self.iou_threshold = 0.5
         self.top_n = 5
-        self.weight_file ="E:/ckpt_dirs/Food_detection/multi_food5/20201116/yolov3_train_loss=6.4928.ckpt-118"  # ckpt文件地址
+        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food5/20201123/yolov3_train_loss=6.5091.ckpt-128"  # ckpt文件地址
         # self.weight_file = "./checkpoint/yolov3_train_loss=4.7681.ckpt-80"
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
@@ -129,8 +129,11 @@ class YoloPredict(object):
 if __name__ == '__main__':
     start_time = time.time()
 
-    img_root = "F:/serve_data/tt_noresults"  # 图片文件地址
-    save_root = "F:/serve_data/tt_noresults_detection"
+    img_root = "F:/serve_data/202012030843/JPGImages"  # 图片文件地址
+
+    layer_data_root = "F:/serve_data/202012030843/layer_data"
+    if not os.path.exists(layer_data_root): os.mkdir(layer_data_root)
+    save_root = "F:/serve_data/202012030843_detection"
     if not os.path.exists(save_root): os.mkdir(save_root)
     Y = YoloPredict()
     end_time0 = time.time()
@@ -145,74 +148,51 @@ if __name__ == '__main__':
     #        "shrimp", "strand"]
     # cls = ["cornone", "eggplant", "fish", "nofood", "potatol", "roastedchicken", "shrimp", "toast"]
     # cls = ["container",  "fish", "nofood", "roastedchicken", "shrimp", "toast"]
-    cls = [""]
+    cls = os.listdir(img_root)
 
     classes_id39 = {"cartooncookies": 1, "cookies": 5, "cupcake": 7, "beefsteak": 0, "chickenwings": 2,
                     "chiffoncake6": 3, "chiffoncake8": 4, "cranberrycookies": 6, "eggtart": 8,
                     "nofood": 9, "peanuts": 10, "porkchops": 14, "potatocut": 15, "potatol": 16,
-                     "potatos": 17, "sweetpotatocut": 18, "sweetpotatol": 19,
+                    "potatos": 17, "sweetpotatocut": 18, "sweetpotatol": 19,
                     "pizzacut": 11, "pizzaone": 12, "roastedchicken": 21,
                     "pizzatwo": 13, "sweetpotatos": 20, "toast": 22, "chestnut": 23, "cornone": 24, "corntwo": 25,
                     "drumsticks": 26,
                     "taro": 27, "steamedbread": 28, "eggplant": 29, "eggplant_cut_sauce": 30, "bread": 31,
                     "container_nonhigh": 32,
                     "container": 33, "duck": 21, "fish": 34, "hotdog": 35, "redshrimp": 36,
-                    "shrimp": 37, "strand": 38, "xizhi": 39, "chiffon_4": 101, "potatom": 40,"sweetpotatom":41}
+                    "shrimp": 37, "strand": 38, "xizhi": 39, "chiffon_4": 101, "potatom": 40, "sweetpotatom": 41}
 
     # cls=[""]
     new_classes = {v: k for k, v in classes_id39.items()}
+    layer_id = {0: "bottom", 1: "middle", 2: "top", 3: "others"}
     for c in cls:
         img_dir = img_root + "/" + c
         save_dir = save_root + "/" + c
+        layer_data_dir=layer_data_root+"/"+c
+        if not os.path.exists(layer_data_dir): os.mkdir(layer_data_dir)
         for img in tqdm(os.listdir(img_dir)):
             if img.endswith("jpg"):
                 img_path = img_dir + "/" + img
                 end_time1 = time.time()
-                bboxes_p, layer_, best_bboxes = Y.result(img_path,save_dir)
+                bboxes_p, layer_, best_bboxes = Y.result(img_path, save_dir)
                 bboxes_pr, layer_n, best_bboxes = correct_bboxes(bboxes_p, layer_, best_bboxes)  # 矫正输出结果
                 bboxes_pr, layer_n = get_potatoml(bboxes_pr, layer_n)  # 根据输出结果对中大红薯，中大土豆做输出
 
                 print(bboxes_pr)
-                if len(bboxes_pr) == 0:
-                    if not os.path.exists(img_dir + "/noresult"): os.mkdir(img_dir + "/noresult")
-                    shutil.move(img_path, img_dir + "/noresult" + "/" + img)
-                else:
-                    pre = int(bboxes_pr[0][-1])
-                    if not os.path.exists(img_dir + "/" + new_classes[pre]): os.mkdir(img_dir + "/" + new_classes[pre])
-                    shutil.move(img_path, img_dir + "/" + new_classes[pre] + "/" + img)
+                print(layer_n[0])
+                # 烤层分到对应文件夹
+                if not os.path.exists(layer_data_dir + "/" + layer_id[layer_n[0]]): os.mkdir(
+                    layer_data_dir + "/" + layer_id[layer_n[0]])
+                shutil.copy(img_path, layer_data_dir + "/" + layer_id[layer_n[0]] + "/"+img)
+
+                # 食材分到对应文件夹
+                # if len(bboxes_pr) == 0:
+                #     if not os.path.exists(img_dir + "/noresult"): os.mkdir(img_dir + "/noresult")
+                #     shutil.move(img_path, img_dir + "/noresult" + "/" + img)
+                # else:
+                #     pre = int(bboxes_pr[0][-1])
+                #     if not os.path.exists(img_dir + "/" + new_classes[pre]): os.mkdir(img_dir + "/" + new_classes[pre])
+                #     shutil.move(img_path, img_dir + "/" + new_classes[pre] + "/" + img)
+
     end_time1 = time.time()
     print("all data time:", end_time1 - end_time0)
-    # try:
-    #     bboxes_p, layer_ = Y.result(img_path, save_dir)
-    #     bboxes_pr, layer_n = correct_bboxes(bboxes_p, layer_)  # 矫正输出结果
-    #     print(bboxes_pr)
-    #     if len(bboxes_pr) == 0:
-    #         if not os.path.exists(img_dir + "/noresult"): os.mkdir(img_dir + "/noresult")
-    #         shutil.move(img_path, img_dir + "/noresult" + "/" + img)
-    #     else:
-    #         pre = int(bboxes_pr[0][-1])
-    #         if not os.path.exists(img_dir + "/" + new_classes[pre]): os.mkdir(img_dir + "/" +new_classes[pre])
-    #         shutil.move(img_path, img_dir + "/" + new_classes[pre] + "/" + img)
-    # except:
-    #     print(img_path)
-    # if pre==3:
-    #     if not os.path.exists(img_dir + "/" +"chiffoncake6"): os.mkdir(img_dir + "/" + "chiffoncake6")
-    #     shutil.move(img_path, img_dir + "/" + "chiffoncake6"+ "/" + img)
-    # else:
-    #     if not os.path.exists(img_dir + "/" +"chiffoncake8"): os.mkdir(img_dir + "/" + "chiffoncake8")
-    #     shutil.move(img_path, img_dir + "/" + "chiffoncake8"+ "/" + img)
-    # try:
-    #     img_path = img_dir + "/" + img
-    #     end_time1 = time.time()
-    #     bboxes_p, layer_ = Y.result(img_path)
-    #     bboxes_pr, layer_n = correct_bboxes(bboxes_p, layer_)  # 矫正输出结果
-    #     print(bboxes_pr)
-    #     if len(bboxes_pr)==0:
-    #         if not os.path.exists(img_dir+"/noresult"):os.mkdir(img_dir+"/noresult")
-    #         shutil.copy(img_path,img_dir+"/noresult"+"/"+img)
-    #     else:
-    #         pre = bboxes_pr[0][-1]
-    #         if not os.path.exists(img_dir+"/"+classes[pre]):os.mkdir(img_dir+"/"+classes[pre])
-    #         shutil.copy(img_path, img_dir +"/"+classes[pre]+"/"+img)
-    # except:
-    #     print(img)

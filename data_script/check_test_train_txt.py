@@ -34,6 +34,6 @@ def check_2_txt(train_txt, test_txt):
 
 
 if __name__ == "__main__":
-    train_txt = "E:/DataSets/X_data_27classes/train.txt"
-    test_txt = "E:/DataSets/X_data_27classes/val.txt"
+    train_txt = "F:/model_data/ZG/SF1_202011/train38.txt"
+    test_txt = "F:/model_data/ZG/SF1_202011/test38.txt"
     check_2_txt(train_txt, test_txt)

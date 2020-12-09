@@ -133,10 +133,10 @@ class append_txt(object):
 
 
 if __name__ == "__main__":
-    root_dir = "E:/DataSets/X_3660_data/bu/serve_data/202011120900"
+    root_dir = "E:/DataSets/X_3660_data/bu/serve_data/202012030843"
     img_dir = "{}/JPGImages".format(root_dir)
     img_save_dir = "{}/JPGImages".format(root_dir)
-    original_txt = "{}/train41.txt".format(root_dir)
+    original_txt = "{}/train42.txt".format(root_dir)
     if not os.path.exists(img_save_dir): os.mkdir(img_save_dir)
     aug = aug_mist(img_dir, img_save_dir)  # 图片增强处理
 
@@ -144,22 +144,22 @@ if __name__ == "__main__":
     # 生成对应的增强txt文件
     for typ in ["lv", "zi", "hot", "huang"]:
         aug.img_mist(typ)  # 图片增强处理
-    #     file_path = "E:/DataSets/X_3660_data/bu/serve_data/202011120900/JPGImages"
-    #     save_txt_path = "E:/DataSets/X_3660_data/bu/serve_data/202011120900/train41_{}.txt".format(typ)
-    #     g_t.change_txt_jpgname(original_txt, save_txt_path, file_path, typ)  # 生成增强单独txt文件
-    # # 合并原图txt和增强txt，且增强数据仅取部分
-    # txt_list = [
-    #     "{}/train41.txt".format(root_dir),
-    #     "{}/train41_lv.txt".format(root_dir),
-    #     "{}/train41_zi.txt".format(root_dir),
-    #     "{}/train41_hot.txt".format(root_dir),
-    #     "{}/train41_huang.txt".format(root_dir),
-    # ]
-    # a_t = append_txt(txt_list)
-    # a_t.append_txt2all("{}/train41_huang_hot_lv_zi.txt".format(root_dir), 2)
-    #
-    # # 生成serve端数据
-    # serve_file_path = "/home/sunyihuan/sunyihuan_algorithm/data/KX_data/3660_202008/bu/serve_data/202011120900/JPGImages"
-    # save_serve_txt_path = "{}/serve_3660train41_huang_hot_lv_zi.txt".format(root_dir)
-    # g_t.change_txt_jpgname("{}/train41_huang_hot_lv_zi.txt".format(root_dir), save_serve_txt_path, serve_file_path,
-    #                        "serve")
+        file_path = "E:/DataSets/X_3660_data/bu/serve_data/202012030843/JPGImages"
+        save_txt_path = "E:/DataSets/X_3660_data/bu/serve_data/202012030843/train42_{}.txt".format(typ)
+        g_t.change_txt_jpgname(original_txt, save_txt_path, file_path, typ)  # 生成增强单独txt文件
+    # 合并原图txt和增强txt，且增强数据仅取部分
+    txt_list = [
+        "{}/train42.txt".format(root_dir),
+        "{}/train42_lv.txt".format(root_dir),
+        "{}/train42_zi.txt".format(root_dir),
+        "{}/train42_hot.txt".format(root_dir),
+        "{}/train42_huang.txt".format(root_dir),
+    ]
+    a_t = append_txt(txt_list)
+    a_t.append_txt2all("{}/train42_huang_hot_lv_zi.txt".format(root_dir), 2)
+
+    # 生成serve端数据
+    serve_file_path = "/home/sunyihuan/sunyihuan_algorithm/data/KX_data/3660_202008/bu/serve_data/202012030843/JPGImages"
+    save_serve_txt_path = "{}/serve_3660train42_huang_hot_lv_zi.txt".format(root_dir)
+    g_t.change_txt_jpgname("{}/train42_huang_hot_lv_zi.txt".format(root_dir), save_serve_txt_path, serve_file_path,
+                           "serve")
