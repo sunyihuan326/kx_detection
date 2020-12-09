@@ -9,11 +9,18 @@ created on 2019-11-16
 # for i in range(100):
 #     print(pow(i, 2))
 
-import numpy as np
-import cv2
-image_path="E:/DataSets/2020_two_phase_KXData/all_data36classes/JPGImages/train/14_191106X3_zl_kaopan_Toast" \
-           ".jpg"
-image = np.array(cv2.imread(image_path))
-
-print(image)
-print(image.shape)
+# import numpy as np
+# import cv2
+# import threading
+# def counter(n):
+#     cnt = 0
+#     for i in range(n):
+#         for j in range(i):
+#             cnt += j
+#     print(cnt)
+#
+# from io import StringIO
+# f = StringIO()
+# f.write('hello')
+# f.write(' ')
+# print(f.getvalue())
