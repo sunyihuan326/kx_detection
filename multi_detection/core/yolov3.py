@@ -51,12 +51,11 @@ class YOLOV3(object):
         # out = tf.layers.dense(out, 400, activation=tf.nn.relu)
         out = tf.layers.dense(out, self.layer_nums)  # layer 输出
 
-        input_data = common.yolo_maxpool_block(input_data)  # spp amxpool_block
-        input_data = common.convolutional(input_data, (1, 1, 1024, 512), self.trainable, 'conv52')
-        input_data = common.convolutional(input_data, (3, 3, 512, 1024), self.trainable, 'conv53')
-        input_data = common.convolutional(input_data, (1, 1, 1024, 512), self.trainable, 'conv54')
+        # input_data = common.convolutional(input_data, (1, 1, 1024, 512), self.trainable, 'conv52')
+        # input_data = common.convolutional(input_data, (3, 3, 512, 1024), self.trainable, 'conv53')
+        # input_data = common.convolutional(input_data, (1, 1, 1024, 512), self.trainable, 'conv54')
         # input_data = common.convolutional(input_data, (3, 3, 512, 1024), self.trainable, 'conv55')
-        # input_data = common.convolutional(input_data, (1, 1, 1024, 512), self.trainable, 'conv56')
+        input_data = common.convolutional(input_data, (1, 1, 1024, 512), self.trainable, 'conv56')
 
         conv_lobj_branch = common.convolutional(input_data, (3, 3, 512, 1024), self.trainable, name='conv_lobj_branch')
         conv_lbbox = common.convolutional(conv_lobj_branch, (1, 1, 1024, 3 * (self.num_class + 5)),
@@ -69,8 +68,8 @@ class YOLOV3(object):
             input_data = tf.concat([input_data, route_2], axis=-1)
 
         input_data = common.convolutional(input_data, (1, 1, 768, 256), self.trainable, 'conv58')
-        input_data = common.convolutional(input_data, (3, 3, 256, 512), self.trainable, 'conv59')
-        input_data = common.convolutional(input_data, (1, 1, 512, 256), self.trainable, 'conv60')
+        # input_data = common.convolutional(input_data, (3, 3, 256, 512), self.trainable, 'conv59')
+        # input_data = common.convolutional(input_data, (1, 1, 512, 256), self.trainable, 'conv60')
         # input_data = common.convolutional(input_data, (3, 3, 256, 512), self.trainable, 'conv61')
         # input_data = common.convolutional(input_data, (1, 1, 512, 256), self.trainable, 'conv62')
 
@@ -85,8 +84,8 @@ class YOLOV3(object):
             input_data = tf.concat([input_data, route_1], axis=-1)
 
         input_data = common.convolutional(input_data, (1, 1, 384, 128), self.trainable, 'conv64')
-        input_data = common.convolutional(input_data, (3, 3, 128, 256), self.trainable, 'conv65')
-        input_data = common.convolutional(input_data, (1, 1, 256, 128), self.trainable, 'conv66')
+        # input_data = common.convolutional(input_data, (3, 3, 128, 256), self.trainable, 'conv65')
+        # input_data = common.convolutional(input_data, (1, 1, 256, 128), self.trainable, 'conv66')
         # input_data = common.convolutional(input_data, (3, 3, 128, 256), self.trainable, 'conv67')
         # input_data = common.convolutional(input_data, (1, 1, 256, 128), self.trainable, 'conv68')
 
@@ -154,8 +153,8 @@ class YOLOV3(object):
 
         inter_section = tf.maximum(right_down - left_up, 0.0)
         inter_area = inter_section[..., 0] * inter_section[..., 1]
-        union_area = tf.maximum(boxes1_area + boxes2_area - inter_area, 1e-5)
-        iou = inter_area / union_area
+        union_area = boxes1_area + boxes2_area - inter_area
+        iou = inter_area / tf.maximum(union_area,1e-5)
 
         enclose_left_up = tf.minimum(boxes1[..., :2], boxes2[..., :2])
         enclose_right_down = tf.maximum(boxes1[..., 2:], boxes2[..., 2:])
@@ -165,115 +164,7 @@ class YOLOV3(object):
 
         return giou
 
-    def bbox_diou(self, boxes1, boxes2):
-        '''
-        计算两个框的DIoU
-        :param boxes1:
-        :param boxes2:
-        :return:
-        '''
-        exchange = False
-        if boxes1.shape[0] > boxes2.shape[0]:
-            boxes1, boxes2 = boxes2, boxes1
-            exchange = True
-        # #xmin,ymin,xmax,ymax->[:,0],[:,1],[:,2],[:,3]
-        w1 = boxes1[..., 2] - boxes1[..., 0]
-        h1 = boxes1[..., 3] - boxes1[..., 1]
-        w2 = boxes2[..., 2] - boxes2[..., 0]
-        h2 = boxes2[..., 3] - boxes2[..., 1]
-
-        area1 = w1 * h1
-        area2 = w2 * h2
-
-        center_x1 = (boxes1[..., 2] + boxes1[..., 0]) / 2  # （x1max +x1min）/2
-        center_y1 = (boxes1[..., 3] + boxes1[..., 1]) / 2  # (y1max+y1min)/2
-        center_x2 = (boxes2[..., 2] + boxes2[..., 0]) / 2
-        center_y2 = (boxes2[..., 3] + boxes2[..., 1]) / 2
-
-        inter_max_xy = tf.minimum(boxes1[..., 2:], boxes2[..., 2:])  # min((x1max,y1max ),(x2max,y2max)) ->返回较小一组
-        inter_min_xy = tf.maximum(boxes1[..., :2], boxes2[..., :2])  # max((x1min,y1min ),(x2min,y2min))->返回较大的一组
-        out_max_xy = tf.maximum(boxes1[..., 2:], boxes2[..., 2:])
-        out_min_xy = tf.minimum(boxes1[..., :2], boxes2[..., :2])
-
-        inter = tf.clip_by_value((inter_max_xy - inter_min_xy), clip_value_min=1e-5, clip_value_max=1e5)
-        inter_area = inter[..., 0] * inter[..., 1]
-        inter_diag = (center_x2 - center_x1) ** 2 + (center_y2 - center_y1) ** 2
-        outer = tf.clip_by_value((out_max_xy - out_min_xy), clip_value_min=1e-5, clip_value_max=1e5)
-        outer_diag = (outer[..., 0] ** 2) + (outer[..., 1] ** 2)
-        union = area1 + area2 - inter_area
-        dious = inter_area / tf.maximum(union, 1e-5) - (inter_diag) / tf.maximum(outer_diag, 1e-5)
-        dious = tf.clip_by_value(dious, clip_value_min=-1.0, clip_value_max=1.0)
-        if exchange:
-            dious = dious.T
-        return dious
-
-    def bbox_ciou(self, boxes1, boxes2):
-        '''
-        计算两个框的ciou
-        :param boxes1:
-        :param boxes2:
-        :return:
-        '''
-        pre_xy = boxes1[..., 0:2]
-        pre_wh = boxes1[..., 2:4]
-        yi_true_xy = boxes2[..., 0:2]
-        yi_true_wh = boxes2[..., 2:4]
-
-        # top dowm left right
-        pre_lt = pre_xy - pre_wh / 2
-        pre_rb = pre_xy + pre_wh / 2
-        truth_lt = yi_true_xy - yi_true_wh / 2
-        truth_rb = yi_true_xy + yi_true_wh / 2
-
-        # left top of intersection : [batch_size, 13, 13, 3,2]
-        intersection_left_top = tf.maximum(pre_lt, truth_lt)
-        intersection_right_bottom = tf.minimum(pre_rb, truth_rb)
-        # width and height of intersection : [batch_size, 13, 13, 3, 2]
-        intersection_wh = tf.maximum(intersection_right_bottom - intersection_left_top, 0.0)
-        # area of intersection : [batch_size, 13, 13, 3, 1]
-        intersection_area = intersection_wh[..., 0:1] * intersection_wh[..., 1:2]
-        # left top of union
-        combine_left_top = tf.minimum(pre_lt, truth_lt)
-        # right bottom of union
-        combine_right_bottom = tf.maximum(pre_rb, truth_rb)
-        # width and height of union
-        combine_wh = tf.maximum(combine_right_bottom - combine_left_top, 0.0)
-
-        # diagonal line of union : [batch_size, 13, 13, 3, 1]
-        C = tf.square(combine_wh[..., 0:1]) + tf.square(combine_wh[..., 1:2])
-        # diagonal line  of center point:[batch_size, 13, 13, 3, 1]
-        D = tf.square(yi_true_xy[..., 0:1] - pre_xy[..., 0:1]) + tf.square(yi_true_xy[..., 1:2] - pre_xy[..., 1:2])
-
-        # area of box : [batch_size, 13, 13, 3, 1]
-        pre_area = pre_wh[..., 0:1] * pre_wh[..., 1:2]
-        true_area = yi_true_wh[..., 0:1] * yi_true_wh[..., 1:2]
-
-        # iou : [batch_size, 13, 13, 3, 1]
-        iou = intersection_area / tf.maximum(pre_area + true_area - intersection_area, 1e-5)
-
-        pi = 3.14159265358979323846
-
-        # [batch_size, 13, 13, 3, 1]
-        v = 4 / (pi * pi) * tf.square(
-            tf.subtract(
-                tf.math.atan(yi_true_wh[..., 0:1] / yi_true_wh[..., 1:2]),
-                tf.math.atan(pre_wh[..., 0:1] / pre_wh[..., 1:2])
-            )
-        )
-
-        # trade-off
-        # alpha
-        alpha = v / (1.0 - iou + v)
-        ciou_loss = 1.0 - iou + D / C + alpha * v
-        return ciou_loss
-
     def bbox_iou(self, boxes1, boxes2):
-        '''
-        计算两个框的iou
-        :param boxes1:
-        :param boxes2:
-        :return:
-        '''
 
         boxes1_area = boxes1[..., 2] * boxes1[..., 3]
         boxes2_area = boxes2[..., 2] * boxes2[..., 3]
@@ -288,7 +179,7 @@ class YOLOV3(object):
 
         inter_section = tf.maximum(right_down - left_up, 0.0)
         inter_area = inter_section[..., 0] * inter_section[..., 1]
-        union_area = tf.maximum(boxes1_area + boxes2_area - inter_area, 1e-5)
+        union_area = boxes1_area + boxes2_area - inter_area
         iou = 1.0 * inter_area / union_area
 
         return iou
@@ -311,21 +202,12 @@ class YOLOV3(object):
         respond_bbox = label[:, :, :, :, 4:5]
         label_prob = label[:, :, :, :, 5:]
 
-        self.giou = tf.expand_dims(self.bbox_giou(pred_xywh, label_xywh), axis=-1)  # giou
-        self.diou = tf.expand_dims(self.bbox_diou(pred_xywh, label_xywh), axis=-1)  # diou
-        self.ciou = tf.expand_dims(self.bbox_ciou(pred_xywh, label_xywh), axis=-1)  # ciou
-
-        ciou_loss = tf.where(tf.math.greater(respond_bbox, 0.5), self.ciou, tf.zeros_like(self.ciou))
-
-        self.ciou = tf.square(ciou_loss * respond_bbox) * 0.07
-        self.ciou_loss = tf.reduce_sum(self.ciou) / batch_size
-
+        self.giou = tf.expand_dims(self.bbox_giou(pred_xywh, label_xywh), axis=-1)
         input_size = tf.cast(input_size, tf.float32)
 
         self.bbox_loss_scale = 2.0 - 1.0 * label_xywh[:, :, :, :, 2:3] * label_xywh[:, :, :, :, 3:4] / (input_size ** 2)
 
-        giou_loss = respond_bbox * self.bbox_loss_scale * (1 - self.giou)  # giou loss
-        diou_loss = respond_bbox * self.bbox_loss_scale * (1 - self.diou)  # diou loss
+        giou_loss = respond_bbox * self.bbox_loss_scale * (1 - self.giou)
 
         iou = self.bbox_iou(pred_xywh[:, :, :, :, np.newaxis, :], bboxes[:, np.newaxis, np.newaxis, np.newaxis, :, :])
         max_iou = tf.expand_dims(tf.reduce_max(iou, axis=-1), axis=-1)
@@ -342,13 +224,12 @@ class YOLOV3(object):
 
         prob_loss = respond_bbox * tf.nn.sigmoid_cross_entropy_with_logits(labels=label_prob, logits=conv_raw_prob)
 
-        giou_loss = tf.reduce_mean(tf.reduce_sum(giou_loss, axis=[1, 2, 3, 4]))  # giou loss
-        diou_loss = tf.reduce_mean(tf.reduce_sum(diou_loss, axis=[1, 2, 3, 4]))  # diou loss
+        giou_loss = tf.reduce_mean(tf.reduce_sum(giou_loss, axis=[1, 2, 3, 4]))
         # giou_loss = tf.reduce_mean(tf.reduce_sum(bbox_loss_scale, axis=[1, 2, 3, 4]))
         conf_loss = tf.reduce_mean(tf.reduce_sum(conf_loss, axis=[1, 2, 3, 4]))
         prob_loss = tf.reduce_mean(tf.reduce_sum(prob_loss, axis=[1, 2, 3, 4]))
 
-        return self.ciou_loss, conf_loss, prob_loss, tf.reduce_sum(self.ciou, axis=[1, 2, 3, 4]), tf.reduce_sum(
+        return giou_loss, conf_loss, prob_loss, tf.reduce_sum(self.giou, axis=[1, 2, 3, 4]), tf.reduce_sum(
             self.bbox_loss_scale)
 
     def compute_loss(self, label_sbbox, label_mbbox, label_lbbox, true_sbbox, true_mbbox, true_lbbox):
@@ -384,7 +265,6 @@ class YOLOV3(object):
     def layer_loss(self, layer_label):
         layer_label = tf.cast(layer_label, tf.int32)
         # Y = tf.one_hot(layer_label, depth=self.layer_nums, axis=1, dtype=tf.float32)
-        cost = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=layer_label, logits=self.out),
-                              name='layer_loss')
+        cost = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=layer_label, logits=self.out), name='layer_loss')
         # cost=tf.losses.mean_squared_error(labels=layer_label,predictions=self.predict_op)
         return cost

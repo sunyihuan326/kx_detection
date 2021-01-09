@@ -23,13 +23,13 @@ class YoloPredict(object):
     '''
 
     def __init__(self):
-        self.input_size = 320  # 输入图片尺寸（默认正方形）
-        self.num_classes = 22  # 种类数
+        self.input_size = 416  # 输入图片尺寸（默认正方形）
+        self.num_classes = 40  # 种类数
         self.top_n = 3
         self.score_cls_threshold = 0.001
         self.score_threshold = 0.45
         self.iou_threshold = 0.5
-        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food3/20200604_22class/yolov3_train_loss=4.9799.ckpt-158"  # ckpt文件地址
+        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food5/20201123/yolov3_train_loss=6.5091.ckpt-128" # ckpt文件地址
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
 
@@ -134,7 +134,7 @@ class get_cam(object):
 
 
 if __name__ == "__main__":
-    img_path = "C:/Users/sunyihuan/Desktop/test_img/1_190923kaopan_EggTart_xiao.jpg"
+    img_path =  "C:/Users/sunyihuan/Desktop/t/data.jpg"
     Y = YoloPredict()
 
     heatmap = get_cam(img_path, Y).cam("l")
@@ -156,4 +156,4 @@ if __name__ == "__main__":
 
     superimposed_img = heatmap * 0.4 + img
 
-    cv2.imwrite('cam_l.jpg', superimposed_img)
+    cv2.imwrite('cam_l_danta.jpg', superimposed_img)

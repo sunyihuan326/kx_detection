@@ -72,13 +72,13 @@ def he_foods(pre):
 
 class YoloTest(object):
     def __init__(self):
-        self.input_size = 320  # 输入图片尺寸（默认正方形）
-        self.num_classes = 42  # 种类数
+        self.input_size = 416  # 输入图片尺寸（默认正方形）
+        self.num_classes = 40  # 种类数
         self.score_cls_threshold = 0.001
-        self.score_threshold = 0.6
+        self.score_threshold = 0.8
         self.iou_threshold = 0.5
         self.top_n = 5
-        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food3/checkpoint/yolov3_train_loss=8.1954.ckpt-76"  # ckpt文件地址
+        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food5/20201123/yolov3_train_loss=6.5091.ckpt-128"  # ckpt文件地址
         # self.weight_file = "./checkpoint/yolov3_train_loss=4.7681.ckpt-80"
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
@@ -113,7 +113,7 @@ class YoloTest(object):
         例如
         [(18, 0.9916), (19, 0.0105), (15, 0.0038), (1, 0.0018), (5, 0.0016), (13, 0.0011)]
         '''
-        bboxes = utils.postprocess_boxes(pred_bbox, (org_h, org_w), self.input_size, self.score_cls_threshold)
+        bboxes = utils.postprocess_boxes_conf1(pred_bbox, (org_h, org_w), self.input_size, self.score_cls_threshold)
         classes_in_img = list(set(bboxes[:, 5]))
         best_bboxes = {}
         for cls in classes_in_img:
@@ -167,7 +167,10 @@ class YoloTest(object):
         :return:
         '''
         image = cv2.imread(image_path)  # 图片读取
-        # image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB).astype(np.float32)
+        # image = Image.open(image_path)
+        # image = np.array(image)
+        # image = cv2.cvtColor(image, cv2.COLOR_BGR
+        # 2RGB).astype(np.float32)
         # image = utils.white_balance(image)  # 图片白平衡处理
         bboxes_pr, layer_n, best_bboxes = self.predict(image)  # 预测结果
         # print(bboxes_pr)
@@ -235,7 +238,7 @@ if __name__ == '__main__':
                     "drumsticks": 26,
                     "taro": 27, "steamedbread": 28, "eggplant": 29, "eggplant_cut_sauce": 30, "bread": 31,
                     "container_nonhigh": 32, "container": 33, "duck": 21, "fish": 34, "hotdog": 35, "redshrimp": 36,
-                    "shrimp": 37, "strand": 38, "xizhi": 39, "small_fish": 40, "chiffon4": 101}
+                    "shrimp": 37, "strand": 38, "xizhi": 39, "small_fish": 40, "chips":41,"chiffon4": 101}
     classes_id46 = {"cartooncookies": 1, "cookies": 5, "cupcake": 7, "beefsteak": 0, "chickenwings": 2,
                     "chiffoncake6": 3, "chiffoncake8": 4, "cranberrycookies": 6, "eggtarts": 8, "eggtartl": 9,
                     "nofood": 10, "peanuts": 11, "porkchops": 16, "potatocut": 17, "potatol": 18,
@@ -261,10 +264,10 @@ if __name__ == '__main__':
                     "pizzatwo": 13, "sweetpotatos": 20, "toast": 22}
     # 需要修改
     classes_id = classes_id39  #######
-    classes = classes_label46  #######    仅2期：classes_label18，所有：classes_label46
-    mode = "multi3_76"  #######
+    classes = classes_label18  #######    仅2期：classes_label18，所有：classes_label46
+    mode = "1123"  #######
     tag = ""
-    img_dir = "F:/test_from_yejing_202010/TXKX_all_20201019_rename_all"  # 文件夹地址
+    img_dir = "F:/test_from_yejing_202010/TXKX_all_20201019_rename"  # 文件夹地址
     # img_dir = "E:/check_2_phase/JPGImages_2"  # 文件夹地址
     save_dir = "F:/test_from_yejing_202010/results/detection_{0}{1}".format(mode, tag)  # 图片保存地址
     if not os.path.exists(save_dir): os.mkdir(save_dir)
@@ -627,7 +630,7 @@ if __name__ == '__main__':
     sheet1.write(55, 4, round((layer_jpgs_acc / jpgs_count_all) * 100, 2))
     sheet1.write(55, 5, round((food_jpgs_acc / jpgs_count_all) * 100, 2))
 
-    workbook.save("F:/test_from_yejing_202010/results/all60_{0}{1}.xls".format(mode, tag))
+    workbook.save("F:/test_from_yejing_202010/results/all_80_conf1_{0}{1}.xls".format(mode, tag))
 
     end_time = time.time()
     print("all jpgs time:", end_time - end0_time)

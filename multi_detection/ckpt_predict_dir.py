@@ -129,11 +129,11 @@ class YoloPredict(object):
 if __name__ == '__main__':
     start_time = time.time()
 
-    img_root = "F:/serve_data/202012030843/JPGImages"  # 图片文件地址
+    img_root = "C:/Users/sunyihuan/Desktop/1210/convert_jpg"  # 图片文件地址
 
-    layer_data_root = "F:/serve_data/202012030843/layer_data"
+    layer_data_root = "C:/Users/sunyihuan/Desktop/1210/convert_jpg_layer_data"
     if not os.path.exists(layer_data_root): os.mkdir(layer_data_root)
-    save_root = "F:/serve_data/202012030843_detection"
+    save_root = "C:/Users/sunyihuan/Desktop/1210/convert_jpg_detection"
     if not os.path.exists(save_root): os.mkdir(save_root)
     Y = YoloPredict()
     end_time0 = time.time()
@@ -148,7 +148,7 @@ if __name__ == '__main__':
     #        "shrimp", "strand"]
     # cls = ["cornone", "eggplant", "fish", "nofood", "potatol", "roastedchicken", "shrimp", "toast"]
     # cls = ["container",  "fish", "nofood", "roastedchicken", "shrimp", "toast"]
-    cls = os.listdir(img_root)
+    # cls = os.listdir(img_root)
 
     classes_id39 = {"cartooncookies": 1, "cookies": 5, "cupcake": 7, "beefsteak": 0, "chickenwings": 2,
                     "chiffoncake6": 3, "chiffoncake8": 4, "cranberrycookies": 6, "eggtart": 8,
@@ -162,7 +162,7 @@ if __name__ == '__main__':
                     "container": 33, "duck": 21, "fish": 34, "hotdog": 35, "redshrimp": 36,
                     "shrimp": 37, "strand": 38, "xizhi": 39, "chiffon_4": 101, "potatom": 40, "sweetpotatom": 41}
 
-    # cls=[""]
+    cls=[""]
     new_classes = {v: k for k, v in classes_id39.items()}
     layer_id = {0: "bottom", 1: "middle", 2: "top", 3: "others"}
     for c in cls:
@@ -186,13 +186,13 @@ if __name__ == '__main__':
                 shutil.copy(img_path, layer_data_dir + "/" + layer_id[layer_n[0]] + "/"+img)
 
                 # 食材分到对应文件夹
-                # if len(bboxes_pr) == 0:
-                #     if not os.path.exists(img_dir + "/noresult"): os.mkdir(img_dir + "/noresult")
-                #     shutil.move(img_path, img_dir + "/noresult" + "/" + img)
-                # else:
-                #     pre = int(bboxes_pr[0][-1])
-                #     if not os.path.exists(img_dir + "/" + new_classes[pre]): os.mkdir(img_dir + "/" + new_classes[pre])
-                #     shutil.move(img_path, img_dir + "/" + new_classes[pre] + "/" + img)
+                if len(bboxes_pr) == 0:
+                    if not os.path.exists(img_dir + "/noresult"): os.mkdir(img_dir + "/noresult")
+                    shutil.move(img_path, img_dir + "/noresult" + "/" + img)
+                else:
+                    pre = int(bboxes_pr[0][-1])
+                    if not os.path.exists(img_dir + "/" + new_classes[pre]): os.mkdir(img_dir + "/" + new_classes[pre])
+                    shutil.move(img_path, img_dir + "/" + new_classes[pre] + "/" + img)
 
     end_time1 = time.time()
     print("all data time:", end_time1 - end_time0)

@@ -11,7 +11,8 @@ import cv2
 import numpy as np
 import tensorflow as tf
 import multi_detection.core.utils as utils
-from multi_detection.food_correct_utils import correct_bboxes,get_potatoml
+from multi_detection.food_correct_utils import correct_bboxes, get_potatoml
+from multi_detection.core.utils import postprocess_boxes_conf1 as postprocess_box
 
 
 class YoloPredict(object):
@@ -26,7 +27,7 @@ class YoloPredict(object):
         self.score_threshold = 0.4
         self.iou_threshold = 0.5
         self.top_n = 5
-        self.weight_file ="E:/ckpt_dirs/Food_detection/multi_food5/20200914/yolov3_train_loss=6.9178.ckpt-95" # ckpt文件地址
+        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food5/20201123/yolov3_train_loss=6.5091.ckpt-128"  # ckpt文件地址
         # self.weight_file = "./checkpoint/yolov3_train_loss=4.7681.ckpt-80"
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
@@ -57,7 +58,7 @@ class YoloPredict(object):
         例如
         [(18, 0.9916), (19, 0.0105), (15, 0.0038), (1, 0.0018), (5, 0.0016), (13, 0.0011)]
         '''
-        bboxes = utils.postprocess_boxes(pred_bbox, (org_h, org_w), self.input_size, self.score_cls_threshold)
+        bboxes = postprocess_box(pred_bbox, (org_h, org_w), self.input_size, self.score_cls_threshold)
         classes_in_img = list(set(bboxes[:, 5]))
         best_bboxes = {}
         for cls in classes_in_img:
@@ -92,13 +93,13 @@ class YoloPredict(object):
 
         best_bboxes = self.get_top_cls(pred_bbox, org_h, org_w, self.top_n)  # 获取top_n类别和置信度
 
-        bboxes = utils.postprocess_boxes(pred_bbox, (org_h, org_w), self.input_size, self.score_threshold)
+        bboxes = postprocess_box(pred_bbox, (org_h, org_w), self.input_size, self.score_threshold)
         bboxes = utils.nms(bboxes, self.iou_threshold)
         layer_n = layer_[0]  # 烤层结果
 
         return bboxes, layer_n, best_bboxes
 
-    def result(self, image_path):
+    def result(self, image_path, save_dir=""):
         image = cv2.imread(image_path)  # 图片读取
         bboxes_pr, layer_n, best_bboxes = self.predict(image)
         print("top_n类被及置信度：", best_bboxes)
@@ -113,18 +114,23 @@ class YoloPredict(object):
         print(layer_n)
         if self.write_image:
             image = utils.draw_bbox(image, bboxes_pr, show_label=self.show_label)
-            drawed_img_save_to_path = str(image_path).split("/")[-1]
+            drawed_img_save_to_path = save_dir + "/" + str(image_path).split("/")[-1]
             cv2.imwrite(drawed_img_save_to_path, image)
 
 
 if __name__ == '__main__':
-    img_path = "C:/Users/sunyihuan/Desktop/test_img/20201118085613_00000016_0.9892_2_0.jpg"  # 图片地址
-    Y = YoloPredict()
-    Y.result(img_path)
     import os
+    # img_path = "C:/Users/sunyihuan/Desktop/t/16_bottom_test2020_zhengchang_canju_nofood.jpg"  # 图片地址
+    # save_dir = "C:/Users/sunyihuan/Desktop/t_detection"
+    # if not os.path.exists(save_dir): os.mkdir(save_dir)
+    Y = YoloPredict()
+    # Y.result(img_path,save_dir)
 
-    # img_dir = "E:/WLS_originalData/3660camera_data202007/all_original_data1/chiffoncake6/cornone"
-    # for img in os.listdir(img_dir):
-    #     if img.endswith(".jpg"):
-    #         img_path = img_dir + "/" + img
-    #         Y.result(img_path)
+
+    img_dir = "C:/Users/sunyihuan/Desktop/te_0108"
+    save_dir = "C:/Users/sunyihuan/Desktop/te_0108_detection"
+    if not os.path.exists(save_dir): os.mkdir(save_dir)
+    for img in os.listdir(img_dir):
+        if img.endswith(".jpg"):
+            img_path = img_dir + "/" + img
+            Y.result(img_path, save_dir)

@@ -5,10 +5,11 @@ import cv2
 import base64
 import datetime
 import numpy as np
+from tqdm import tqdm
 
 
 def base64stringtojpg(filedir, dstfiledir):
-    for f in os.listdir(filedir):
+    for f in tqdm(os.listdir(filedir)):
         if f[-4:] == ".jpg":
             data_file_path = os.path.join(filedir, f)
             with open(data_file_path, 'r', encoding='utf-8') as file:
@@ -20,4 +21,9 @@ def base64stringtojpg(filedir, dstfiledir):
 
 
 # 源/目标
-base64stringtojpg("E:/lhf/OSS2JPG/src/", "E:/lhf/OSS2JPG/img/")
+
+for kk in os.listdir("F:/serve_data/OVEN"):
+    jpg_dir = "F:/serve_data/OVEN/{}".format(kk)
+    save_dir = "F:/serve_data/OVEN/{}/conver_jpg".format(kk)
+    if not os.path.exists(save_dir): os.mkdir(save_dir)
+    base64stringtojpg(jpg_dir, save_dir)

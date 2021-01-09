@@ -147,6 +147,18 @@ class Dataset(object):
 
         return image, bboxes
 
+    def random_blur(self, image):
+        if random.random() < 0.5:
+            h, w, _ = image.shape
+            b_x_min = random.randint(100, int(3 * w / 4))
+            b_y_min = random.randint(100, int(3 * h / 4))
+            x_ = random.randint(50, 600)
+            y_ = random.randint(50, 600)
+            img2 = image[b_x_min:min(b_x_min + x_, w), b_y_min:min(b_y_min + y_, h), :]
+            img2 = cv2.GaussianBlur(img2, (9, 9), 50)
+            image[b_x_min:min(b_x_min + x_, w), b_y_min:min(b_y_min + y_, h), :] = img2
+        return image
+
     def parse_annotation(self, annotation):
 
         line = annotation.split()
@@ -160,22 +172,30 @@ class Dataset(object):
         if self.data_aug:
             if random.random() < 0.2:  # 灰度数据
                 image = image.convert("L")
-            if random.random() < 0.5:
-                image = ImageEnhance.Contrast(image)  # 对比度增强
-                image = image.enhance(random.uniform(0.6, 1.2))  # 增强系数[0.6, 1.2]
-            if random.random() < 0.5:
-                image = ImageEnhance.Brightness(image)  # 亮度调整
-                image = image.enhance(random.uniform(0.7, 1.2))  # 亮度调整系数[0.7, 1.2]
-            if random.random() < 0.5:
-                image = ImageEnhance.Sharpness(image)  # 锐度增强
-                image = image.enhance(random.uniform(0.8, 1.3))  # 亮度调整系数[0.5, 2]
-            if random.random() < 0.5:
-                image = ImageEnhance.Color(image)  # 颜色增强
-                image = image.enhance(random.uniform(0.3, 3))  # 颜色调整系数[0.3, 3]
-            if random.random() < 0.5:
-                image = util.random_noise(np.array(image), mode="gaussian")  # 加入高斯噪声,输出值为[0,1],需乘以255
-                image = image * 255
-            image = np.array(image)
+                image = np.array(image)
+                w, h = image.shape
+                image_ = np.zeros((w, h, 3))
+                image_[:, :, 0] = image
+                image_[:, :, 1] = image
+                image_[:, :, 2] = image
+                image = image_
+            else:
+                if random.random() < 0.5:
+                    image = ImageEnhance.Contrast(image)  # 对比度增强
+                    image = image.enhance(random.uniform(0.6, 1.2))  # 增强系数[0.6, 1.2]
+                if random.random() < 0.5:
+                    image = ImageEnhance.Brightness(image)  # 亮度调整
+                    image = image.enhance(random.uniform(0.7, 1.2))  # 亮度调整系数[0.7, 1.2]
+                if random.random() < 0.5:
+                    image = ImageEnhance.Sharpness(image)  # 锐度增强
+                    image = image.enhance(random.uniform(0.8, 1.3))  # 亮度调整系数[0.5, 2]
+                if random.random() < 0.5:
+                    image = ImageEnhance.Color(image)  # 颜色增强
+                    image = image.enhance(random.uniform(0.3, 3))  # 颜色调整系数[0.3, 3]
+                if random.random() < 0.5:
+                    image = util.random_noise(np.array(image), mode="gaussian")  # 加入高斯噪声,输出值为[0,1],需乘以255
+                    image = image * 255
+                image = np.array(image)
 
         else:
             image = np.array(image)
@@ -188,6 +208,10 @@ class Dataset(object):
         # print(bboxes)
 
         if self.data_aug:
+            try:
+                image = self.random_blur(np.copy(image))
+            except:
+                pass
             image, bboxes = self.random_horizontal_flip(np.copy(image), np.copy(bboxes))
             image, bboxes = self.random_crop(np.copy(image), np.copy(bboxes))
             image, bboxes = self.random_translate(np.copy(image), np.copy(bboxes))

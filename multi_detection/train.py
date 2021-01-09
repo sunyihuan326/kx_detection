@@ -19,8 +19,10 @@ from multi_detection.core.config import cfg
 
 import os
 
-config = tf.ConfigProto()
-config.gpu_options.per_process_gpu_memory_fraction = 0.9  # 占用GPU的显存
+
+# config = tf.ConfigProto()
+# config.gpu_options.per_process_gpu_memory_fraction = 0.8  # maximun alloc gpu50% of MEM
+# config.gpu_options.allow_growth = True  # allocate dynamically
 
 
 class YoloTrain(object):
@@ -42,7 +44,7 @@ class YoloTrain(object):
         self.trainset = Dataset('train')
         self.testset = Dataset('test')
         self.steps_per_period = len(self.trainset)
-        self.sess = tf.Session(config=config)
+        self.sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
 
         with tf.name_scope('define_input'):
             self.input_data = tf.placeholder(dtype=tf.float32,
@@ -58,19 +60,16 @@ class YoloTrain(object):
             self.trainable = tf.placeholder(dtype=tf.bool, name='training')
 
         with tf.name_scope("define_loss"):
-            self.model = YOLOV3(self.input_data,self.trainable)
+            self.model = YOLOV3(self.input_data, self.trainable)
             self.net_var = tf.global_variables()
             self.giou_loss, self.conf_loss, self.prob_loss, self.giou, self.bbox_loss_scale = self.model.compute_loss(
                 self.label_sbbox, self.label_mbbox, self.label_lbbox,
                 self.true_sbboxes, self.true_mbboxes, self.true_lbboxes)
             self.layer_loss = self.model.layer_loss(self.layer_label)
-            print("layer_loss::::")
-            print(self.layer_loss)
-            self.l2_loss = tf.add_n([tf.nn.l2_loss(var) for var in tf.trainable_variables()])
             self.layer_loss = tf.cond(self.layer_loss > 0.01, lambda: self.layer_loss, lambda: 0.0)
-            # self.loss = self.giou_loss + self.conf_loss + 2 * self.prob_loss + 10 * self.layer_loss
-            self.loss = self.giou_loss + self.conf_loss + 2 * self.prob_loss + 10 * self.layer_loss + 1e-5 * self.l2_loss
-        self.layer_out = self.model.out
+            self.l2_loss = tf.add_n([tf.nn.l2_loss(var) for var in tf.trainable_variables()])
+            self.loss = self.giou_loss + self.conf_loss + 4 * self.prob_loss + 10 * self.layer_loss + self.l2_loss * 1e-5
+            # self.loss = self.giou_loss + self.conf_loss + self.prob_loss
 
         with tf.name_scope('learn_rate'):
             self.global_step = tf.Variable(1.0, dtype=tf.float64, trainable=False, name='global_step')
@@ -89,6 +88,7 @@ class YoloTrain(object):
                                      (self.global_step - warmup_steps) / (train_steps - warmup_steps) * np.pi))
             )
             global_step_update = tf.assign_add(self.global_step, 1.0)
+        # self._optimizer = tf.train.AdamOptimizer(self.learn_rate).minimize(self.loss, global_step=self.global_step)
 
         with tf.name_scope("define_weight_decay"):
             moving_ave = tf.train.ExponentialMovingAverage(self.moving_ave_decay).apply(tf.trainable_variables())
@@ -103,7 +103,6 @@ class YoloTrain(object):
 
             first_stage_optimizer = tf.train.AdamOptimizer(self.learn_rate).minimize(self.loss,
                                                                                      var_list=self.first_stage_trainable_var_list)
-            # first_stage_optimizer = tf.train.AdamOptimizer(self.learn_rate).minimize(self.loss)
             with tf.control_dependencies(tf.get_collection(tf.GraphKeys.UPDATE_OPS)):
                 with tf.control_dependencies([first_stage_optimizer, global_step_update]):
                     with tf.control_dependencies([moving_ave]):
@@ -120,8 +119,14 @@ class YoloTrain(object):
                         self.train_op_with_all_variables = tf.no_op()
 
         with tf.name_scope('loader_and_saver'):
+            variables = tf.contrib.framework.get_variables_to_restore()
+            # variables_to_resotre = [v for v in variables if
+            #                         v.name.split('/')[0] not in ['conv_sbbox', 'conv_mbbox', 'conv_lbbox']]
+            # print(variables_to_resotre)
+            # self.loader = tf.train.Saver(variables_to_resotre)  # 仅加载部分参数
+            # print(self.net_var)
             self.loader = tf.train.Saver(self.net_var)
-            self.saver = tf.train.Saver(tf.global_variables(), max_to_keep=10)
+            self.saver = tf.train.Saver(tf.global_variables(), max_to_keep=20)
 
         with tf.name_scope('summary'):
             tf.summary.scalar("learn_rate", self.learn_rate)
@@ -141,24 +146,19 @@ class YoloTrain(object):
             self.train_summary_writer = tf.summary.FileWriter(self.train_logdir, graph=self.sess.graph)
             self.test_summary_writer = tf.summary.FileWriter(test_logdir, graph=self.sess.graph)
 
-        # # 参数量计算
-        # flops = tf.profiler.profile(self.sess.graph, options=tf.profiler.ProfileOptionBuilder.float_operation())
-        # params = tf.profiler.profile(self.sess.graph,
-        #                              options=tf.profiler.ProfileOptionBuilder.trainable_variables_parameter())
-        # print('FLOPs: {};    Trainable params: {}'.format(flops.total_float_ops, params.total_parameters))
-
     def train(self):
         self.sess.run(tf.global_variables_initializer())
         try:
             print('=> Restoring weights from: %s ... ' % self.initial_weight)
             self.loader.restore(self.sess, self.initial_weight)
-            self.epoch_start = (self.initial_weight).split("-")[1].split(".")[0]
+            epoch_start = int(self.initial_weight.split("ckpt-")[1].split(".")[0])
         except:
             print('=> %s does not exist !!!' % self.initial_weight)
             print('=> Now it starts to train YOLOV3 from scratch ...')
-            self.epoch_start = 0
+            # self.first_stage_epochs = 0
+            epoch_start = 0
 
-        for epoch in range(int(self.epoch_start)+1, 1 + self.first_stage_epochs + self.second_stage_epochs):
+        for epoch in range(epoch_start + 1, 1 + self.first_stage_epochs + self.second_stage_epochs):
             if epoch <= self.first_stage_epochs:
                 train_op = self.train_op_with_frozen_variables
             else:
@@ -166,13 +166,11 @@ class YoloTrain(object):
             # train_op = self._optimizer
             pbar = tqdm(self.trainset)
             train_epoch_loss, test_epoch_loss = [], []
-            # self.l2_loss,
-            # train_step_l2loss,
+
             for train_data in pbar:
-                _, summary, train_step_loss, global_step_val, gi_loss, gi, bbo, layer_loss_v, layer_o = self.sess.run(
-                    [train_op, self.write_op, self.loss, self.global_step, self.giou_loss, self.giou,
-                     self.bbox_loss_scale,
-                     self.layer_loss, self.layer_out], feed_dict={
+                _, summary, train_step_loss, global_step_val, gi, bbo, layer_loss_v = self.sess.run(
+                    [train_op, self.write_op, self.loss, self.global_step, self.giou, self.bbox_loss_scale,
+                     self.layer_loss], feed_dict={
                         # _, summary, train_step_loss, global_step_val, gi, bbo, = self.sess.run(
                         #     [train_op, self.write_op, self.loss, self.global_step, self.giou, self.bbox_loss_scale,
                         #      ], feed_dict={
@@ -186,27 +184,12 @@ class YoloTrain(object):
                         self.true_lbboxes: train_data[7],
                         self.trainable: True,
                     })
+                # print("layer_loss:::")
                 # print(layer_loss_v)
-                # print("true:::::")
-                # print(train_data[1])
-                # print("predict:::")
-                # print(layer_o)
 
                 train_epoch_loss.append(train_step_loss)
                 self.train_summary_writer.add_summary(summary, global_step_val)
                 pbar.set_description("train loss: %.2f" % train_step_loss)
-
-            # 生成tflite文件
-            # out_tensors = [self.model.pred_sbbox, self.model.pred_mbbox,
-            #                    self.model.pred_lbbox, self.model.predict_op]
-            #     # print("----------------------------------------------------------------")
-            #     # print(self.input_data.shape.as_list())
-            #     # print(self.trainable.shape.as_list())
-            #     # print("----------------------------------------------------------------")
-            # tflite_model = tf.lite.TFLiteConverter.from_session(self.sess, [self.input_data],
-            #                                                         out_tensors)
-            # tflite_model = tflite_model.convert()
-            # open("./model/converted_model.tflite", "wb").write(tflite_model)
 
             # 保存模型
             train_epoch_loss = np.mean(train_epoch_loss)
@@ -219,19 +202,16 @@ class YoloTrain(object):
             with tf.gfile.GFile('model/yolo_model.pb', mode='wb') as f:
                 f.write(constant_graph.SerializeToString())
 
-
             # 保存为pb用于tf_serving
-            # export_dir = "./pb_model"
-            # tf.saved_model.simple_save(self.sess, export_dir,
-            #                            inputs={"input": self.input_data, "trainable": self.trainable},
-            #                            outputs={"pred_sbbox": self.model.pred_sbbox,
-            #                                     "pred_mbbox": self.model.pred_mbbox, })
-            # "pre_lbbox": self.model.pred_lbbox})
+            # export_dir = "E:/Joyoung_WLS_github/tf_yolov3/pb"
+            # tf.saved_model.simple_save(self.sess, export_dir, inputs={"input": self.input_data},
+            #                            outputs={"pred_sbbox": self.pred_sbbox, "pred_mbbox": self.pred_mbbox,
+            #                                     "pre_lbbox": self.pred_lbbox})
 
             par_test = tqdm(self.testset)
             for test_data in par_test:
-                test_step_loss, test_summary, test_step_giou_loss, test_step_prob_loss, test_step_conf_loss, test_layer_o = self.sess.run(
-                    [self.loss, self.write_op, self.giou_loss, self.prob_loss, self.conf_loss, self.layer_out],
+                test_step_loss, test_step_layer_loss, test_step_giou_loss, test_step_prob_loss, test_conf_layer_loss, test_summary = self.sess.run(
+                    [self.loss, self.layer_loss, self.giou_loss, self.prob_loss, self.conf_loss, self.write_op],
                     feed_dict={
                         self.input_data: test_data[0],
                         self.layer_label: test_data[1],
@@ -245,12 +225,8 @@ class YoloTrain(object):
                     })
 
                 test_epoch_loss.append(test_step_loss)
-                self.test_summary_writer.add_summary(test_summary)
+                self.test_summary_writer.add_summary(test_summary, global_step=epoch)
                 par_test.set_description("test loss: %.2f" % test_step_loss)
-                # print("true:::::")
-                # print(test_data[1])
-                # print("test prediction")
-                # print(test_layer_o)
 
             train_epoch_loss, test_epoch_loss = np.mean(train_epoch_loss), np.mean(test_epoch_loss)
             ckpt_file = "./checkpoint/yolov3_test_loss=%.4f.ckpt" % test_epoch_loss
