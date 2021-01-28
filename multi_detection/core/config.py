@@ -12,7 +12,7 @@ __C.YOLO                        = edict()
 
 # Set the class name
 __C.YOLO.LAYER_NUMS             = 4
-__C.YOLO.CLASSES                = "E:/kx_detection/multi_detection/data/classes/food42.names"
+__C.YOLO.CLASSES                = "E:/kx_detection/multi_detection/data/classes/food40.names"
 __C.YOLO.ANCHORS                = "./data/anchors/food_anchors.txt"
 __C.YOLO.MOVING_AVE_DECAY       = 0.9995
 __C.YOLO.STRIDES                = [8, 16, 32]

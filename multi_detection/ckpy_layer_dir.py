@@ -33,7 +33,7 @@ class YoloPredict(object):
         self.score_threshold = 0.8
         self.iou_threshold = 0.5
         self.top_n = 5
-        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food5/20200914/yolov3_train_loss=6.9178.ckpt-95"  # ckpt文件地址
+        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food5/20201123/yolov3_train_loss=6.5091.ckpt-128"  # ckpt文件地址
         # self.weight_file = "./checkpoint/yolov3_train_loss=4.7681.ckpt-80"
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
@@ -76,7 +76,7 @@ class YoloPredict(object):
 if __name__ == '__main__':
     start_time = time.time()
 
-    img_root = "E:/DataSets/X_3660_data/bu/serve_data/202011181630/layer_data_2"  # 图片文件地址
+    img_root = "F:serve_data/OVEN/for_model/layer_data"  # 图片文件地址
     Y = YoloPredict()
     end_time0 = time.time()
     print("model loading time:", end_time0 - start_time)
@@ -89,9 +89,9 @@ if __name__ == '__main__':
     #        "container", "fish", "hotdog", "redshrimp",
     #        "shrimp", "strand"]
     # cls = ["cornone", "eggplant", "fish", "nofood", "potatol", "roastedchicken", "shrimp", "toast"]
-    # cls = ["container",  "fish", "nofood", "roastedchicken", "shrimp", "toast"]
+    cls = os.listdir(img_root)
     layer_name = {"0": "bottom", "1": "middle", "2": "top", "3": "others"}
-    for c in ["bottom", "middle", "top", "others"]:
+    for c in cls:
         img_dir = img_root + "/" + c
         for img in tqdm(os.listdir(img_dir)):
             if img.endswith("jpg"):

@@ -12,7 +12,7 @@ import numpy as np
 import tensorflow as tf
 import multi_detection.core.utils as utils
 from multi_detection.food_correct_utils import correct_bboxes, get_potatoml
-from multi_detection.core.utils import postprocess_boxes_conf1 as postprocess_box
+from multi_detection.core.utils import postprocess_boxes_conf as postprocess_box
 
 
 class YoloPredict(object):

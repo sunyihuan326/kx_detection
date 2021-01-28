@@ -8,8 +8,13 @@
 '''
 import os
 import shutil
+from tqdm import tqdm
 
-img_root = "C:/Users/sunyihuan/Desktop/test_img/t0"
-for c in os.listdir(img_root):
-    for c_img in os.listdir(img_root + "/" + c):
-        shutil.move(img_root + "/" + c + "/" + c_img, img_root)
+img_root = "F:/serve_data/OVEN/202012"
+img_save = "F:/serve_data/OVEN/202012/for_test"
+
+for c in tqdm((os.listdir(img_root))):
+    if c != "for_test":
+        for c_img in os.listdir(img_root + "/" + c):
+            for img in os.listdir(img_root + "/" + c + "/covert_jpg"):
+                shutil.copy(img_root + "/" + c + "/covert_jpg" + "/" + img, img_save + "/" + img)

@@ -187,19 +187,22 @@ class process(object):
         for c in classes:
             for l in ["bottom", "middle", "top", "others"]:
                 img_layer_dir = self.layer_root + "/" + c + "/" + l
-                for img in tqdm(os.listdir(img_layer_dir)):
-                    if img.split(".")[0] in val_txt_files:  # 判断若img名称在val中，拷贝图片至val中
-                        shutil.copy(img_layer_dir + "/" + img, self.layer_root + "/val/" + l + "/" + img)
-                    elif img.split(".")[0] in test_txt_files:  # 判断若img名称在test中，拷贝图片至test中
-                        shutil.copy(img_layer_dir + "/" + img, self.layer_root + "/test/" + l + "/" + img)
-                    elif img.split(".")[0] in train_txt_files:  # 其他的拷贝图片至train中
-                        shutil.copy(img_layer_dir + "/" + img, self.layer_root + "/train/" + l + "/" + img)
-                    else:
-                        print("*****************:", img)
+                try:
+                    for img in tqdm(os.listdir(img_layer_dir)):
+                        if img.split(".")[0] in val_txt_files:  # 判断若img名称在val中，拷贝图片至val中
+                            shutil.copy(img_layer_dir + "/" + img, self.layer_root + "/val/" + l + "/" + img)
+                        elif img.split(".")[0] in test_txt_files:  # 判断若img名称在test中，拷贝图片至test中
+                            shutil.copy(img_layer_dir + "/" + img, self.layer_root + "/test/" + l + "/" + img)
+                        elif img.split(".")[0] in train_txt_files:  # 其他的拷贝图片至train中
+                            shutil.copy(img_layer_dir + "/" + img, self.layer_root + "/train/" + l + "/" + img)
+                        else:
+                            print("*****************:", img)
+                except:
+                    print(img_layer_dir)
 
 
 if __name__ == "__main__":
-    data_root = "E:/DataSets/X_3660_data/bu/serve_data/202012030843"
+    data_root = "E:/DataSets/X_3660_data/bu/serve_data/20210115"
     dprocess = process(data_root)
     # classes = ["beefsteak", "bread", "cartooncookies", "chestnut", "chickenwings",
     #             "chiffoncake6", "chiffoncake8", "container", "container_nonhigh", "cookies",
@@ -212,8 +215,8 @@ if __name__ == "__main__":
     classes =os.listdir(data_root+"/JPGImages")
     val_percent = 0
     test_percent = 0.1
-    dprocess.split_data(classes, test_percent, val_percent)
-    dprocess.train_all_txt(["train", "test", "val"])
-    dprocess.copy2dir(classes, "xml")
-    dprocess.copy2dir(classes, "jpg")
+    # dprocess.split_data(classes, test_percent, val_percent)
+    # dprocess.train_all_txt(["train", "test", "val"])
+    # dprocess.copy2dir(classes, "xml")
+    # dprocess.copy2dir(classes, "jpg")
     dprocess.copy_layer2split_dir(classes)

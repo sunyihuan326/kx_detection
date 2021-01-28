@@ -31,12 +31,12 @@ class YoloPredict(object):
         self.input_size = 416  # 输入图片尺寸（默认正方形）
         self.num_classes = 40  # 种类数
         self.score_cls_threshold = 0.001
-        self.score_threshold = 0.6
+        self.score_threshold = 0.8
         self.iou_threshold = 0.5
         self.top_n = 5
-        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food5/20201123/yolov3_train_loss=6.5091.ckpt-128"  # ckpt文件地址
+        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food5/20210127/yolov3_train_loss=5.9155.ckpt-148"  # ckpt文件地址
         # self.weight_file = "./checkpoint/yolov3_train_loss=4.7681.ckpt-80"
-        self.write_image = True  # 是否画图
+        self.write_image = False  # 是否画图
         self.show_label = True  # 是否显示标签
 
         graph = tf.Graph()
@@ -69,7 +69,7 @@ class YoloPredict(object):
         例如
         [(18, 0.9916), (19, 0.0105), (15, 0.0038), (1, 0.0018), (5, 0.0016), (13, 0.0011)]
         '''
-        bboxes = utils.postprocess_boxes(pred_bbox, (org_h, org_w), self.input_size, self.score_cls_threshold)
+        bboxes = utils.postprocess_boxes_conf(pred_bbox, (org_h, org_w), self.input_size, self.score_cls_threshold)
         classes_in_img = list(set(bboxes[:, 5]))
         best_bboxes = {}
         for cls in classes_in_img:
@@ -85,55 +85,66 @@ class YoloPredict(object):
         return best_bboxes[:top_n]
 
     def predict(self, image):
+        '''
+        预测结果
+        :param image: 图片数据，shape为[800,600,3]
+        :return:
+            bboxes：食材检测预测框结果，格式为：[x_min, y_min, x_max, y_max, probability, cls_id],
+            layer_n[0]：烤层检测结果，0：最下层、1：中间层、2：最上层、3：其他
+        '''
         org_image = np.copy(image)
         org_h, org_w, _ = org_image.shape
 
         image_data = utils.image_preporcess(image, [self.input_size, self.input_size])
         image_data = image_data[np.newaxis, ...]
 
-        pred_sbbox, pred_mbbox, pred_lbbox, layer_ = self.sess.run(
+        pred_sbbox, pred_mbbox, pred_lbbox, layer_n = self.sess.run(
             [self.pred_sbbox, self.pred_mbbox, self.pred_lbbox, self.layer_num],
             feed_dict={
                 self.input: image_data,
                 self.trainable: False
             }
         )
+
         pred_bbox = np.concatenate([np.reshape(pred_sbbox, (-1, 5 + self.num_classes)),
                                     np.reshape(pred_mbbox, (-1, 5 + self.num_classes)),
                                     np.reshape(pred_lbbox, (-1, 5 + self.num_classes))], axis=0)
-
         best_bboxes = self.get_top_cls(pred_bbox, org_h, org_w, self.top_n)  # 获取top_n类别和置信度
         bboxes = utils.postprocess_boxes(pred_bbox, (org_h, org_w), self.input_size, self.score_threshold)
         bboxes = utils.nms(bboxes, self.iou_threshold)
-        layer_n = layer_  # 烤层结果
 
-        return bboxes, layer_n, best_bboxes
+        return bboxes, layer_n[0], best_bboxes
 
-    def result(self, image_path, save_dir="E:/WLS_originalData/3660camera_data202007/all_original_data_detect"):
+    def result(self, image_path, save_dir):
+        '''
+        得出预测结果并保存
+        :param image_path: 图片地址
+        :param save_dir: 预测结果原图标注框，保存地址
+        :return:
+        '''
         image = cv2.imread(image_path)  # 图片读取
         # image = utils.white_balance(image)  # 图片白平衡处理
-        bboxes_pr, layer_n, best_bboxes = self.predict(image)
+        bboxes_pr, layer_n, best_bboxes = self.predict(image)  # 预测结果
 
-        if not os.path.exists(save_dir): os.mkdir(save_dir)
+
         if self.write_image:
             image = utils.draw_bbox(image, bboxes_pr, show_label=self.show_label)
             drawed_img_save_to_path = str(image_path).split("/")[-1]
-            drawed_img_save_to_path = save_dir + "/" + drawed_img_save_to_path.split(".jpg")[0] + "_" + str(
-                layer_n[0]) + ".jpg"
-            # print(drawed_img_save_to_path)
-            cv2.imwrite(drawed_img_save_to_path, image)
-
+            drawed_img_save_to_path = str(drawed_img_save_to_path).split(".")[0] + "_" + str(
+                layer_n) + ".jpg"  # 图片保存地址，烤层结果在命名中
+            # cv2.imshow('Detection result', image)
+            cv2.imwrite(save_dir + "/" + drawed_img_save_to_path, image)  # 保存图片
         return bboxes_pr, layer_n, best_bboxes
 
 
 if __name__ == '__main__':
     start_time = time.time()
 
-    img_root = "C:/Users/sunyihuan/Desktop/1210/convert_jpg"  # 图片文件地址
+    img_root = "F:/serve_data/OVEN/202101/peanuts_test0127"  # 图片文件地址
 
-    layer_data_root = "C:/Users/sunyihuan/Desktop/1210/convert_jpg_layer_data"
+    layer_data_root = "F:/serve_data/OVEN/202101/peanuts_test_layer_data"
     if not os.path.exists(layer_data_root): os.mkdir(layer_data_root)
-    save_root = "C:/Users/sunyihuan/Desktop/1210/convert_jpg_detection"
+    save_root = "F:/serve_data/OVEN/202101/peanuts_test_detection"
     if not os.path.exists(save_root): os.mkdir(save_root)
     Y = YoloPredict()
     end_time0 = time.time()
@@ -179,11 +190,11 @@ if __name__ == '__main__':
                 bboxes_pr, layer_n = get_potatoml(bboxes_pr, layer_n)  # 根据输出结果对中大红薯，中大土豆做输出
 
                 print(bboxes_pr)
-                print(layer_n[0])
+                print(layer_n)
                 # 烤层分到对应文件夹
-                if not os.path.exists(layer_data_dir + "/" + layer_id[layer_n[0]]): os.mkdir(
-                    layer_data_dir + "/" + layer_id[layer_n[0]])
-                shutil.copy(img_path, layer_data_dir + "/" + layer_id[layer_n[0]] + "/"+img)
+                if not os.path.exists(layer_data_dir + "/" + layer_id[layer_n]): os.mkdir(
+                    layer_data_dir + "/" + layer_id[layer_n])
+                shutil.copy(img_path, layer_data_dir + "/" + layer_id[layer_n] + "/"+img)
 
                 # 食材分到对应文件夹
                 if len(bboxes_pr) == 0:

@@ -1,13 +1,9 @@
+# -*- coding: utf-8 -*-
+# @Time    : 2021/1/22
+# @Author  : sunyihuan
+# @File    : ckpt_results_20201020_noresults.py
+
 # -*- encoding: utf-8 -*-
-
-"""
-二期验证结果输出
-数据来源2020年10月19日叶晶交付验证集(可选择所有、或者仅二期数据)
-
-@File    : ckpt_results_20201020.py
-@Time    : 2020/10/20 14:39
-@Author  : sunyihuan
-"""
 
 import cv2
 import numpy as np
@@ -26,13 +22,6 @@ from PIL import Image
 # 仅cpu执行
 # os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 # os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
-
-# 限制CPU核数
-# cpu_num = int(os.environ.get('CPU_NUM', 1))
-# config = tf.ConfigProto(device_count={"CPU": cpu_num},
-#                         inter_op_parallelism_threads=cpu_num,
-#                         intra_op_parallelism_threads=cpu_num,
-#                         log_device_placement=True)
 
 
 # gpu限制
@@ -75,10 +64,10 @@ class YoloTest(object):
         self.input_size = 416  # 输入图片尺寸（默认正方形）
         self.num_classes = 40  # 种类数
         self.score_cls_threshold = 0.001
-        self.score_threshold = 0.8
+        self.score_threshold = 0.3
         self.iou_threshold = 0.5
         self.top_n = 5
-        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food5/20210127/yolov3_train_loss=5.9155.ckpt-148"  # ckpt文件地址
+        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food5/20201123/yolov3_train_loss=6.5091.ckpt-128"  # ckpt文件地址
         # self.weight_file = "./checkpoint/yolov3_train_loss=4.7681.ckpt-80"
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
@@ -265,20 +254,20 @@ if __name__ == '__main__':
     # 需要修改
     classes_id = classes_id39  #######
     classes = classes_label18  #######    仅2期：classes_label18，所有：classes_label46
-    mode = "0127"  #######
+    mode = "0122_138"  #######
     tag = ""
-    img_dir = "F:/test_from_yejing_202010/TXKX_all_20201019_rename"  # 文件夹地址
+    img_dir = "F:/test_from_yejing_202010/results/noresults/no_result_1123"  # 文件夹地址
     # img_dir = "E:/check_2_phase/JPGImages_2"  # 文件夹地址
-    save_dir = "F:/test_from_yejing_202010/results/detection_{0}{1}".format(mode, tag)  # 图片保存地址
+    save_dir = "F:/test_from_yejing_202010/results/noresults/no_result_1123_detection".format(mode, tag)  # 图片保存地址
     if not os.path.exists(save_dir): os.mkdir(save_dir)
 
-    layer_error_dir = "F:/test_from_yejing_202010/results/layer_error_{0}{1}".format(mode, tag)  # 预测结果错误保存地址
+    layer_error_dir = "F:/test_from_yejing_202010/results/noresults/no_result_1123_layer_error".format(mode, tag)  # 预测结果错误保存地址
     if not os.path.exists(layer_error_dir): os.mkdir(layer_error_dir)
 
-    fooderror_dir = "F:/test_from_yejing_202010/results/food_error_{0}{1}".format(mode, tag)  # 食材预测结果错误保存地址
+    fooderror_dir = "F:/test_from_yejing_202010/results/noresults/no_result_1123_food_error".format(mode, tag)  # 食材预测结果错误保存地址
     if not os.path.exists(fooderror_dir): os.mkdir(fooderror_dir)
 
-    no_result_dir = "F:/test_from_yejing_202010/results/no_result_{0}{1}".format(mode, tag)  # 无任何输出结果保存地址
+    no_result_dir = "F:/test_from_yejing_202010/results/noresults/no_result_1123_no_result".format(mode, tag)  # 无任何输出结果保存地址
     if not os.path.exists(no_result_dir): os.mkdir(no_result_dir)
 
     start_time = time.time()
@@ -286,32 +275,6 @@ if __name__ == '__main__':
     end0_time = time.time()
     print("model loading time:", end0_time - start_time)
     new_classes = {v: k for k, v in classes_id.items()}
-
-    jpgs_count_all = 0
-    layer_jpgs_acc = 0
-    food_jpgs_acc = 0
-
-    workbook = xlwt.Workbook(encoding='utf-8')
-    sheet1 = workbook.add_sheet("multi_food")
-    sheet1.write(0, 0, "classes")
-    sheet1.write(1, 0, "classes")
-
-    sheet1.write(1, 1, "bottom_layer_acc")
-    sheet1.write(1, 2, "bottom_food_acc")
-    sheet1.write(1, 3, "middle_layer_acc")
-    sheet1.write(1, 4, "middle_food_acc")
-    sheet1.write(1, 5, "top_layer_acc")
-    sheet1.write(1, 6, "top_food_acc")
-    sheet1.write(1, 7, "others_layer_acc")
-    sheet1.write(1, 8, "others_food_acc")
-    sheet1.write(1, 9, "jpgs_all")
-    sheet1.write(1, 10, "layer_right_nums")
-    sheet1.write(1, 11, "food_right_nums")
-    sheet1.write(1, 12, "layer_acc")
-    sheet1.write(1, 13, "food_acc")
-    sheet1.write(1, 14, "no_result_nums")
-    sheet1.write(1, 15, "layer_and_food_right")
-
     layer_img_true = []
     layer_img_pre = []
 
@@ -337,29 +300,29 @@ if __name__ == '__main__':
         food_acc_o = 0  # 其他--食材
 
         img_dirs = img_dir + "/" + c
-        layer_error_c_dirs = layer_error_dir + "/" + c
-        if os.path.exists(layer_error_c_dirs): shutil.rmtree(layer_error_c_dirs)
-        os.mkdir(layer_error_c_dirs)
+        layer_error_c_dirs = layer_error_dir
+        # if os.path.exists(layer_error_c_dirs): shutil.rmtree(layer_error_c_dirs)
+        # os.mkdir(layer_error_c_dirs)
 
-        fooderror_dirs = fooderror_dir + "/" + c
-        if os.path.exists(fooderror_dirs): shutil.rmtree(fooderror_dirs)
-        os.mkdir(fooderror_dirs)
+        fooderror_dirs = fooderror_dir
+        # if os.path.exists(fooderror_dirs): shutil.rmtree(fooderror_dirs)
+        # os.mkdir(fooderror_dirs)
 
-        noresult_dir = no_result_dir + "/" + c
-        if os.path.exists(noresult_dir): shutil.rmtree(noresult_dir)
-        os.mkdir(noresult_dir)
+        noresult_dir = no_result_dir
+        # if os.path.exists(noresult_dir): shutil.rmtree(noresult_dir)
+        # os.mkdir(noresult_dir)
 
-        save_c_dir = save_dir + "/" + c
-        if os.path.exists(save_c_dir): shutil.rmtree(save_c_dir)
-        os.mkdir(save_c_dir)
+        save_c_dir = save_dir
+        # if os.path.exists(save_c_dir): shutil.rmtree(save_c_dir)
+        # os.mkdir(save_c_dir)
 
         c_layer_right_list = []
         c_food_right_list = []
         # 底层结果查看
-        for file in tqdm(os.listdir(img_dirs + "/bottom")):  # 底层
+        for file in tqdm(os.listdir(img_dirs)):
             if file.endswith("jpg"):
                 all_jpgs += 1  # 统计总jpg图片数量
-                image_path = img_dirs + "/bottom" + "/" + file
+                image_path = img_dirs + "/" + file
                 bboxes_pr, layer_n, best_bboxes = Y.result(image_path, save_c_dir)  # 预测每一张结果并保存
 
                 layer_img_true.append(0)  # 烤层真实结果
@@ -400,237 +363,3 @@ if __name__ == '__main__':
                                             pre) + ".jpg")
                             shutil.copy(image_path, fooderror_dirs + "/" + file.split(".jpg")[0] + "_{}.jpg".format(
                                 new_classes[pre]))
-
-        if len(os.listdir(img_dirs + "/bottom")) == 0:  # 判断是否有值
-            layer_bottom_acc = 0
-            food_bottom_acc = 0
-        else:
-            layer_bottom_acc = round(layer_acc_b / len(os.listdir(img_dirs + "/bottom")), 2)
-            food_bottom_acc = round(food_acc_b / len(os.listdir(img_dirs + "/bottom")), 2)
-        sheet1.write(i + 2, 1, layer_bottom_acc)  # 下层烤层准确率写入
-        sheet1.write(i + 2, 2, food_bottom_acc)  # 下层食材准确率写入
-        # 中层结果查看
-        for file in tqdm(os.listdir(img_dirs + "/middle")):  # 中层
-            if file.endswith("jpg"):
-                all_jpgs += 1  # 统计总jpg图片数量
-                image_path = img_dirs + "/middle" + "/" + file
-                bboxes_pr, layer_n, best_bboxes = Y.result(image_path, save_c_dir)  # 预测每一张结果并保存
-
-                layer_img_true.append(1)  # 烤层真实结果
-                layer_img_pre.append(layer_n)  # 烤层预测结果
-                if layer_n != 1:  # 判断烤层是否为1
-                    shutil.copy(image_path,
-                                layer_error_c_dirs + "/" + file.split(".jpg")[0] + "_" + str(layer_n) + ".jpg")
-                else:
-                    layer_acc_m += 1  # 中层烤层正确+1
-                    layer_acc += 1  # 烤层正确+1
-                    c_layer_right_list.append(str(c) + "/m" + file)  # 正确将名字写入c_layer_right_list中
-
-                bboxes_pr, layer_n, best_bboxes = correct_bboxes(bboxes_pr, layer_n, best_bboxes)  # 矫正输出结果
-                if len(bboxes_pr) == 0:  # 无任何结果返回，输出并统计+1
-                    error_noresults += 1
-                    shutil.copy(image_path, noresult_dir + "/" + file)
-                else:
-                    pre = bboxes_pr[0][-1]
-                    food_img_pre.append(pre)
-                    food_img_true.append(classes_id[classes[i]])
-
-                    if pre == classes_id[classes[i]]:  # 若结果正确，食材正确数+1
-                        food_acc_m += 1
-                        food_acc += 1
-                        c_food_right_list.append(str(c) + "/m" + file)  # 食材正确将名字写入c_food_right_list中
-                    else:
-                        right_label_m = he_foods(pre)
-                        if right_label_m:  # 合并后结果正确
-                            food_acc_m += 1
-                            food_acc += 1
-                            c_food_right_list.append(str(c) + "/m" + file)  # 食材正确将名字写入c_food_right_list中
-                        else:
-                            drawed_img_save_to_path = str(image_path).split("/")[-1]
-                            drawed_img_save_to_path = str(drawed_img_save_to_path).split(".")[0] + "_" + str(
-                                layer_n) + ".jpg"  # 图片保存地址，烤层结果在命名中
-                            shutil.copy(save_c_dir + "/" + drawed_img_save_to_path,
-                                        fooderror_dirs + "/" + file.split(".jpg")[0] + "_" + str(layer_n) + "_" + str(
-                                            pre) + ".jpg")
-                            shutil.copy(image_path, fooderror_dirs + "/" + file.split(".jpg")[0] + "_{}.jpg".format(
-                                new_classes[pre]))
-
-        if len(os.listdir(img_dirs + "/middle")) == 0:  # 判断是否有值
-            layer_middle_acc = 0
-            food_middle_acc = 0
-        else:
-            layer_middle_acc = round(layer_acc_m / len(os.listdir(img_dirs + "/middle")), 2)
-            food_middle_acc = round(food_acc_m / len(os.listdir(img_dirs + "/middle")), 2)
-        sheet1.write(i + 2, 3, layer_middle_acc)  # 中层烤层准确率写入
-        sheet1.write(i + 2, 4, food_middle_acc)  # 中层食材准确率写入
-        # 上层结果查看
-        for file in tqdm(os.listdir(img_dirs + "/top")):  # 上层
-            if file.endswith("jpg"):
-                all_jpgs += 1  # 统计总jpg图片数量
-                image_path = img_dirs + "/top" + "/" + file
-                bboxes_pr, layer_n, best_bboxes = Y.result(image_path, save_c_dir)  # 预测每一张结果并保存
-
-                layer_img_true.append(2)  # 烤层真实结果
-                layer_img_pre.append(layer_n)  # 烤层预测结果
-                if layer_n != 2:  # 判断烤层是否为2
-                    shutil.copy(image_path,
-                                layer_error_c_dirs + "/" + file.split(".jpg")[0] + "_" + str(layer_n) + ".jpg")
-                else:
-                    layer_acc_t += 1  # 上层烤层正确+1
-                    layer_acc += 1  # 烤层正确+1
-                    c_layer_right_list.append(str(c) + "/t" + file)  # 正确将名字写入c_layer_right_list中
-
-                bboxes_pr, layer_n, best_bboxes = correct_bboxes(bboxes_pr, layer_n, best_bboxes)  # 矫正输出结果
-                if len(bboxes_pr) == 0:  # 无任何结果返回，输出并统计+1
-                    error_noresults += 1
-                    shutil.copy(image_path, noresult_dir + "/" + file)
-                else:
-                    bboxes_pr, layer_n, best_bboxes = correct_bboxes(bboxes_pr, layer_n, best_bboxes)  # 矫正输出结果
-                    if len(bboxes_pr) == 0:
-                        error_noresults += 1
-                        shutil.copy(image_path, noresult_dir + "/" + file)
-                    else:
-                        pre = bboxes_pr[0][-1]
-                        food_img_pre.append(pre)
-                        food_img_true.append(classes_id[classes[i]])
-
-                        if pre == classes_id[classes[i]]:  # 若结果正确，食材正确数+1
-                            food_acc_t += 1
-                            food_acc += 1
-                            c_food_right_list.append(str(c) + "/t" + file)  # 食材正确将名字写入c_food_right_list中
-                        else:
-                            right_label_t = he_foods(pre)
-                            if right_label_t:  # 合并后结果正确
-                                food_acc_t += 1
-                                food_acc += 1
-                                c_food_right_list.append(str(c) + "/t" + file)  # 食材正确将名字写入c_food_right_list中
-                            else:
-                                drawed_img_save_to_path = str(image_path).split("/")[-1]
-                                drawed_img_save_to_path = str(drawed_img_save_to_path).split(".")[0] + "_" + str(
-                                    layer_n) + ".jpg"  # 图片保存地址，烤层结果在命名中
-                                shutil.copy(save_c_dir + "/" + drawed_img_save_to_path,
-                                            fooderror_dirs + "/" + file.split(".jpg")[0] + "_" + str(
-                                                layer_n) + "_" + str(
-                                                pre) + ".jpg")
-                                shutil.copy(image_path, fooderror_dirs + "/" + file.split(".jpg")[0] + "_{}.jpg".format(
-                                    new_classes[pre]))
-
-        if len(os.listdir(img_dirs + "/top")) == 0:  # 判断是否有值
-            layer_top_acc = 0
-            food_top_acc = 0
-        else:
-            layer_top_acc = round(layer_acc_t / len(os.listdir(img_dirs + "/top")), 2)
-            food_top_acc = round(food_acc_t / len(os.listdir(img_dirs + "/top")), 2)
-        sheet1.write(i + 2, 5, layer_top_acc)  # 上层烤层准确率写入
-        sheet1.write(i + 2, 6, food_top_acc)  # 上层食材准确率写入
-        # 其他层结果查看
-        for file in tqdm(os.listdir(img_dirs + "/others")):  # 其他层
-            if file.endswith("jpg"):
-                all_jpgs += 1  # 统计总jpg图片数量
-                image_path = img_dirs + "/others" + "/" + file
-                bboxes_pr, layer_n, best_bboxes = Y.result(image_path, save_c_dir)  # 预测每一张结果并保存
-
-                layer_img_true.append(3)  # 烤层真实结果
-                layer_img_pre.append(layer_n)  # 烤层预测结果
-                if layer_n != 3:  # 判断烤层是否为3
-                    shutil.copy(image_path,
-                                layer_error_c_dirs + "/" + file.split(".jpg")[0] + "_" + str(layer_n) + ".jpg")
-                else:
-                    layer_acc_o += 1  # 上层烤层正确+1
-                    layer_acc += 1  # 烤层正确+1
-                    c_layer_right_list.append(str(c) + "/o" + file)  # 正确将名字写入c_layer_right_list中
-
-                bboxes_pr, layer_, best_bboxesn = correct_bboxes(bboxes_pr, layer_n, best_bboxes)  # 矫正输出结果
-                if len(bboxes_pr) == 0:  # 无任何结果返回，输出并统计+1
-                    error_noresults += 1
-                    shutil.copy(image_path, noresult_dir + "/" + file)
-                else:
-                    pre = bboxes_pr[0][-1]
-                    food_img_pre.append(pre)
-                    food_img_true.append(classes_id[classes[i]])
-
-                    if pre == classes_id[classes[i]]:  # 若结果正确，食材正确数+1
-                        food_acc_o += 1
-                        food_acc += 1
-                        c_food_right_list.append(str(c) + "/o" + file)  # 食材正确将名字写入c_food_right_list中
-                    else:
-                        right_label_o = he_foods(pre)
-                        if right_label_o:  # 合并后结果正确
-                            food_acc_o += 1
-                            food_acc += 1
-                            c_food_right_list.append(str(c) + "/o" + file)  # 食材正确将名字写入c_food_right_list中
-                        else:
-                            drawed_img_save_to_path = str(image_path).split("/")[-1]
-                            drawed_img_save_to_path = str(drawed_img_save_to_path).split(".")[0] + "_" + str(
-                                layer_n) + ".jpg"  # 图片保存地址，烤层结果在命名中
-                            shutil.copy(save_c_dir + "/" + drawed_img_save_to_path,
-                                        fooderror_dirs + "/" + file.split(".jpg")[0] + "_" + str(layer_n) + "_" + str(
-                                            pre) + ".jpg")
-                            shutil.copy(image_path, fooderror_dirs + "/" + file.split(".jpg")[0] + ".jpg".format(
-                                new_classes[pre]))
-
-        if len(os.listdir(img_dirs + "/others")) == 0:  # 判断是否有值
-            layer_others_acc = 0
-            food_others_acc = 0
-        else:
-            layer_others_acc = round(layer_acc_o / len(os.listdir(img_dirs + "/others")), 2)
-            food_others_acc = round(food_acc_o / len(os.listdir(img_dirs + "/others")), 2)
-        sheet1.write(i + 2, 7, layer_others_acc)  # 烤层-其他，准确率写入
-        sheet1.write(i + 2, 8, food_others_acc)  # 烤层-其他食材准确率写入
-
-        sheet1.write(i + 2, 0, c)
-
-        sheet1.write(i + 2, 9, all_jpgs)  # 写入正确总数
-        sheet1.write(i + 2, 10, layer_acc)  # 写入烤层正确数
-        sheet1.write(i + 2, 11, food_acc)  # 写入食材正确数
-
-        sheet1.write(i + 2, 12, round((layer_acc / all_jpgs) * 100, 2))
-        sheet1.write(i + 2, 13, round((food_acc / all_jpgs) * 100, 2))
-        sheet1.write(i + 2, 14, error_noresults)
-
-        # 烤层和烤盘均正确数量
-        layer_and_food_right = set(c_food_right_list) & set(c_layer_right_list)
-        sheet1.write(i + 2, 15, len(list(layer_and_food_right)))
-
-        print("food name:", c)
-        print("layer accuracy:", round((layer_acc / all_jpgs) * 100, 2))  # 输出烤层正确数
-        jpgs_count_all += all_jpgs
-        layer_jpgs_acc += layer_acc
-        food_jpgs_acc += food_acc
-    print("all layer accuracy:", round((layer_jpgs_acc / jpgs_count_all) * 100, 2))  # 输出烤层正确数
-    print("all food accuracy:", round((food_jpgs_acc / jpgs_count_all) * 100, 2))  # 输出食材正确数
-
-    layer_conf = confusion_matrix(y_pred=layer_img_pre, y_true=layer_img_true)
-    food_conf = confusion_matrix(y_pred=food_img_pre, y_true=food_img_true)
-
-    sheet2 = workbook.add_sheet("food_confusion_matrix")
-    classes_ = ["beefsteak", "cartooncookies", "chickenwings", "chiffoncake6", "chiffoncake8",
-                "cookies", "cranberrycookies", "cupcake", "eggtart", "nofood",
-                "peanuts", "pizzacut", "pizzaone", "pizzatwo", "porkchops",
-                "potatocut", "potatol", "potatos", "sweetpotatocut", "sweetpotatol",
-                "sweetpotatos", "roastedchicken", "toast", "chestnut", "cornone",
-                "corntwo", "drumsticks", "taro", "steamedbread", "eggplant",
-                "eggplant_cut_sauce", "bread", "container_nonhigh", "container",
-                "fish", "hotdog", "redshrimp", "shrimp", "strand"]
-    for i in range(len(classes_)):
-        sheet2.write(i + 1, 0, classes_[i])
-        sheet2.write(0, i + 1, classes_[i])
-    for i in range(food_conf.shape[0]):
-        for j in range(food_conf.shape[1]):
-            sheet2.write(i + 1, j + 1, str(food_conf[i, j]))
-
-    print(layer_conf)
-    print(sum(sum(layer_conf)))
-    print(food_conf)
-    print(sum(sum(food_conf)))
-
-    sheet1.write(55, 1, jpgs_count_all)
-    sheet1.write(55, 2, layer_jpgs_acc)
-    sheet1.write(55, 3, food_jpgs_acc)
-    sheet1.write(55, 4, round((layer_jpgs_acc / jpgs_count_all) * 100, 2))
-    sheet1.write(55, 5, round((food_jpgs_acc / jpgs_count_all) * 100, 2))
-
-    workbook.save("F:/test_from_yejing_202010/results/all_80_{0}{1}.xls".format(mode, tag))
-
-    end_time = time.time()
-    print("all jpgs time:", end_time - end0_time)

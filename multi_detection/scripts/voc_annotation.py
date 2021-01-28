@@ -204,11 +204,11 @@ def check_txt(txt_path):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--data_path",
-                        default="E:/DataSets/X_3660_data/bu/serve_data/202012030843")
+                        default="E:/DataSets/X_3660_data/bu/serve_data/20210115")
     parser.add_argument("--train_annotation",
-                        default="E:/DataSets/X_3660_data/bu/serve_data/202012030843/train42.txt")
+                        default="E:/DataSets/X_3660_data/bu/serve_data/20210115/train42.txt")
     parser.add_argument("--test_annotation",
-                        default="E:/DataSets/X_3660_data/bu/serve_data/202012030843/test42.txt")
+                        default="E:/DataSets/X_3660_data/bu/serve_data/20210115/test42.txt")
     # parser.add_argument("--val_annotation",
     #                     default="E:/DataSets/X_3660_data/val39.txt")
     flags = parser.parse_args()

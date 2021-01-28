@@ -62,6 +62,9 @@ def draw_bbox(image, bboxes, show_label=True):
     bboxes: [x_min, y_min, x_max, y_max, probability, cls_id] format coordinates.
     """
     classes = read_class_names(cfg.YOLO.CLASSES)
+    classes[40] = "ptatom"
+    classes[41] = "sweetpotatom"
+    classes[101] = "chiffon_size4"
     num_classes = len(classes)
     image_h, image_w, _ = image.shape
     hsv_tuples = [(1.0 * x / num_classes, 1., 1.) for x in range(num_classes)]
@@ -162,7 +165,7 @@ def nms(bboxes, iou_threshold, sigma=0.3, method='nms'):
     return best_bboxes
 
 
-def postprocess_boxes_conf1(pred_bbox, org_img_shape, input_size, score_threshold):
+def postprocess_boxes_conf(pred_bbox, org_img_shape, input_size, score_threshold):
     valid_scale = [0, np.inf]
     pred_bbox = np.array(pred_bbox)
 
@@ -196,12 +199,12 @@ def postprocess_boxes_conf1(pred_bbox, org_img_shape, input_size, score_threshol
     # # (5) discard some boxes with low scores
     classes = np.argmax(pred_prob, axis=-1)
     scores = pred_conf * pred_prob[np.arange(len(pred_coor)), classes]
-    scores1 = pred_prob[np.arange(len(pred_coor)), classes]
+    # scores1 = pred_prob[np.arange(len(pred_coor)), classes]
     score_mask = scores > score_threshold
     mask = np.logical_and(scale_mask, score_mask)
     coors, scores, classes = pred_coor[mask], scores[mask], classes[mask]
-    scores1 = scores1[mask]
-    return np.concatenate([coors, scores1[:, np.newaxis], classes[:, np.newaxis]], axis=-1)
+    # scores1 = scores1[mask]
+    return np.concatenate([coors, scores[:, np.newaxis], classes[:, np.newaxis]], axis=-1)
 
 def postprocess_boxes(pred_bbox, org_img_shape, input_size, score_threshold):
     valid_scale = [0, np.inf]
