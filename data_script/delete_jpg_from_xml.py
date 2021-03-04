@@ -45,11 +45,13 @@ def delete_xmljpg_diff(img_dir, xml_dir, cut_save_dir):
     print("已标注总数：", len(xml_name_list))
     print("已标注，但图片已删除名称：")
     for i in xml_name_list:
+        # print(i)
         if not i.endswith(".xml"):
             os.remove(xml_dir + "/" + i)
-        if str(i.split(".xml")[0] + ".jpg") not in img_name_list:
-            print(xml_dir + "/" + i)
-            shutil.move(xml_dir + "/" + i, xml_cut_save_dir + "/" + i)
+        else:
+            if str(i.split(".xml")[0] + ".jpg") not in img_name_list:
+                print(xml_dir + "/" + i)
+                shutil.move(xml_dir + "/" + i, xml_cut_save_dir + "/" + i)
         # try:
         #     if not i.endswith(".xml"):
         #         os.remove(img_dir + "/" + i)
@@ -61,9 +63,9 @@ def delete_xmljpg_diff(img_dir, xml_dir, cut_save_dir):
 
 
 if __name__ == "__main__":
-    xml_root = "F:serve_data/OVEN/for_model/Annotations"
-    img_root = "F:serve_data/OVEN/for_model/JPGImages"
-    cut_save_root = "F:serve_data/OVEN/for_model/cut"
+    img_root = "E:/已标数据备份/二期数据/JPGImages"
+    xml_root = "E:/已标数据备份/二期数据/Annotations"
+    cut_save_root = "E:/已标数据备份/二期数据/cut"
     if not os.path.exists(cut_save_root): os.mkdir(cut_save_root)
     # cls_list = ["beefsteak", "bread", "cartooncookies", "chestnut", "chickenwings",
     #             "chiffoncake6", "chiffoncake8", "container", "container_nonhigh", "cookies",
@@ -75,9 +77,9 @@ if __name__ == "__main__":
     #             "sweetpotatos", "taro", "toast", "duck"]
     cls_list = os.listdir(img_root)
     for c in tqdm(cls_list):
-        print(c)
-        img_dir = img_root + "/" + c
-        xml_dir = xml_root + "/" + c
-        cut_save_dir=cut_save_root + "/" + c
-        if not os.path.exists(cut_save_dir): os.mkdir(cut_save_dir)
-        delete_xmljpg_diff(img_dir, xml_dir, cut_save_dir)
+        if not c.endswith("xls"):
+            img_dir = img_root + "/" + c
+            xml_dir = xml_root + "/" + c
+            cut_save_dir = cut_save_root + "/" + c
+            if not os.path.exists(cut_save_dir): os.mkdir(cut_save_dir)
+            delete_xmljpg_diff(img_dir, xml_dir, cut_save_dir)

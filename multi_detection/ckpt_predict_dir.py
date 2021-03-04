@@ -34,7 +34,7 @@ class YoloPredict(object):
         self.score_threshold = 0.8
         self.iou_threshold = 0.5
         self.top_n = 5
-        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food5/20210127/yolov3_train_loss=5.9155.ckpt-148"  # ckpt文件地址
+        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food5/20210224/yolov3_train_loss=5.9418.ckpt-148" # ckpt文件地址
         # self.weight_file = "./checkpoint/yolov3_train_loss=4.7681.ckpt-80"
         self.write_image = False  # 是否画图
         self.show_label = True  # 是否显示标签
@@ -69,7 +69,7 @@ class YoloPredict(object):
         例如
         [(18, 0.9916), (19, 0.0105), (15, 0.0038), (1, 0.0018), (5, 0.0016), (13, 0.0011)]
         '''
-        bboxes = utils.postprocess_boxes_conf(pred_bbox, (org_h, org_w), self.input_size, self.score_cls_threshold)
+        bboxes = utils.postprocess_boxes(pred_bbox, (org_h, org_w), self.input_size, self.score_cls_threshold)
         classes_in_img = list(set(bboxes[:, 5]))
         best_bboxes = {}
         for cls in classes_in_img:
@@ -140,11 +140,11 @@ class YoloPredict(object):
 if __name__ == '__main__':
     start_time = time.time()
 
-    img_root = "F:/serve_data/OVEN/202101/peanuts_test0127"  # 图片文件地址
+    img_root = "F:/serve_data/OVEN/nofood148"  # 图片文件地址
 
-    layer_data_root = "F:/serve_data/OVEN/202101/peanuts_test_layer_data"
+    layer_data_root = "F:/serve_data/OVEN/nofood148_layer_data"
     if not os.path.exists(layer_data_root): os.mkdir(layer_data_root)
-    save_root = "F:/serve_data/OVEN/202101/peanuts_test_detection"
+    save_root = "F:/serve_data/OVEN/nofood148_detection"
     if not os.path.exists(save_root): os.mkdir(save_root)
     Y = YoloPredict()
     end_time0 = time.time()

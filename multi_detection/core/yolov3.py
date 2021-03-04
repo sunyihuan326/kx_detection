@@ -9,7 +9,6 @@ import multi_detection.core.utils as utils
 import multi_detection.core.common as common
 import multi_detection.core.backbone as backbone
 from multi_detection.core.config import cfg
-import math
 
 
 class YOLOV3(object):
@@ -46,16 +45,16 @@ class YOLOV3(object):
 
     def __build_nework(self, input_data):
 
-        route_1, route_2, input_data = backbone.darknet53(input_data, self.trainable)
-        out = tf.layers.flatten(input_data)
+        self.route_1, self.route_2, self.input_data = backbone.darknet53(input_data, self.trainable)
+        self.out = tf.layers.flatten(self.input_data)
         # out = tf.layers.dense(out, 400, activation=tf.nn.relu)
-        out = tf.layers.dense(out, self.layer_nums)  # layer 输出
+        out = tf.layers.dense(self.out, self.layer_nums)  # layer 输出
 
         # input_data = common.convolutional(input_data, (1, 1, 1024, 512), self.trainable, 'conv52')
         # input_data = common.convolutional(input_data, (3, 3, 512, 1024), self.trainable, 'conv53')
         # input_data = common.convolutional(input_data, (1, 1, 1024, 512), self.trainable, 'conv54')
         # input_data = common.convolutional(input_data, (3, 3, 512, 1024), self.trainable, 'conv55')
-        input_data = common.convolutional(input_data, (1, 1, 1024, 512), self.trainable, 'conv56')
+        input_data = common.convolutional(self.input_data, (1, 1, 1024, 512), self.trainable, 'conv56')
 
         conv_lobj_branch = common.convolutional(input_data, (3, 3, 512, 1024), self.trainable, name='conv_lobj_branch')
         conv_lbbox = common.convolutional(conv_lobj_branch, (1, 1, 1024, 3 * (self.num_class + 5)),
@@ -65,7 +64,7 @@ class YOLOV3(object):
         input_data = common.upsample(input_data, name='upsample0', method=self.upsample_method)
 
         with tf.variable_scope('route_1'):
-            input_data = tf.concat([input_data, route_2], axis=-1)
+            input_data = tf.concat([input_data, self.route_2], axis=-1)
 
         input_data = common.convolutional(input_data, (1, 1, 768, 256), self.trainable, 'conv58')
         # input_data = common.convolutional(input_data, (3, 3, 256, 512), self.trainable, 'conv59')
@@ -81,7 +80,7 @@ class YOLOV3(object):
         input_data = common.upsample(input_data, name='upsample1', method=self.upsample_method)
 
         with tf.variable_scope('route_2'):
-            input_data = tf.concat([input_data, route_1], axis=-1)
+            input_data = tf.concat([input_data, self.route_1], axis=-1)
 
         input_data = common.convolutional(input_data, (1, 1, 384, 128), self.trainable, 'conv64')
         # input_data = common.convolutional(input_data, (3, 3, 128, 256), self.trainable, 'conv65')
@@ -159,8 +158,8 @@ class YOLOV3(object):
         enclose_left_up = tf.minimum(boxes1[..., :2], boxes2[..., :2])
         enclose_right_down = tf.maximum(boxes1[..., 2:], boxes2[..., 2:])
         enclose = tf.maximum(enclose_right_down - enclose_left_up, 0.0)
-        enclose_area = tf.maximum(enclose[..., 0] * enclose[..., 1], 1e-5)
-        giou = iou - 1.0 * (enclose_area - union_area) / enclose_area
+        enclose_area = enclose[..., 0] * enclose[..., 1]
+        giou = iou - 1.0 * (enclose_area - union_area) /tf.maximum(enclose_area,1e-5) 
 
         return giou
 
@@ -180,7 +179,7 @@ class YOLOV3(object):
         inter_section = tf.maximum(right_down - left_up, 0.0)
         inter_area = inter_section[..., 0] * inter_section[..., 1]
         union_area = boxes1_area + boxes2_area - inter_area
-        iou = 1.0 * inter_area / union_area
+        iou = 1.0 * inter_area / tf.maximum(union_area,1e-5)
 
         return iou
 

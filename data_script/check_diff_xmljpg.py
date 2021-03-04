@@ -41,11 +41,12 @@ def check_layerjpg_diff(img_dir, layer_dir):
     :param layer_dir: layer数据地址
     :return:
     '''
-    layer_name_list=[]
+    layer_name_list = []
     for b in os.listdir(layer_dir):
-        if b in ["bottom","middle","top","others"]:
-            for jpg in os.listdir(layer_dir+"/"+b):
-                layer_name_list.append(jpg.split(".")[0])
+        if b in ["bottom", "middle", "top", "others"]:
+            if os.path.exists(layer_dir + "/" + b):
+                for jpg in os.listdir(layer_dir + "/" + b):
+                    layer_name_list.append(jpg.split(".")[0])
 
     img_name_list = [o.split(".")[0] for o in os.listdir(img_dir)]
 
@@ -65,8 +66,8 @@ def check_layerjpg_diff(img_dir, layer_dir):
 
 
 if __name__ == "__main__":
-    img_dir = "E:/DataSets/All_data_0923/JPGImages"
-    xml_dir = "E:/DataSets/All_data_0923/Annotations"
-    layer_dir="E:/DataSets/All_data_0923/layer_data"
+    img_dir = "E:/已标数据备份/X新模组数据/X/JPGImages"
+    xml_dir = "E:/已标数据备份/X新模组数据/X/Annotations"
+    layer_dir = "E:/已标数据备份/X新模组数据/X/layer_data"
     check_xmljpg_diff(img_dir, xml_dir)
-    check_layerjpg_diff(img_dir,layer_dir)
+    check_layerjpg_diff(img_dir, layer_dir)

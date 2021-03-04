@@ -4,11 +4,10 @@
 
 import os
 import cv2
-from PIL import Image, ImageEnhance, ImageFilter
-from skimage import util
 import random
 import numpy as np
 import tensorflow as tf
+from PIL import Image, ImageEnhance, ImageFilter
 import multi_detection.core.utils as utils
 from multi_detection.core.config import cfg
 
@@ -20,7 +19,7 @@ class Dataset(object):
         self.annot_path = cfg.TRAIN.ANNOT_PATH if dataset_type == 'train' else cfg.TEST.ANNOT_PATH
         self.input_sizes = cfg.TRAIN.INPUT_SIZE if dataset_type == 'train' else cfg.TEST.INPUT_SIZE
         self.batch_size = cfg.TRAIN.BATCH_SIZE if dataset_type == 'train' else cfg.TEST.BATCH_SIZE
-        self.batch_size = 4 * self.batch_size
+        self.batch_size = self.batch_size
         self.data_aug = cfg.TRAIN.DATA_AUG if dataset_type == 'train' else cfg.TEST.DATA_AUG
 
         self.train_input_size = cfg.TRAIN.INPUT_SIZE
@@ -73,9 +72,9 @@ class Dataset(object):
                     if index >= self.num_samples: index -= self.num_samples
                     annotation = self.annotations[index]
                     image, layer_label, bboxes = self.parse_annotation(annotation)
+
                     label_sbbox, label_mbbox, label_lbbox, sbboxes, mbboxes, lbboxes = self.preprocess_true_boxes(
                         bboxes)
-
                     batch_image[num, :, :, :] = image
                     batch_layerlabel[num] = int(layer_label)  # batch layer标签
                     batch_label_sbbox[num, :, :, :, :] = label_sbbox
@@ -147,78 +146,37 @@ class Dataset(object):
 
         return image, bboxes
 
-    def random_blur(self, image):
-        if random.random() < 0.5:
-            h, w, _ = image.shape
-            b_x_min = random.randint(100, int(3 * w / 4))
-            b_y_min = random.randint(100, int(3 * h / 4))
-            x_ = random.randint(50, 600)
-            y_ = random.randint(50, 600)
-            img2 = image[b_x_min:min(b_x_min + x_, w), b_y_min:min(b_y_min + y_, h), :]
-            img2 = cv2.GaussianBlur(img2, (9, 9), 50)
-            image[b_x_min:min(b_x_min + x_, w), b_y_min:min(b_y_min + y_, h), :] = img2
-        return image
-
     def parse_annotation(self, annotation):
 
         line = annotation.split()
         image_path = line[0]
-        # print(image_path)
 
         if not os.path.exists(image_path):
             raise KeyError("%s does not exist ... " % image_path)
-        # image = np.array(cv2.imread(image_path))
         image = Image.open(image_path)
         if self.data_aug:
-            if random.random() < 0.2:  # 灰度数据
-                image = image.convert("L")
-                image = np.array(image)
-                w, h = image.shape
-                image_ = np.zeros((w, h, 3))
-                image_[:, :, 0] = image
-                image_[:, :, 1] = image
-                image_[:, :, 2] = image
-                image = image_
-            else:
-                if random.random() < 0.5:
-                    image = ImageEnhance.Contrast(image)  # 对比度增强
-                    image = image.enhance(random.uniform(0.6, 1.2))  # 增强系数[0.6, 1.2]
-                if random.random() < 0.5:
-                    image = ImageEnhance.Brightness(image)  # 亮度调整
-                    image = image.enhance(random.uniform(0.7, 1.2))  # 亮度调整系数[0.7, 1.2]
-                if random.random() < 0.5:
-                    image = ImageEnhance.Sharpness(image)  # 锐度增强
-                    image = image.enhance(random.uniform(0.8, 1.3))  # 亮度调整系数[0.5, 2]
-                if random.random() < 0.5:
-                    image = ImageEnhance.Color(image)  # 颜色增强
-                    image = image.enhance(random.uniform(0.3, 3))  # 颜色调整系数[0.3, 3]
-                if random.random() < 0.5:
-                    image = util.random_noise(np.array(image), mode="gaussian")  # 加入高斯噪声,输出值为[0,1],需乘以255
-                    image = image * 255
-                image = np.array(image)
-
-        else:
+            if random.random() < 0.5:
+                image = ImageEnhance.Contrast(image)  # 对比度增强
+                image = image.enhance(random.uniform(0.6, 1.2))  # 增强系数[0.6, 1.2]
+            if random.random() < 0.5:
+                image = ImageEnhance.Brightness(image)  # 亮度调整
+                image = image.enhance(random.uniform(0.7, 1.2))  # 亮度调整系数[0.7, 1.2]
+            if random.random() < 0.5:
+                image = ImageEnhance.Sharpness(image)  # 锐度调整
+                image = image.enhance(random.uniform(0.8, 1.8))  # 调整系数[0.8, 1.8]
             image = np.array(image)
-
         # image = np.array(cv2.cvtColor(cv2.imread(image_path), cv2.COLOR_RGB2HSV))  # RGB空间转为HSV空间
         layer_label = int(line[1])
 
         bboxes = np.array([list(map(int, box.split(','))) for box in line[2:]])
-        # print("bboxes::::")
-        # print(bboxes)
 
         if self.data_aug:
-            try:
-                image = self.random_blur(np.copy(image))
-            except:
-                pass
             image, bboxes = self.random_horizontal_flip(np.copy(image), np.copy(bboxes))
             image, bboxes = self.random_crop(np.copy(image), np.copy(bboxes))
             image, bboxes = self.random_translate(np.copy(image), np.copy(bboxes))
+
         image, bboxes = utils.image_preporcess(np.copy(image), [self.train_input_size, self.train_input_size],
                                                np.copy(bboxes))
-        # print("bboxes---------------------------------------:")
-        # print(bboxes)
         return image, layer_label, bboxes
 
     def bbox_iou(self, boxes1, boxes2):

@@ -21,9 +21,12 @@ def base64stringtojpg(filedir, dstfiledir):
 
 
 # 源/目标
-
-for kk in os.listdir("F:/serve_data/OVEN"):
-    jpg_dir = "F:/serve_data/OVEN/{}".format(kk)
-    save_dir = "F:/serve_data/OVEN/{}/conver_jpg".format(kk)
-    if not os.path.exists(save_dir): os.mkdir(save_dir)
-    base64stringtojpg(jpg_dir, save_dir)
+jpg_dir = "F:/serve_data/OVEN/202101/20210130"
+save_dir = "F:/serve_data/OVEN/202101/20210130/convet_jpg"
+if not os.path.exists(save_dir): os.mkdir(save_dir)
+base64stringtojpg(jpg_dir, save_dir)
+# for kk in os.listdir("F:/serve_data/OVEN"):
+#     jpg_dir = "F:/serve_data/OVEN/202101/20210130/{}".format(kk)
+#     save_dir = "F:/serve_data/OVEN/{}/conver_jpg".format(kk)
+#     if not os.path.exists(save_dir): os.mkdir(save_dir)
+#     base64stringtojpg(jpg_dir, save_dir)

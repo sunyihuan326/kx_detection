@@ -75,10 +75,10 @@ class YoloTest(object):
         self.input_size = 416  # 输入图片尺寸（默认正方形）
         self.num_classes = 40  # 种类数
         self.score_cls_threshold = 0.001
-        self.score_threshold = 0.8
+        self.score_threshold = 0.6
         self.iou_threshold = 0.5
         self.top_n = 5
-        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food5/20210127/yolov3_train_loss=5.9155.ckpt-148"  # ckpt文件地址
+        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food5/20210224/yolov3_train_loss=5.9418.ckpt-148"  # ckpt文件地址
         # self.weight_file = "./checkpoint/yolov3_train_loss=4.7681.ckpt-80"
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
@@ -113,7 +113,7 @@ class YoloTest(object):
         例如
         [(18, 0.9916), (19, 0.0105), (15, 0.0038), (1, 0.0018), (5, 0.0016), (13, 0.0011)]
         '''
-        bboxes = utils.postprocess_boxes_conf(pred_bbox, (org_h, org_w), self.input_size, self.score_cls_threshold)
+        bboxes = utils.postprocess_boxes(pred_bbox, (org_h, org_w), self.input_size, self.score_cls_threshold)
         classes_in_img = list(set(bboxes[:, 5]))
         best_bboxes = {}
         for cls in classes_in_img:
@@ -169,8 +169,7 @@ class YoloTest(object):
         image = cv2.imread(image_path)  # 图片读取
         # image = Image.open(image_path)
         # image = np.array(image)
-        # image = cv2.cvtColor(image, cv2.COLOR_BGR
-        # 2RGB).astype(np.float32)
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB).astype(np.float32)
         # image = utils.white_balance(image)  # 图片白平衡处理
         bboxes_pr, layer_n, best_bboxes = self.predict(image)  # 预测结果
         # print(bboxes_pr)
@@ -265,8 +264,8 @@ if __name__ == '__main__':
     # 需要修改
     classes_id = classes_id39  #######
     classes = classes_label18  #######    仅2期：classes_label18，所有：classes_label46
-    mode = "0127"  #######
-    tag = ""
+    mode = "0224"  #######
+    tag = "_60"
     img_dir = "F:/test_from_yejing_202010/TXKX_all_20201019_rename"  # 文件夹地址
     # img_dir = "E:/check_2_phase/JPGImages_2"  # 文件夹地址
     save_dir = "F:/test_from_yejing_202010/results/detection_{0}{1}".format(mode, tag)  # 图片保存地址
@@ -630,7 +629,7 @@ if __name__ == '__main__':
     sheet1.write(55, 4, round((layer_jpgs_acc / jpgs_count_all) * 100, 2))
     sheet1.write(55, 5, round((food_jpgs_acc / jpgs_count_all) * 100, 2))
 
-    workbook.save("F:/test_from_yejing_202010/results/all_80_{0}{1}.xls".format(mode, tag))
+    workbook.save("F:/test_from_yejing_202010/results/2phase_{0}{1}.xls".format(mode, tag))
 
     end_time = time.time()
     print("all jpgs time:", end_time - end0_time)

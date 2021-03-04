@@ -62,7 +62,7 @@ class YoloTrain(object):
         with tf.name_scope("define_loss"):
             self.model = YOLOV3(self.input_data, self.trainable)
             self.net_var = tf.global_variables()
-            self.giou_loss, self.conf_loss, self.prob_loss, self.giou, self.bbox_loss_scale = self.model.compute_loss(
+            self.giou_loss, self.conf_loss, self.prob_loss, giou, bbox_loss_scale = self.model.compute_loss(
                 self.label_sbbox, self.label_mbbox, self.label_lbbox,
                 self.true_sbboxes, self.true_mbboxes, self.true_lbboxes)
             self.layer_loss = self.model.layer_loss(self.layer_label)
@@ -168,8 +168,8 @@ class YoloTrain(object):
             train_epoch_loss, test_epoch_loss = [], []
 
             for train_data in pbar:
-                _, summary, train_step_loss, global_step_val, gi, bbo, layer_loss_v = self.sess.run(
-                    [train_op, self.write_op, self.loss, self.global_step, self.giou, self.bbox_loss_scale,
+                _, summary, train_step_loss, global_step_val, layer_loss_v = self.sess.run(
+                    [train_op, self.write_op, self.loss, self.global_step,
                      self.layer_loss], feed_dict={
                         # _, summary, train_step_loss, global_step_val, gi, bbo, = self.sess.run(
                         #     [train_op, self.write_op, self.loss, self.global_step, self.giou, self.bbox_loss_scale,

@@ -143,7 +143,7 @@ if __name__ == "__main__":
     g_t = generate_txt()
     # 生成对应的增强txt文件
     for typ in ["lv", "zi", "hot", "huang"]:
-        aug.img_mist(typ)  # 图片增强处理
+        # aug.img_mist(typ)  # 图片增强处理
         file_path = "E:/DataSets/X_3660_data/bu/serve_data/20210115/JPGImages"
         save_txt_path = "E:/DataSets/X_3660_data/bu/serve_data/20210115/train42_{}.txt".format(typ)
         g_t.change_txt_jpgname(original_txt, save_txt_path, file_path, typ)  # 生成增强单独txt文件

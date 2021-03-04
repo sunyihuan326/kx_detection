@@ -35,7 +35,7 @@ def darknet53(input_data, trainable):
 
         for i in range(3):
             input_data = common.residual_block(input_data, 512, 256, 512, trainable=trainable,
-                                               name='residual%d' % (i + 9))
+                                               name='residual%d' % (i + 11))
 
         route_2 = input_data
         input_data = common.convolutional(input_data, filters_shape=(3, 3, 512, 1024),
@@ -43,6 +43,6 @@ def darknet53(input_data, trainable):
 
         for i in range(2):
             input_data = common.residual_block(input_data, 1024, 512, 1024, trainable=trainable,
-                                               name='residual%d' % (i + 15))
+                                               name='residual%d' % (i + 19))
 
         return route_1, route_2, input_data

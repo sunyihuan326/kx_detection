@@ -8,7 +8,6 @@ import numpy as np
 import tensorflow as tf
 from multi_detection.core.config import cfg
 
-
 def read_class_names(class_file_name):
     '''loads class name from a file'''
     names = {}
@@ -27,32 +26,26 @@ def get_anchors(anchors_path):
 
 
 def image_preporcess(image, target_size, gt_boxes=None):
-    # image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB).astype(np.float32)  #有数据增强需注释
 
-    ih, iw = target_size
-    h, w, _ = image.shape
-    # print("h,w")
-    # print(h,w)
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB).astype(np.float32)
 
-    scale = min(iw / w, ih / h)
-    # print(scale)
-    nw, nh = int(scale * w), int(scale * h)
+    ih, iw    = target_size
+    h,  w, _  = image.shape
+
+    scale = min(iw/w, ih/h)
+    nw, nh  = int(scale * w), int(scale * h)
     image_resized = cv2.resize(image, (nw, nh))
 
     image_paded = np.full(shape=[ih, iw, 3], fill_value=128.0)
-    dw, dh = (iw - nw) // 2, (ih - nh) // 2
-    # print("dw,dh")
-    # print(dw,dh)
-    image_paded[dh:nh + dh, dw:nw + dw, :] = image_resized
+    dw, dh = (iw - nw) // 2, (ih-nh) // 2
+    image_paded[dh:nh+dh, dw:nw+dw, :] = image_resized
     image_paded = image_paded / 255.
 
     if gt_boxes is None:
         return image_paded
 
     else:
-        # print( gt_boxes[:, [0, 2]])
         gt_boxes[:, [0, 2]] = gt_boxes[:, [0, 2]] * scale + dw
-        # print(gt_boxes[:, [0, 2]])
         gt_boxes[:, [1, 3]] = gt_boxes[:, [1, 3]] * scale + dh
         return image_paded, gt_boxes
 
@@ -62,13 +55,9 @@ def draw_bbox(image, bboxes, show_label=True):
     bboxes: [x_min, y_min, x_max, y_max, probability, cls_id] format coordinates.
     """
     classes = read_class_names(cfg.YOLO.CLASSES)
-    classes[40] = "ptatom"
-    classes[41] = "sweetpotatom"
-    classes[101] = "chiffon_size4"
     num_classes = len(classes)
     image_h, image_w, _ = image.shape
     hsv_tuples = [(1.0 * x / num_classes, 1., 1.) for x in range(num_classes)]
-    # hsv_tuples = [(1.0 * x / num_classes, 1., 1.) for x in range(num_classes+3)]
     colors = list(map(lambda x: colorsys.hsv_to_rgb(*x), hsv_tuples))
     colors = list(map(lambda x: (int(x[0] * 255), int(x[1] * 255), int(x[2] * 255)), colors))
 
@@ -87,36 +76,39 @@ def draw_bbox(image, bboxes, show_label=True):
         cv2.rectangle(image, c1, c2, bbox_color, bbox_thick)
 
         if show_label:
-            # print(classes[class_ind])
             bbox_mess = '%s: %.2f' % (classes[class_ind], score)
-            t_size = cv2.getTextSize(bbox_mess, 0, fontScale, thickness=bbox_thick // 2)[0]
-            cv2.rectangle(image, c1, (c1[0] + t_size[0], c1[1] - t_size[1] + 18), bbox_color, -1)  # filled
+            t_size = cv2.getTextSize(bbox_mess, 0, fontScale, thickness=bbox_thick//2)[0]
+            cv2.rectangle(image, c1, (c1[0] + t_size[0], c1[1] - t_size[1] - 3), bbox_color, -1)  # filled
 
-            cv2.putText(image, bbox_mess, (c1[0], c1[1] + 8), cv2.FONT_HERSHEY_SIMPLEX,
-                        fontScale, (0, 0, 0), bbox_thick // 2, lineType=cv2.LINE_AA)
+            cv2.putText(image, bbox_mess, (c1[0], c1[1]-2), cv2.FONT_HERSHEY_SIMPLEX,
+                        fontScale, (0, 0, 0), bbox_thick//2, lineType=cv2.LINE_AA)
 
     return image
 
 
+
 def bboxes_iou(boxes1, boxes2):
+
     boxes1 = np.array(boxes1)
     boxes2 = np.array(boxes2)
 
     boxes1_area = (boxes1[..., 2] - boxes1[..., 0]) * (boxes1[..., 3] - boxes1[..., 1])
     boxes2_area = (boxes2[..., 2] - boxes2[..., 0]) * (boxes2[..., 3] - boxes2[..., 1])
 
-    left_up = np.maximum(boxes1[..., :2], boxes2[..., :2])
-    right_down = np.minimum(boxes1[..., 2:], boxes2[..., 2:])
+    left_up       = np.maximum(boxes1[..., :2], boxes2[..., :2])
+    right_down    = np.minimum(boxes1[..., 2:], boxes2[..., 2:])
 
     inter_section = np.maximum(right_down - left_up, 0.0)
-    inter_area = inter_section[..., 0] * inter_section[..., 1]
-    union_area = boxes1_area + boxes2_area - inter_area
-    ious = np.maximum(1.0 * inter_area / union_area, np.finfo(np.float32).eps)
+    inter_area    = inter_section[..., 0] * inter_section[..., 1]
+    union_area    = boxes1_area + boxes2_area - inter_area
+    ious          = np.maximum(1.0 * inter_area / union_area, np.finfo(np.float32).eps)
 
     return ious
 
 
+
 def read_pb_return_tensors(graph, pb_file, return_elements):
+
     with tf.gfile.FastGFile(pb_file, 'rb') as f:
         frozen_graph_def = tf.GraphDef()
         frozen_graph_def.ParseFromString(f.read())
@@ -165,49 +157,9 @@ def nms(bboxes, iou_threshold, sigma=0.3, method='nms'):
     return best_bboxes
 
 
-def postprocess_boxes_conf(pred_bbox, org_img_shape, input_size, score_threshold):
-    valid_scale = [0, np.inf]
-    pred_bbox = np.array(pred_bbox)
-
-    pred_xywh = pred_bbox[:, 0:4]
-    pred_conf = pred_bbox[:, 4]
-    pred_prob = pred_bbox[:, 5:]
-
-    # # (1) (x, y, w, h) --> (xmin, ymin, xmax, ymax)
-    pred_coor = np.concatenate([pred_xywh[:, :2] - pred_xywh[:, 2:] * 0.5,
-                                pred_xywh[:, :2] + pred_xywh[:, 2:] * 0.5], axis=-1)
-    # # (2) (xmin, ymin, xmax, ymax) -> (xmin_org, ymin_org, xmax_org, ymax_org)
-    org_h, org_w = org_img_shape
-    resize_ratio = min(input_size / org_w, input_size / org_h)
-
-    dw = (input_size - resize_ratio * org_w) / 2
-    dh = (input_size - resize_ratio * org_h) / 2
-
-    pred_coor[:, 0::2] = 1.0 * (pred_coor[:, 0::2] - dw) / resize_ratio
-    pred_coor[:, 1::2] = 1.0 * (pred_coor[:, 1::2] - dh) / resize_ratio
-
-    # # (3) clip some boxes those are out of range
-    pred_coor = np.concatenate([np.maximum(pred_coor[:, :2], [0, 0]),
-                                np.minimum(pred_coor[:, 2:], [org_w - 1, org_h - 1])], axis=-1)
-    invalid_mask = np.logical_or((pred_coor[:, 0] > pred_coor[:, 2]), (pred_coor[:, 1] > pred_coor[:, 3]))
-    pred_coor[invalid_mask] = 0
-
-    # # (4) discard some invalid boxes
-    bboxes_scale = np.sqrt(np.multiply.reduce(pred_coor[:, 2:4] - pred_coor[:, 0:2], axis=-1))
-    scale_mask = np.logical_and((valid_scale[0] < bboxes_scale), (bboxes_scale < valid_scale[1]))
-
-    # # (5) discard some boxes with low scores
-    classes = np.argmax(pred_prob, axis=-1)
-    scores = pred_conf * pred_prob[np.arange(len(pred_coor)), classes]
-    # scores1 = pred_prob[np.arange(len(pred_coor)), classes]
-    score_mask = scores > score_threshold
-    mask = np.logical_and(scale_mask, score_mask)
-    coors, scores, classes = pred_coor[mask], scores[mask], classes[mask]
-    # scores1 = scores1[mask]
-    return np.concatenate([coors, scores[:, np.newaxis], classes[:, np.newaxis]], axis=-1)
-
 def postprocess_boxes(pred_bbox, org_img_shape, input_size, score_threshold):
-    valid_scale = [0, np.inf]
+
+    valid_scale=[0, np.inf]
     pred_bbox = np.array(pred_bbox)
 
     pred_xywh = pred_bbox[:, 0:4]
@@ -243,41 +195,8 @@ def postprocess_boxes(pred_bbox, org_img_shape, input_size, score_threshold):
     score_mask = scores > score_threshold
     mask = np.logical_and(scale_mask, score_mask)
     coors, scores, classes = pred_coor[mask], scores[mask], classes[mask]
+
     return np.concatenate([coors, scores[:, np.newaxis], classes[:, np.newaxis]], axis=-1)
 
-def white_balance(img):
-    '''
-    图片自动白平衡
-    :param img: 图片
-    :return:
-    '''
-    dst = np.zeros(img.shape, img.dtype)
 
-    # 1.计算三通道灰度平均值
-    imgB, imgG, imgR = cv2.split(img)
 
-    bAve = cv2.mean(imgB)[0]
-    gAve = cv2.mean(imgG)[0]
-    rAve = cv2.mean(imgR)[0]
-
-    Ave = (bAve + gAve + rAve) / 3
-
-    # 2.通道值调整
-    KB = Ave / bAve
-    KG = Ave / gAve
-    KR = Ave / rAve
-
-    # 3使用增益系数
-    imgB = imgB * KB
-    imgG = imgG * KG
-    imgR = imgR * KR
-
-    # # 4将数组元素后处理
-    imgB = np.clip(imgB, 0, 255)
-    imgG = np.clip(imgG, 0, 255)
-    imgR = np.clip(imgR, 0, 255)
-
-    dst[:, :, 0] = imgB
-    dst[:, :, 1] = imgG
-    dst[:, :, 2] = imgR
-    return dst

@@ -41,7 +41,7 @@ def from_txt_copy_data2all(txt_path, save_dir, jpg_typ, layer_tpy=False):
             img_name = file.strip().split(" ")[0]
             jpg_name = str(img_name).split("/")[-1]
             cls = int(file.strip().split(" ")[-1].split(",")[-1])
-            if "_hot.jpg" not in file and "_zi.jpg" not in file and "_lv.jpg" not in file:
+            if "_hot.jpg" not in file and "_zi.jpg" not in file and "_lv.jpg" not in file and "_huang.jpg" not in file:
                 shutil.copy(img_name, save_dir + "/" + jpg_name)
                 if layer_tpy:
                     if file.split(" ")[1] == "0":
@@ -76,11 +76,12 @@ def from_txt_copy_data2all(txt_path, save_dir, jpg_typ, layer_tpy=False):
             na = str(jpg_name.split(".jpg")[0]) + ".xml"
             xml_path = img_name.split("JPGImages")[0] + "Annotations/" + na
             cls = int(file.strip().split(" ")[-1][-1])
-            if "_hot.jpg" not in file and "_zi.jpg" not in file and "_lv.jpg" not in file:
+            if "_hot.jpg" not in file and "_zi.jpg" not in file and "_lv.jpg"  not in file and "_huang.jpg" not in file:
+                # shutil.copy(xml_path, save_dir + "/" + na)
                 try:
                     shutil.copy(xml_path, save_dir + "/" + na)
                 except:
-                    print(na)
+                    print(xml_path)
             # if cls == 37:
             #     try:
             #         shutil.copy(xml_path, save_dir + "/" + na)
@@ -89,8 +90,11 @@ def from_txt_copy_data2all(txt_path, save_dir, jpg_typ, layer_tpy=False):
 
 
 if __name__ == "__main__":
-    txt_path = "E:/DataSets/X_3660_data/train39_zi_hot_and_old_strand.txt"
-    save_dir = "E:/DataSets/All_data_0923/JPGImages"
+    txt_path =  "E:/DataSets/X_3660_data/test39.txt"
+    save_dir = "E:/DataSets/X_3660_data/all_data/JPGImages_test"
     if not os.path.exists(save_dir): os.mkdir(save_dir)
     from_txt_copy_data2all(txt_path, save_dir, "jpg", True)
-    from_txt_copy_data2all(txt_path, "E:/DataSets/All_data_0923/Annotations", "xml", False)
+
+    save_dir_anno = "E:/DataSets/X_3660_data/all_data/Annotations_test"
+    if not os.path.exists(save_dir_anno): os.mkdir(save_dir_anno)
+    from_txt_copy_data2all(txt_path, save_dir_anno, "xml", False)
