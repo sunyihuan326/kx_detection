@@ -23,24 +23,24 @@ __C.YOLO.DEMO_WEIGHT                 = "./yolo3_coco/yolov3_coco.ckpt"
 # Train options
 __C.TRAIN = edict()
 
-__C.TRAIN.ANNOT_PATH                 = "E:/DataSets/X_3660_data/train39_zi_hot_and_old_strand_900hotdog.txt"
+__C.TRAIN.ANNOT_PATH                 = "E:/DataSets/model_data/train42.txt"
 __C.TRAIN.BATCH_SIZE                 = 4
-__C.TRAIN.INPUT_SIZE                 = 640
+__C.TRAIN.INPUT_SIZE                 = 320
 __C.TRAIN.DATA_AUG                   = True
 __C.TRAIN.LEARN_RATE_INIT            = 1e-4
 __C.TRAIN.LEARN_RATE_END             = 1e-6
 __C.TRAIN.WARMUP_EPOCHS              = 10
-__C.TRAIN.FISRT_STAGE_EPOCHS         = 50
+__C.TRAIN.FISRT_STAGE_EPOCHS         = 20
 __C.TRAIN.SECOND_STAGE_EPOCHS        = 30
 # __C.TRAIN.INITIAL_WEIGHT             = "E:/ckpt_dirs/Food_detection/multi_food3/20200604_22class/yolov3_train_loss=4.9799.ckpt-158"
-__C.TRAIN.INITIAL_WEIGHT             = "./checkpoint/yolov3_train_loss=9.2850.ckpt-28"
+__C.TRAIN.INITIAL_WEIGHT             = "./checkpoint/yolov3_train_loss=19.8911.ckpt-13"
 
 # TEST options
 __C.TEST = edict()
 
-__C.TEST.ANNOT_PATH                  ="E:/DataSets/X_3660_data/test39.txt"
+__C.TEST.ANNOT_PATH                  ="E:/DataSets/model_data/test42.txt"
 __C.TEST.BATCH_SIZE                  = 2
-__C.TEST.INPUT_SIZE                  = 640
+__C.TEST.INPUT_SIZE                  = 320
 __C.TEST.DATA_AUG                    = False
 __C.TEST.WRITE_IMAGE                 = True
 __C.TEST.WRITE_IMAGE_PATH            = "./data/detection"

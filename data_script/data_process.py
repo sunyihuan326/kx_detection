@@ -125,7 +125,7 @@ class process(object):
             file_dir = self.xml_root
         else:
             file_dir = self.image_root
-        for c in classes:
+        for c in tqdm(classes):
             for file in os.listdir(file_dir + "/{}".format(c)):
                 file_name = file_dir + "/{}".format(c) + "/" + file
                 shutil.copy(file_name, file_dir + "/" + file)
@@ -202,21 +202,14 @@ class process(object):
 
 
 if __name__ == "__main__":
-    data_root = "E:/DataSets/X_3660_data/bu/serve_data/20210115"
+    data_root = "E:/DataSets/model_data/serve_data2020"
     dprocess = process(data_root)
-    # classes = ["beefsteak", "bread", "cartooncookies", "chestnut", "chickenwings",
-    #             "chiffoncake6", "chiffoncake8", "container", "container_nonhigh", "cookies",
-    #             "cornone", "corntwo", "cranberrycookies", "cupcake", "drumsticks",
-    #             "eggplant", "eggplant_cut_sauce", "eggtart", "fish", "hotdog",
-    #             "peanuts", "pizzacut", "pizzaone", "pizzatwo", "porkchops",
-    #             "potatocut", "potatol", "potatos", "redshrimp", "roastedchicken",
-    #             "shrimp", "steamedbread", "strand", "sweetpotatocut", "sweetpotatol",
-    #             "sweetpotatos", "taro", "toast"]
+
     classes =os.listdir(data_root+"/JPGImages")
     val_percent = 0
-    test_percent = 0.1
-    # dprocess.split_data(classes, test_percent, val_percent)
-    # dprocess.train_all_txt(["train", "test", "val"])
-    # dprocess.copy2dir(classes, "xml")
-    # dprocess.copy2dir(classes, "jpg")
+    test_percent = 0.15
+    dprocess.split_data(classes, test_percent, val_percent)
+    dprocess.train_all_txt(["train", "test", "val"])
+    dprocess.copy2dir(classes, "xml")
+    dprocess.copy2dir(classes, "jpg")
     dprocess.copy_layer2split_dir(classes)

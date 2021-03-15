@@ -44,7 +44,7 @@ def split_jpg_xml(file_root):
                 shutil.move(xml_name, xml_cls_dir + "/" + xml_)
         else:
             no_xml_jpg = jpg_root + "/" + "no_xml_jpg"
-            if os.path.exists(no_xml_jpg): os.mkdir(no_xml_jpg)
+            if not os.path.exists(no_xml_jpg): os.mkdir(no_xml_jpg)
             shutil.move(jpg_name, no_xml_jpg + "/" + j)
 
 

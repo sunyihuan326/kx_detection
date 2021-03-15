@@ -29,5 +29,7 @@ def changeFilename(inputpath):
 
 
 if __name__ == '__main__':
-    inputpath = 'E:/DataSets/KX_FOODSets/Annotations/ChickenWings'  # 这是xml文件的文件夹的绝对地址
-    changeFilename(inputpath)
+    xml_root = "E:/DataSets/model_data/X_data2019/Annotations"
+    for c in os.listdir(xml_root):
+        inputpath = xml_root + "/" + c  # 这是xml文件的文件夹的绝对地址
+        changeFilename(inputpath)

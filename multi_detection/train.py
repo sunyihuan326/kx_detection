@@ -50,6 +50,7 @@ class YoloTrain(object):
             self.input_data = tf.placeholder(dtype=tf.float32,
                                              shape=(None, self.train_input_size, self.train_input_size, 3),
                                              name='input_data')
+            print("self.input_data",self.input_data)
             self.layer_label = tf.placeholder(dtype=tf.float32, name='layer_label')
             self.label_sbbox = tf.placeholder(dtype=tf.float32, name='label_sbbox')
             self.label_mbbox = tf.placeholder(dtype=tf.float32, name='label_mbbox')
@@ -58,6 +59,7 @@ class YoloTrain(object):
             self.true_mbboxes = tf.placeholder(dtype=tf.float32, name='mbboxes')
             self.true_lbboxes = tf.placeholder(dtype=tf.float32, name='lbboxes')
             self.trainable = tf.placeholder(dtype=tf.bool, name='training')
+            print("self.trainable",self.trainable)
 
         with tf.name_scope("define_loss"):
             self.model = YOLOV3(self.input_data, self.trainable)
@@ -142,12 +144,12 @@ class YoloTrain(object):
             if os.path.exists(self.train_logdir): shutil.rmtree(self.train_logdir)
             os.mkdir(self.train_logdir)
 
-            self.write_op = tf.summary.merge_all()
-            self.train_summary_writer = tf.summary.FileWriter(self.train_logdir, graph=self.sess.graph)
-            self.test_summary_writer = tf.summary.FileWriter(test_logdir, graph=self.sess.graph)
+            self.write_op = tf.compat.v1.summary.merge_all()
+            self.train_summary_writer = tf.compat.v1.summary.FileWriter(self.train_logdir, graph=self.sess.graph)
+            self.test_summary_writer = tf.compat.v1.summary.FileWriter(test_logdir, graph=self.sess.graph)
 
     def train(self):
-        self.sess.run(tf.global_variables_initializer())
+        self.sess.run(tf.compat.v1.global_variables_initializer())
         try:
             print('=> Restoring weights from: %s ... ' % self.initial_weight)
             self.loader.restore(self.sess, self.initial_weight)
@@ -199,7 +201,7 @@ class YoloTrain(object):
             output = ["define_loss/pred_sbbox/concat_2", "define_loss/pred_mbbox/concat_2",
                       "define_loss/pred_lbbox/concat_2", "define_loss/layer_classes"]
             constant_graph = graph_util.convert_variables_to_constants(self.sess, self.sess.graph_def, output)
-            with tf.gfile.GFile('model/yolo_model.pb', mode='wb') as f:
+            with tf.io.gfile.GFile('model/yolo_model.pb', mode='wb') as f:
                 f.write(constant_graph.SerializeToString())
 
             # 保存为pb用于tf_serving

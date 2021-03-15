@@ -37,46 +37,6 @@ def get_layer(data_path, typ):
 
 
 def convert_voc_annotation(data_path, data_type, anno_path, use_difficult_bbox=True):
-    # classes = ["beefsteak", "cartooncookies", "chickenwings", "chiffoncake", "cookies",
-    #            "cranberrycookies", "cupcake", "eggtart", "nofood", "peanuts",
-    #            "pizza", "porkchops", "purplesweetpotato", "roastedchicken", "toast",
-    #            "potatos", "potatom", "potatol", "sweetpotatos", "sweetpotatom", "sweetpotatol"] # 21分类
-
-    # classes = ["beefsteak", "cartooncookies", "chickenwings", "chiffoncake", "cookies",
-    #            "cranberrycookies", "cupcake", "eggtart", "nofood", "peanuts",
-    #            "pizza", "porkchops", "purplesweetpotato", "roastedchicken", "toast",
-    #            "potatos", "potatom", "potatol", "sweetpotatos", "sweetpotatom", "sweetpotatol", "potatocut",
-    #            "sweetpotatocut"]  # 23分类
-    # classes = ["beefsteak", "cartooncookies", "chickenwings", "chiffoncake", "cookies",
-    #            "cranberrycookies", "cupcake", "eggtart", "nofood", "peanuts",
-    #            "pizza", "porkchops", "purplesweetpotato", "roastedchicken", "toast"]  # 15分类
-    # classes = ["beefsteak", "cartooncookies", "chickenwings", "chiffoncake6", "chiffoncake8",
-    #            "cookies", "cranberrycookies", "cupcake", "eggtart", "eggtartbig",
-    #            "nofood", "peanuts", "pizzafour", "pizzaone", "pizzasix",
-    #            "pizzatwo", "porkchops", "potatocut", "potatol", "potatom",
-    #            "potatos", "sweetpotatocut", "sweetpotatol", "sweetpotatom", "sweetpotatos",
-    #            "roastedchicken", "toast"]  # 27分类
-    # classes = ["beefsteak", "cartooncookies", "chickenwings", "chiffoncake6", "chiffoncake8",
-    #            "cookies", "cranberrycookies", "cupcake", "eggtart", "eggtartbig",
-    #            "nofood", "peanuts", "pizzafour", "pizzaone", "pizzasix",
-    #            "pizzatwo", "porkchops", "potatocut", "potatol", "potatom",
-    #            "potatos", "sweetpotatocut", "sweetpotatol", "sweetpotatom", "sweetpotatos",
-    #            "roastedchicken", "toast", "sweetpotato_others", "pizza_others",
-    #            "potato_others"]  # 30分类,加入了sweetpotato_others,pizza_others,potato_others
-    # classes = ["beefsteak", "cartooncookies", "chickenwings", "chiffoncake",
-    #            "cookies","cranberrycookies", "cupcake", "eggtart","nofood",
-    #            "peanuts", "pizzacut", "pizzaone","pizzatwo", "porkchops",
-    #            "potatocut", "potatol","potatos", "sweetpotatocut", "sweetpotatol",
-    #            "sweetpotatos", "roastedchicken", "toast",]  # 22分类,合并蛋挞、土豆、披萨切、红薯；去掉sweetpotato_others,pizza_others,potato_others
-    # classes = ["beefsteak", "cartooncookies", "chickenwings", "chiffoncake6", "chiffoncake8",
-    #            "cookies", "cranberrycookies", "cupcake", "eggtart", "eggtartbig",
-    #            "nofood", "peanuts", "pizzafour", "pizzaone", "pizzasix",
-    #            "pizzatwo", "porkchops", "potatocut", "potatol", "potatom",
-    #            "potatos", "sweetpotatocut", "sweetpotatol", "sweetpotatom", "sweetpotatos",
-    #            "roastedchicken", "toast", "sweetpotato_others", "pizza_others",
-    #            "potato_others", "chestnut", "cornone", "corntwo", "drumsticks", "taro",
-    #            "steamedbread", "eggplant", "eggplant_cut_sauce", "bread", "container_nonhigh"
-    #     , "container", "fish", "hotdog", "redshrimp", "shrimp", "strand"]  # 原30分类，加入二期17类
     def read_class_names(class_file_name):
         '''loads class name from a file'''
         names = []
@@ -87,20 +47,6 @@ def convert_voc_annotation(data_path, data_type, anno_path, use_difficult_bbox=T
 
     classes = read_class_names(cfg.YOLO.CLASSES)
     print(classes)
-    # classes = ["beefsteak", "cartooncookies", "chickenwings", "chiffoncake6", "chiffoncake8",
-    #            "cookies", "cranberrycookies", "cupcake", "eggtart", "nofood",
-    #            "peanuts", "pizzacut", "pizzaone", "pizzatwo", "porkchops",
-    #            "potatocut", "potatol", "potatos", "sweetpotatocut", "sweetpotatol",
-    #            "sweetpotatos", "roastedchicken", "toast", "chestnut", "cornone",
-    #            "corntwo", "drumsticks", "taro", "steamedbread", "eggplant",
-    #            "eggplant_cut_sauce", "bread", "container_nonhigh", "container", "fish",
-    #            "hotdog", "redshrimp", "shrimp", "strand"]# 39分类
-    # classes = ["nofood","chestnut", "cornone", "corntwo", "drumsticks", "taro",
-    #            "steamedbread", "eggplant", "eggplant_cut_sauce", "bread", "container_nonhigh",
-    #            "container", "roastedchicken", "fish", "hotdog", "redshrimp",
-    #            "shrimp", "strand"]  # 仅二期17类
-
-    # img_inds_file = os.path.join(data_path, 'ImageSets', 'Main', data_type + '.txt')
 
     img_inds_file = data_path + '/ImageSets' + '/Main/' + '{}.txt'.format(data_type)
     with open(img_inds_file, 'r') as f:
@@ -116,11 +62,8 @@ def convert_voc_annotation(data_path, data_type, anno_path, use_difficult_bbox=T
 
     with open(anno_path, 'a') as f:
         for image_ind in tqdm(image_inds):
-            # image_path = os.path.join(data_path, 'JPEGImages', image_ind + '.jpg')
-            # print("image_path::::::::", image_path)
             st = "/"
             image_path = (data_path, 'JPGImages', image_ind + '.jpg')  # 原图片
-            # image_path = (data_path, 'JPGImages_hot', image_ind + '_hot.jpg')  # 增强图片
             image_path = st.join(image_path)
 
             annotation = image_path
@@ -151,8 +94,28 @@ def convert_voc_annotation(data_path, data_type, anno_path, use_difficult_bbox=T
                     bbox = obj.find('bndbox')
                     label_name = obj.find('name').text.lower()
 
-                    # if "chiffoncake" in label_name:
-                    #     label_name = "chiffoncake"
+                    if "pizza_others" in label_name:
+                        break
+                    if "sweetpotato_others" in label_name:
+                        break
+                    if "potato_others" in label_name:
+                        break
+                    if "eggplant_cut" in label_name and "eggplant_cut_sauce" not in label_name:
+                        break
+                    if "pizzasix" in label_name:
+                        label_name = "pizzacut"
+                    if "duck" in label_name:
+                        label_name = "roastedchicken"
+                    if "stand" in label_name:
+                        label_name = "strand"
+                    if "pizzafour" in label_name:
+                        label_name = "pizzacut"
+                    if "no container_nonhigh" in label_name:
+                        label_name = "container_nonhigh"
+                    if "no food" in label_name:
+                        label_name = "nofood"
+                    if "no bread" in label_name:
+                        break
                     class_ind = classes.index(label_name.strip())
                     xmin = bbox.find('xmin').text.strip()
                     xmax = bbox.find('xmax').text.strip()
@@ -160,25 +123,6 @@ def convert_voc_annotation(data_path, data_type, anno_path, use_difficult_bbox=T
                     ymax = bbox.find('ymax').text.strip()
                     annotation += ' ' + ','.join([xmin, ymin, xmax, ymax, str(class_ind)])
                 f.write(annotation + "\n")
-                # try:
-                #     for obj in objects:
-                #         # difficult = obj.find('difficult').text.strip()
-                #         # if (not use_difficult_bbox) and (int(difficult) == 1):
-                #         #     continue
-                #         bbox = obj.find('bndbox')
-                #         label_name = obj.find('name').text.lower()
-                #
-                #         # if "chiffoncake" in label_name:
-                #         #     label_name = "chiffoncake"
-                #         class_ind = classes.index(label_name.strip())
-                #         xmin = bbox.find('xmin').text.strip()
-                #         xmax = bbox.find('xmax').text.strip()
-                #         ymin = bbox.find('ymin').text.strip()
-                #         ymax = bbox.find('ymax').text.strip()
-                #         annotation += ' ' + ','.join([xmin, ymin, xmax, ymax, str(class_ind)])
-                #     f.write(annotation + "\n")
-                # except:
-                #     print(image_path)
 
     return len(image_inds)
 
@@ -204,29 +148,29 @@ def check_txt(txt_path):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--data_path",
-                        default="E:/DataSets/X_3660_data/bu/serve_data/20210115")
+                        default="E:/DataSets/model_data/serve_data2020")
     parser.add_argument("--train_annotation",
-                        default="E:/DataSets/X_3660_data/bu/serve_data/20210115/train42.txt")
+                        default="E:/DataSets/model_data/serve_data2020/train42.txt")
     parser.add_argument("--test_annotation",
-                        default="E:/DataSets/X_3660_data/bu/serve_data/20210115/test42.txt")
-    # parser.add_argument("--val_annotation",
-    #                     default="E:/DataSets/X_3660_data/val39.txt")
+                        default="E:/DataSets/model_data/serve_data2020/test42.txt")
+    parser.add_argument("--val_annotation",
+                        default="E:/DataSets/model_data/serve_data2020/val42.txt")
     flags = parser.parse_args()
     #
     if os.path.exists(flags.train_annotation): os.remove(flags.train_annotation)
     if os.path.exists(flags.test_annotation): os.remove(flags.test_annotation)
-    # if os.path.exists(flags.val_annotation): os.remove(flags.val_annotation)
+    if os.path.exists(flags.val_annotation): os.remove(flags.val_annotation)
     # # #
     num1 = convert_voc_annotation(flags.data_path, 'train',
                                   flags.train_annotation, False)
     num2 = convert_voc_annotation(flags.data_path, 'test',
                                   flags.test_annotation, False)
-    # num3 = convert_voc_annotation(flags.data_path, 'val',
-    #                               flags.val_annotation, False)
+    num3 = convert_voc_annotation(flags.data_path, 'val',
+                                  flags.val_annotation, False)
     # print(
     #     '=> The number of image for train is: %d\tThe number of image for test is:%d\tThe number of image for val is:%d' % (
     #         num1, num2, num3))
     #
     check_txt(flags.test_annotation)
     check_txt(flags.train_annotation)
-    # check_txt(flags.val_annotation)
+    check_txt(flags.val_annotation)

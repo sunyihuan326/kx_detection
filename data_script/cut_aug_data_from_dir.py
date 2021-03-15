@@ -11,6 +11,7 @@ import os
 import shutil
 from tqdm import tqdm
 
+
 def cut_aug_data(file_root):
     '''
 
@@ -35,10 +36,20 @@ def cut_aug_data(file_root):
             for f in os.listdir(c_dir):
                 aug_c_fir = aug_r + "/" + c
                 if not os.path.exists(aug_c_fir): os.mkdir(aug_c_fir)
-                if "_hot.jpg" in f or "_huang.jpg" in f or "_lv.jpg" in f or "_hong.jpg" in f or "_zi.jpg" in f\
-                        or "_hot.xml" in f or "_huang.xml" in f or "_lv.xml" in f or "_hong.xml" in f or "_zi.xml" in f :
-                    fname = c_dir + "/" + f
-                    shutil.move(fname, aug_c_fir + "/" + f)
+                if r == "layer_data":
+                    print(c_dir + "/" + f)
+                    for b in os.listdir(c_dir + "/" + f):
+                        aug_b_dir = aug_c_fir + "/" + f
+                        if not os.path.exists(aug_b_dir): os.mkdir(aug_b_dir)
+                        if "_hot.jpg" in b or "_huang.jpg" in b or "_lv.jpg" in b or "_hong.jpg" in b or "_zi.jpg" in b \
+                                or "_hot.xml" in b or "_huang.xml" in b or "_lv.xml" in b or "_hong.xml" in b or "_zi.xml" in b:
+                            fname = c_dir + "/" + f + "/" + b
+                            shutil.move(fname, aug_b_dir + "/" + f)
+                else:
+                    if "_hot.jpg" in f or "_huang.jpg" in f or "_lv.jpg" in f or "_hong.jpg" in f or "_zi.jpg" in f \
+                            or "_hot.xml" in f or "_huang.xml" in f or "_lv.xml" in f or "_hong.xml" in f or "_zi.xml" in f:
+                        fname = c_dir + "/" + f
+                        shutil.move(fname, aug_c_fir + "/" + f)
 
 
 if __name__ == "__main__":

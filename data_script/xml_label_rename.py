@@ -53,20 +53,10 @@ def check_labelname(inputpath, label_name='Potatom'):
 
 
 if __name__ == '__main__':
-    inputpath = "E:/DataSets/X_3660_data/bu/serve_data/202011120900/Annotations"  # 这是xml文件的文件夹的绝对地址
-    # cls_list = ["beefsteak", "bread", "cartooncookies", "chestnut", "chickenwings",
-    #             "chiffoncake6", "chiffoncake8", "container", "container_nonhigh", "cookies",
-    #             "cornone", "corntwo", "cranberrycookies", "cupcake", "drumsticks",
-    #             "eggplant", "eggplant_cut_sauce", "eggtart", "fish", "hotdog",
-    #             "peanuts", "pizzacut", "pizzaone", "pizzatwo", "porkchops",
-    #             "potatocut", "potatol", "potatos", "redshrimp", "roastedchicken",
-    #             "shrimp", "steamedbread", "strand", "sweetpotatocut", "sweetpotatol",
-    #             "sweetpotatos", "taro", "toast"]
-    cls_list = ["sweetpotatol", ]
+    inputpath = "E:/DataSets/model_data/X_data2019/Annotations"  # 这是xml文件的文件夹的绝对地址
+
+    # cls_list = ["Pizzasix", "Pizzafour"]  # Pizza合并
+    cls_list = ["EggTartBig"]
     for c in cls_list:
         input_dir = inputpath + "/" + c
-        changesku(input_dir, "sweetpotatol")
-    # check_labelname(input_dir, c)
-    # inputpath = inputpath + "/duck"  # 这是xml文件的文件夹的绝对地址
-    # changesku(inputpath, "roastedchicken")
-    # check_labelname(inputpath, "cookies")
+        changesku(input_dir, "EggTart")
