@@ -4,10 +4,11 @@
 # @Author  : sunyihuan
 
 '''
-拷贝未使用的数据
+A为所有文件，将不在B中的文件拷贝至C
 '''
 import os
 import shutil
+from tqdm import tqdm
 
 
 def file_sub(all_data, using_dir, sub_save_dir):
@@ -20,21 +21,20 @@ def file_sub(all_data, using_dir, sub_save_dir):
     '''
     file_dirs = os.listdir(all_data)
     using_files = os.listdir(using_dir)
-    for file_dir in file_dirs:
-        if file_dir != ".DS_Store":
-            file_name = os.listdir(os.path.join(all_data, file_dir))
-            for file_n in file_name:
-                if file_n != ".DS_Store":
-                    if file_n not in using_files:
-                        if not os.path.exists(os.path.join(sub_save_dir, file_dir)): os.mkdir(
-                            os.path.join(sub_save_dir, file_dir))
-                        save_file_name = os.path.join(sub_save_dir, file_dir) + "/" + file_n
-                        print(save_file_name)
-                        shutil.copy(os.path.join(os.path.join(all_data, file_dir), file_n), save_file_name)
+    all_use_f = []  # 所有已用列表
+    for c in using_files:
+        for f in os.listdir(os.path.join(using_dir, c)):
+            all_use_f.append(f.strip())
+    print(len(all_use_f))
+    for fil in tqdm(file_dirs):
+        if fil != ".DS_Store":
+            if fil not in all_use_f:
+                shutil.move(os.path.join(all_data, fil), os.path.join(sub_save_dir, fil))
 
 
 if __name__ == "__main__":
-    all_data = "E:/DataSets/KX_FOODSets/JPGImages"
-    using_dir = "E:/DataSets/KX_FOODSets_model_data/15classes_0722/JPGImages"
-    sub_save_dir = "E:/DataSets/已标注未使用数据/JPGImages"
+    all_data = "F:/serve_data/202101-04/covert_jpg"
+    using_dir = "F:/serve_data/202101-04/classes"
+    sub_save_dir = "F:/serve_data/202101-04/classes_others"
+    if not os.path.exists(sub_save_dir): os.mkdir(sub_save_dir)
     file_sub(all_data, using_dir, sub_save_dir)

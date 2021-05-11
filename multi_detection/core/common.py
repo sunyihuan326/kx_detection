@@ -6,7 +6,6 @@ import tensorflow as tf
 
 
 def convolutional(input_data, filters_shape, trainable, name, downsample=False, activate=True, bn=True):
-
     with tf.variable_scope(name):
         if downsample:
             pad_h, pad_w = (filters_shape[0] - 2) // 2 + 1, (filters_shape[1] - 2) // 2 + 1
@@ -33,21 +32,21 @@ def convolutional(input_data, filters_shape, trainable, name, downsample=False, 
             conv = tf.nn.bias_add(conv, bias)
 
         if activate == True:
-            conv=tf.nn.relu(conv)
-            # conv = tf.nn.relu(conv, alpha=0.1)
+            # conv=tf.nn.relu(conv)#relu激活
+            conv = conv * tf.math.tanh(tf.math.softplus(conv))  # mish激活
 
+            # conv = tf.nn.relu(conv, alpha=0.1)
 
     return conv
 
 
 def residual_block(input_data, input_channel, filter_num1, filter_num2, trainable, name):
-
     short_cut = input_data
 
     with tf.variable_scope(name):
         input_data = convolutional(input_data, filters_shape=(1, 1, input_channel, filter_num1),
                                    trainable=trainable, name='conv1')
-        input_data = convolutional(input_data, filters_shape=(3, 3, filter_num1,   filter_num2),
+        input_data = convolutional(input_data, filters_shape=(3, 3, filter_num1, filter_num2),
                                    trainable=trainable, name='conv2')
 
         residual_output = input_data + short_cut
@@ -55,9 +54,7 @@ def residual_block(input_data, input_channel, filter_num1, filter_num2, trainabl
     return residual_output
 
 
-
 def route(name, previous_output, current_output):
-
     with tf.variable_scope(name):
         output = tf.concat([current_output, previous_output], axis=-1)
 
@@ -76,9 +73,10 @@ def upsample(input_data, name, method="deconv"):
         # replace resize_nearest_neighbor with conv2d_transpose To support TensorRT optimization
         numm_filter = input_data.shape.as_list()[-1]
         output = tf.layers.conv2d_transpose(input_data, numm_filter, kernel_size=2, padding='same',
-                                            strides=(2,2), kernel_initializer=tf.random_normal_initializer())
+                                            strides=(2, 2), kernel_initializer=tf.random_normal_initializer())
 
     return output
+
 
 def yolo_maxpool_block(inputs):
     '''
@@ -92,6 +90,3 @@ def yolo_maxpool_block(inputs):
     # concat
     net = tf.concat([max_13, max_9, max_5, inputs], -1)
     return net
-
-
-

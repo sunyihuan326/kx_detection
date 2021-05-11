@@ -256,18 +256,18 @@ if __name__ == '__main__':
     classes = classes_label18  #######    仅2期：classes_label18，所有：classes_label46
     mode = "0122_138"  #######
     tag = ""
-    img_dir = "F:/test_from_yejing_202010/results/noresults/no_result_1123"  # 文件夹地址
+    img_dir = "F:/Test_set/OVEN/all_test_set"  # 文件夹地址
     # img_dir = "E:/check_2_phase/JPGImages_2"  # 文件夹地址
-    save_dir = "F:/test_from_yejing_202010/results/noresults/no_result_1123_detection".format(mode, tag)  # 图片保存地址
+    save_dir = "F:/Test_set/OVEN/all_test_set/all_test_set_results/{}_{}_detection".format(mode, tag)  # 图片保存地址
     if not os.path.exists(save_dir): os.mkdir(save_dir)
 
-    layer_error_dir = "F:/test_from_yejing_202010/results/noresults/no_result_1123_layer_error".format(mode, tag)  # 预测结果错误保存地址
+    layer_error_dir = "F:/Test_set/OVEN/all_test_set/all_test_set_results/{}_{}_layer_error".format(mode, tag)  # 预测结果错误保存地址
     if not os.path.exists(layer_error_dir): os.mkdir(layer_error_dir)
 
-    fooderror_dir = "F:/test_from_yejing_202010/results/noresults/no_result_1123_food_error".format(mode, tag)  # 食材预测结果错误保存地址
+    fooderror_dir = "F:/Test_set/OVEN/all_test_set/all_test_set_results/{}_{}__food_error".format(mode, tag)  # 食材预测结果错误保存地址
     if not os.path.exists(fooderror_dir): os.mkdir(fooderror_dir)
 
-    no_result_dir = "F:/test_from_yejing_202010/results/noresults/no_result_1123_no_result".format(mode, tag)  # 无任何输出结果保存地址
+    no_result_dir = "F:/Test_set/OVEN/all_test_set/all_test_set_results/{}_{}__no_result".format(mode, tag)  # 无任何输出结果保存地址
     if not os.path.exists(no_result_dir): os.mkdir(no_result_dir)
 
     start_time = time.time()

@@ -23,13 +23,17 @@ def print_nums(img_dirs):
 if __name__ == "__main__":
     w = xlwt.Workbook()
     sheet0 = w.add_sheet("all_nums")
-    dir_root = "E:/已标数据备份/二期数据/JPGImages"
+    dir_root = "F:/serve_data/ZG_data/20210129/biaozhu_20210428/exrtact_file/JPGImages"
     all_nums = print_nums(dir_root)
     sheet0.write(0, 0, "classes")
     sheet0.write(0, 1, "nums")
     c_c = 0
+    c_sum = 0
     for c in all_nums.keys():
+        c_sum += int(all_nums[c])
         sheet0.write(c_c + 1, 0, c)
         sheet0.write(c_c + 1, 1, str(all_nums[c]))
         c_c += 1
-    w.save("E:/已标数据备份/二期数据/JPGImages/all.xls")
+    sheet0.write(c_c + 2, 0, "all")
+    sheet0.write(c_c + 2, 1, str(c_sum))
+    w.save("{}/all.xls".format(dir_root))

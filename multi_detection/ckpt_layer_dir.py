@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2020/11/19
 # @Author  : sunyihuan
-# @File    : ckpy_layer_dir.py
+# @File    : ckpt_layer_dir.py
 '''
 将文件夹下按烤层识别结果，分为对应的文件夹
 
@@ -76,7 +76,7 @@ class YoloPredict(object):
 if __name__ == '__main__':
     start_time = time.time()
 
-    img_root = "E:/t/JPGImages"  # 图片文件地址
+    img_root = "F:/serve_data/202101-03formodel/exrtact_file/layer_data"  # 图片文件地址
     Y = YoloPredict()
     end_time0 = time.time()
     print("model loading time:", end_time0 - start_time)

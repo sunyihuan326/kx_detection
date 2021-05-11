@@ -202,12 +202,12 @@ class process(object):
 
 
 if __name__ == "__main__":
-    data_root = "E:/DataSets/model_data/serve_data2020"
+    data_root = "F:/serve_data/for_model/202101_03"
     dprocess = process(data_root)
 
     classes =os.listdir(data_root+"/JPGImages")
     val_percent = 0
-    test_percent = 0.15
+    test_percent = 0.1
     dprocess.split_data(classes, test_percent, val_percent)
     dprocess.train_all_txt(["train", "test", "val"])
     dprocess.copy2dir(classes, "xml")

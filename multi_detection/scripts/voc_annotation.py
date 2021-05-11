@@ -148,13 +148,13 @@ def check_txt(txt_path):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--data_path",
-                        default="E:/DataSets/model_data/serve_data2020")
+                        default="F:/serve_data/for_model/202101_03")
     parser.add_argument("--train_annotation",
-                        default="E:/DataSets/model_data/serve_data2020/train42.txt")
+                        default="F:/serve_data/for_model/202101_03/train42.txt")
     parser.add_argument("--test_annotation",
-                        default="E:/DataSets/model_data/serve_data2020/test42.txt")
+                        default="F:/serve_data/for_model/202101_03/test42.txt")
     parser.add_argument("--val_annotation",
-                        default="E:/DataSets/model_data/serve_data2020/val42.txt")
+                        default="F:/serve_data/for_model/202101_03/val42.txt")
     flags = parser.parse_args()
     #
     if os.path.exists(flags.train_annotation): os.remove(flags.train_annotation)

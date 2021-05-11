@@ -53,10 +53,10 @@ def check_labelname(inputpath, label_name='Potatom'):
 
 
 if __name__ == '__main__':
-    inputpath = "E:/DataSets/model_data/X_data2019/Annotations"  # 这是xml文件的文件夹的绝对地址
+    inputpath = "F:/serve_data/202101-03formodel/exrtact_file/Annotations"  # 这是xml文件的文件夹的绝对地址
 
     # cls_list = ["Pizzasix", "Pizzafour"]  # Pizza合并
-    cls_list = ["EggTartBig"]
+    cls_list = ["duck"]
     for c in cls_list:
         input_dir = inputpath + "/" + c
-        changesku(input_dir, "EggTart")
+        changesku(input_dir, "roastedchicken")

@@ -19,6 +19,20 @@ class ImageRename():
         self.target = target
         self.save_dir = save_dir
 
+    def rename_from_file_name(self):
+        '''
+        图片重命名
+
+        :return:
+        '''
+        for item in os.listdir(self.root_path):
+            try:
+                file_name = self.root_path + "/" + item
+                f = item.split("_")[0] + "_{}".format(target) + ".jpg"
+                os.rename(file_name, self.save_dir + "/" + f)
+            except:
+                print(item)
+
     def rename0(self, say):
         '''
         将文件夹中排序命名
@@ -28,30 +42,11 @@ class ImageRename():
             if item.endswith('.jpg'):
                 src = os.path.join(os.path.abspath(self.root_path), item)
                 filename = str(i + 1)
-                # filename = str(item).split(".")[0]
-                # print(filename)
-                # dst = os.path.join(os.path.abspath(self.path),
-                #                    filename + '_s.jpg')
-                # os.rename(src, dst)
-                # #
+
                 dst = os.path.join(os.path.abspath(self.root_path),
                                    filename + "_202012030843" + "_{}".format(say) + self.target + '.jpg')
                 os.rename(src, dst)
                 print('converting %s to %s ...' % (src, dst))
-                # save_name = os.path.join(os.path.abspath(self.save_dir),
-                #                          filename + "_2001010" + "_{}".format(say) + self.target + '.jpg')
-                # shutil.copy(dst, save_name)
-                # try:
-                #     # 修改命名，规则为：i_日期_烤箱/其他说明_类别名.jpg
-                #     dst = os.path.join(os.path.abspath(self.root_path),
-                #                        filename + "_200803" + "_{}".format(say) + self.target + '.jpg')
-                #     os.rename(src, dst)
-                #     print('converting %s to %s ...' % (src, dst))
-                #     save_name = os.path.join(os.path.abspath(self.save_dir),
-                #                              filename + "_200803" + "_{}".format(say) + self.target + '.jpg')
-                #     shutil.copy(dst, save_name)
-                # except:
-                #     pass
 
     def change_jpg_name(self):
         for i, item in enumerate(os.listdir(self.root_path)):
@@ -100,9 +95,9 @@ class ImageRename():
 
 
 if __name__ == '__main__':
-    path = "F:/serve_data/202012030843"
+    path = "F:serve_data/ZG_data/20210129/bi aozhu_20210428/JPGImages"
     for g in os.listdir(path):
         target = g
         dir_path = path + "/" + g
         newname = ImageRename(dir_path, g, dir_path)
-        newname.rename0("")
+        newname.rename_from_file_name()

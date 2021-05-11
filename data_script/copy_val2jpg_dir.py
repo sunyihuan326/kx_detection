@@ -6,13 +6,16 @@
 '''
 将xxx_val.txt图片拷贝到对应的xxx_val文件中
 并对其进行分层
+
+2021年4月15日修改
+
 '''
 
 import os
 import shutil
 
 
-def copy_val2jpg_dir(txt_root, all_jpg_dir, save_dir):
+def copy_val2jpg_dir(txt_root, layer_dir, all_jpg_dir, save_dir, typ):
     '''
     将val中的数据拷贝到单独的文件夹中，并且烤层也分类
 
@@ -23,9 +26,9 @@ def copy_val2jpg_dir(txt_root, all_jpg_dir, save_dir):
     '''
 
     for txt in os.listdir(txt_root):
-        if "_test" in txt:
+        if "_{}".format(typ) in txt:
             save_name = save_dir + "/" + txt.split("_test")[0]
-            layer_data = "E:/已标数据备份/二期数据/3660摄像头补采数据集/JPGImages_layerdata/{}".format(txt.split("_test")[0])
+            layer_data = "{}/{}".format(layer_dir, txt.split("_test")[0])
             val_b_list = os.listdir(layer_data + "/bottom")
             val_m_list = os.listdir(layer_data + "/middle")
             val_t_list = os.listdir(layer_data + "/top")
@@ -44,7 +47,7 @@ def copy_val2jpg_dir(txt_root, all_jpg_dir, save_dir):
                 if jpg_name in val_b_list:
                     shutil.copy(all_jpg_dir + "/" + jpg_name, save_b_name + "/" + jpg_name)
                 elif jpg_name in val_m_list:
-                    shutil.copy(all_jpg_dir + "/" + jpg_name, save_m_name+ "/" + jpg_name)
+                    shutil.copy(all_jpg_dir + "/" + jpg_name, save_m_name + "/" + jpg_name)
                 elif jpg_name in val_t_list:
                     shutil.copy(all_jpg_dir + "/" + jpg_name, save_t_name + "/" + jpg_name)
                 elif jpg_name in val_o_list:
@@ -53,8 +56,12 @@ def copy_val2jpg_dir(txt_root, all_jpg_dir, save_dir):
                     print(jpg_name)
 
 
-txt_root = "E:/DataSets/X_3660_data/ImageSets/Main"
-all_jpg_dir = "E:/DataSets/X_3660_data/JPGImages"
-save_dir = "E:/DataSets/X_3660_data/JPGImages_test"
-if os.path.exists(save_dir):shutil.rmtree(save_dir),os.mkdir(save_dir)
-copy_val2jpg_dir(txt_root, all_jpg_dir, save_dir)
+typ = "test"
+txt_root = "F:/serve_data/for_model/202101_03/ImageSets/Main"
+all_jpg_dir = "F:/serve_data/for_model/202101_03/JPGImages"
+save_dir = "F:/serve_data/for_model/202101_03/JPGImages_{}".format(typ)
+if os.path.exists(save_dir): shutil.rmtree(save_dir)
+os.mkdir(save_dir)
+layer_dir = "F:/serve_data/for_model/202101_03/layer_data"
+
+copy_val2jpg_dir(txt_root, layer_dir, all_jpg_dir, save_dir, typ)

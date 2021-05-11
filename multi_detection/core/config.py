@@ -30,10 +30,10 @@ __C.TRAIN.DATA_AUG                   = True
 __C.TRAIN.LEARN_RATE_INIT            = 1e-4
 __C.TRAIN.LEARN_RATE_END             = 1e-6
 __C.TRAIN.WARMUP_EPOCHS              = 10
-__C.TRAIN.FISRT_STAGE_EPOCHS         = 20
-__C.TRAIN.SECOND_STAGE_EPOCHS        = 30
+__C.TRAIN.FISRT_STAGE_EPOCHS         = 56
+__C.TRAIN.SECOND_STAGE_EPOCHS        = 20
 # __C.TRAIN.INITIAL_WEIGHT             = "E:/ckpt_dirs/Food_detection/multi_food3/20200604_22class/yolov3_train_loss=4.9799.ckpt-158"
-__C.TRAIN.INITIAL_WEIGHT             = "./checkpoint/yolov3_train_loss=19.8911.ckpt-13"
+__C.TRAIN.INITIAL_WEIGHT             = "./checkpoint/yolov3_train_loss=11.2574.ckpt-56"
 
 # TEST options
 __C.TEST = edict()

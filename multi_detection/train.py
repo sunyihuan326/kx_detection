@@ -51,14 +51,14 @@ class YoloTrain(object):
                                              shape=(None, self.train_input_size, self.train_input_size, 3),
                                              name='input_data')
             print("self.input_data",self.input_data)
-            self.layer_label = tf.placeholder(dtype=tf.float32, name='layer_label')
-            self.label_sbbox = tf.placeholder(dtype=tf.float32, name='label_sbbox')
-            self.label_mbbox = tf.placeholder(dtype=tf.float32, name='label_mbbox')
-            self.label_lbbox = tf.placeholder(dtype=tf.float32, name='label_lbbox')
-            self.true_sbboxes = tf.placeholder(dtype=tf.float32, name='sbboxes')
-            self.true_mbboxes = tf.placeholder(dtype=tf.float32, name='mbboxes')
-            self.true_lbboxes = tf.placeholder(dtype=tf.float32, name='lbboxes')
-            self.trainable = tf.placeholder(dtype=tf.bool, name='training')
+            self.layer_label = tf.compat.v1.placeholder(dtype=tf.float32, name='layer_label')
+            self.label_sbbox = tf.compat.v1.placeholder(dtype=tf.float32, name='label_sbbox')
+            self.label_mbbox = tf.compat.v1.placeholder(dtype=tf.float32, name='label_mbbox')
+            self.label_lbbox = tf.compat.v1.placeholder(dtype=tf.float32, name='label_lbbox')
+            self.true_sbboxes = tf.compat.v1.placeholder(dtype=tf.float32, name='sbboxes')
+            self.true_mbboxes = tf.compat.v1.placeholder(dtype=tf.float32, name='mbboxes')
+            self.true_lbboxes = tf.compat.v1.placeholder(dtype=tf.float32, name='lbboxes')
+            self.trainable = tf.compat.v1.placeholder(dtype=tf.bool, name='training')
             print("self.trainable",self.trainable)
 
         with tf.name_scope("define_loss"):
@@ -89,23 +89,23 @@ class YoloTrain(object):
                                  (1 + tf.cos(
                                      (self.global_step - warmup_steps) / (train_steps - warmup_steps) * np.pi))
             )
-            global_step_update = tf.assign_add(self.global_step, 1.0)
+            global_step_update = tf.compat.v1.assign_add(self.global_step, 1.0)
         # self._optimizer = tf.train.AdamOptimizer(self.learn_rate).minimize(self.loss, global_step=self.global_step)
 
         with tf.name_scope("define_weight_decay"):
-            moving_ave = tf.train.ExponentialMovingAverage(self.moving_ave_decay).apply(tf.trainable_variables())
+            moving_ave = tf.train.ExponentialMovingAverage(self.moving_ave_decay).apply(tf.compat.v1.trainable_variables())
 
         with tf.name_scope("define_first_stage_train"):
             self.first_stage_trainable_var_list = []
-            for var in tf.trainable_variables():
+            for var in tf.compat.v1.trainable_variables():
                 var_name = var.op.name
                 var_name_mess = str(var_name).split('/')
                 if var_name_mess[0] in ['conv_sbbox', 'conv_mbbox', 'conv_lbbox']:
                     self.first_stage_trainable_var_list.append(var)
 
-            first_stage_optimizer = tf.train.AdamOptimizer(self.learn_rate).minimize(self.loss,
+            first_stage_optimizer = tf.compat.v1.train.AdamOptimizer(self.learn_rate).minimize(self.loss,
                                                                                      var_list=self.first_stage_trainable_var_list)
-            with tf.control_dependencies(tf.get_collection(tf.GraphKeys.UPDATE_OPS)):
+            with tf.control_dependencies(tf.compat.v1.get_collection(tf.GraphKeys.UPDATE_OPS)):
                 with tf.control_dependencies([first_stage_optimizer, global_step_update]):
                     with tf.control_dependencies([moving_ave]):
                         self.train_op_with_frozen_variables = tf.no_op()
@@ -115,7 +115,7 @@ class YoloTrain(object):
             second_stage_optimizer = tf.train.AdamOptimizer(self.learn_rate).minimize(self.loss,
                                                                                       var_list=second_stage_trainable_var_list)
 
-            with tf.control_dependencies(tf.get_collection(tf.GraphKeys.UPDATE_OPS)):
+            with tf.control_dependencies(tf.get_collection(tf.compat.v1.GraphKeys.UPDATE_OPS)):
                 with tf.control_dependencies([second_stage_optimizer, global_step_update]):
                     with tf.control_dependencies([moving_ave]):
                         self.train_op_with_all_variables = tf.no_op()
@@ -127,16 +127,16 @@ class YoloTrain(object):
             # print(variables_to_resotre)
             # self.loader = tf.train.Saver(variables_to_resotre)  # 仅加载部分参数
             # print(self.net_var)
-            self.loader = tf.train.Saver(self.net_var)
-            self.saver = tf.train.Saver(tf.global_variables(), max_to_keep=20)
+            self.loader = tf.compat.v1.train.Saver(self.net_var)
+            self.saver = tf.compat.v1.train.Saver(tf.global_variables(), max_to_keep=20)
 
         with tf.name_scope('summary'):
-            tf.summary.scalar("learn_rate", self.learn_rate)
-            tf.summary.scalar("giou_loss", self.giou_loss)
-            tf.summary.scalar("conf_loss", self.conf_loss)
-            tf.summary.scalar("prob_loss", self.prob_loss)
-            tf.summary.scalar("layer_loss", self.layer_loss)
-            tf.summary.scalar("total_loss", self.loss)
+            tf.compat.v1.summary.scalar("learn_rate", self.learn_rate)
+            tf.compat.v1.summary.scalar("giou_loss", self.giou_loss)
+            tf.compat.v1.summary.scalar("conf_loss", self.conf_loss)
+            tf.compat.v1.summary.scalar("prob_loss", self.prob_loss)
+            tf.compat.v1.summary.scalar("layer_loss", self.layer_loss)
+            tf.compat.v1.summary.scalar("total_loss", self.loss)
 
             test_logdir = "./data/log/test"
             if os.path.exists(test_logdir): shutil.rmtree(test_logdir)

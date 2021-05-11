@@ -63,9 +63,9 @@ def delete_xmljpg_diff(img_dir, xml_dir, cut_save_dir):
 
 
 if __name__ == "__main__":
-    img_root = "E:/已标数据备份/老模组数据2019/按单类文件夹分类/JPGImages"
-    xml_root = "E:/已标数据备份/老模组数据2019/按单类文件夹分类/Annotations"
-    cut_save_root = "E:/已标数据备份/老模组数据2019/按单类文件夹分类/cut"
+    img_root = "F:/serve_data/202101-03formodel/exrtact_file/JPGImages"
+    xml_root = "F:/serve_data/202101-03formodel/exrtact_file/Annotations"
+    cut_save_root = "F:/serve_data/202101-03formodel/exrtact_file/cut"
     if not os.path.exists(cut_save_root): os.mkdir(cut_save_root)
     # cls_list = ["beefsteak", "bread", "cartooncookies", "chestnut", "chickenwings",
     #             "chiffoncake6", "chiffoncake8", "container", "container_nonhigh", "cookies",

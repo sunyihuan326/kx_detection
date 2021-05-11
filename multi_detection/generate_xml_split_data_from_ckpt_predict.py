@@ -126,7 +126,7 @@ def rename_for_jpgandxml(filedir, c, typ):
     if typ == "jpg":
         for xxxx in os.listdir(filedir):
             if xxxx.endswith("jpg"):
-                file_name = xxxx.split("_")[0] +"_{}".format(c) + ".jpg"
+                file_name = xxxx.split("_")[0] + "_{}".format(c) + ".jpg"
                 os.rename(filedir + "/" + xxxx, filedir + "/" + file_name)
     else:
         for xxxx in os.listdir(filedir):
@@ -147,7 +147,7 @@ class YoloPredict(object):
         self.score_threshold = 0.45
         self.iou_threshold = 0.5
         self.top_n = 5
-        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food5/20201123/yolov3_train_loss=6.5091.ckpt-128"  # ckpt文件地址
+        self.weight_file = "E:/模型交付版本/multi_yolov3_predict-20210129/checkpoint/yolov3_train_loss=5.9575.ckpt-151"  # ckpt文件地址
         # self.weight_file = "./checkpoint/yolov3_train_loss=4.7681.ckpt-80"
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
@@ -237,13 +237,13 @@ if __name__ == '__main__':
     classes[101] = "chiffon_size4"
     start_time = time.time()
     Y = YoloPredict()
-    dir_root = "F:serve_data/OVEN/for_model"
+    dir_root = "F:serve_data/OVEN/202104/covert_jpg"
     img_root = dir_root + "/yuantu"
     # cls_list = ["potatos", "chestnut", "chickenwings", "porkchops"]
     cls_list = os.listdir(img_root)
     xml_root = dir_root + "/Annotations"
     for c in cls_list:
-        if c != " ":
+        if c != " " and c != "others":
             img_dir = img_root + "/" + c
             xml_dir = xml_root + "/" + c
             img_anno_dir = dir_root + "/JPGImages" + "/" + c
@@ -259,7 +259,7 @@ if __name__ == '__main__':
                     if len(bboxes_pr) > 0:  # 有标签框
                         cls_name = classes[int(bboxes_pr[0][-1])]  # 预测类别
                         score = bboxes_pr[0][-2]  # 置信度
-                        if score >= 0.82:
+                        if score >= 0.8:
                             if cls_name != c:  # 分值高于0.8，结果不一致的，输出xml
                                 print("0.8 write")
                                 shutil.copy(img_path, img_anno_dir + "/" + img)

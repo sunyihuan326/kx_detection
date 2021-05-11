@@ -75,10 +75,10 @@ class YoloTest(object):
         self.input_size = 416  # 输入图片尺寸（默认正方形）
         self.num_classes = 40  # 种类数
         self.score_cls_threshold = 0.001
-        self.score_threshold = 0.6
+        self.score_threshold = 0.8
         self.iou_threshold = 0.5
         self.top_n = 5
-        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food5/20210224/yolov3_train_loss=5.9418.ckpt-148"  # ckpt文件地址
+        self.weight_file = "E:/ckpt_dirs/Food_detection/multi_food5/20210419/yolov3_train_loss=6.1071.ckpt-168"  # ckpt文件地址
         # self.weight_file = "./checkpoint/yolov3_train_loss=4.7681.ckpt-80"
         self.write_image = True  # 是否画图
         self.show_label = True  # 是否显示标签
@@ -169,7 +169,7 @@ class YoloTest(object):
         image = cv2.imread(image_path)  # 图片读取
         # image = Image.open(image_path)
         # image = np.array(image)
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB).astype(np.float32)
+        # image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB).astype(np.float32)
         # image = utils.white_balance(image)  # 图片白平衡处理
         bboxes_pr, layer_n, best_bboxes = self.predict(image)  # 预测结果
         # print(bboxes_pr)
@@ -237,7 +237,7 @@ if __name__ == '__main__':
                     "drumsticks": 26,
                     "taro": 27, "steamedbread": 28, "eggplant": 29, "eggplant_cut_sauce": 30, "bread": 31,
                     "container_nonhigh": 32, "container": 33, "duck": 21, "fish": 34, "hotdog": 35, "redshrimp": 36,
-                    "shrimp": 37, "strand": 38, "xizhi": 39, "small_fish": 40, "chips":41,"chiffon4": 101}
+                    "shrimp": 37, "strand": 38, "xizhi": 39, "small_fish": 40, "chips": 41, "chiffon4": 101}
     classes_id46 = {"cartooncookies": 1, "cookies": 5, "cupcake": 7, "beefsteak": 0, "chickenwings": 2,
                     "chiffoncake6": 3, "chiffoncake8": 4, "cranberrycookies": 6, "eggtarts": 8, "eggtartl": 9,
                     "nofood": 10, "peanuts": 11, "porkchops": 16, "potatocut": 17, "potatol": 18,
@@ -263,21 +263,21 @@ if __name__ == '__main__':
                     "pizzatwo": 13, "sweetpotatos": 20, "toast": 22}
     # 需要修改
     classes_id = classes_id39  #######
-    classes = classes_label18  #######    仅2期：classes_label18，所有：classes_label46
-    mode = "0224"  #######
-    tag = "_60"
-    img_dir = "F:/test_from_yejing_202010/TXKX_all_20201019_rename"  # 文件夹地址
+    classes = classes_label46  #######    仅2期：classes_label18，所有：classes_label46
+    mode = "0419"  #######
+    tag = "_80"
+    img_dir = "F:/Test_set/OVEN/JPGImages"  # 文件夹地址
     # img_dir = "E:/check_2_phase/JPGImages_2"  # 文件夹地址
-    save_dir = "F:/test_from_yejing_202010/results/detection_{0}{1}".format(mode, tag)  # 图片保存地址
+    save_dir = "F:/Test_set/OVEN/JPGImages_results/detection_{0}{1}".format(mode, tag)  # 图片保存地址
     if not os.path.exists(save_dir): os.mkdir(save_dir)
 
-    layer_error_dir = "F:/test_from_yejing_202010/results/layer_error_{0}{1}".format(mode, tag)  # 预测结果错误保存地址
+    layer_error_dir = "F:/Test_set/OVEN/JPGImages_results/layer_error_{0}{1}".format(mode, tag)  # 预测结果错误保存地址
     if not os.path.exists(layer_error_dir): os.mkdir(layer_error_dir)
 
-    fooderror_dir = "F:/test_from_yejing_202010/results/food_error_{0}{1}".format(mode, tag)  # 食材预测结果错误保存地址
+    fooderror_dir = "F:/Test_set/OVEN/JPGImages_results/food_error_{0}{1}".format(mode, tag)  # 食材预测结果错误保存地址
     if not os.path.exists(fooderror_dir): os.mkdir(fooderror_dir)
 
-    no_result_dir = "F:/test_from_yejing_202010/results/no_result_{0}{1}".format(mode, tag)  # 无任何输出结果保存地址
+    no_result_dir = "F:/Test_set/OVEN/JPGImages_results/no_result_{0}{1}".format(mode, tag)  # 无任何输出结果保存地址
     if not os.path.exists(no_result_dir): os.mkdir(no_result_dir)
 
     start_time = time.time()
@@ -336,6 +336,7 @@ if __name__ == '__main__':
         food_acc_o = 0  # 其他--食材
 
         img_dirs = img_dir + "/" + c
+        if not os.path.exists(img_dirs): continue
         layer_error_c_dirs = layer_error_dir + "/" + c
         if os.path.exists(layer_error_c_dirs): shutil.rmtree(layer_error_c_dirs)
         os.mkdir(layer_error_c_dirs)
@@ -578,24 +579,25 @@ if __name__ == '__main__':
         sheet1.write(i + 2, 8, food_others_acc)  # 烤层-其他食材准确率写入
 
         sheet1.write(i + 2, 0, c)
+        if all_jpgs!=0:
 
-        sheet1.write(i + 2, 9, all_jpgs)  # 写入正确总数
-        sheet1.write(i + 2, 10, layer_acc)  # 写入烤层正确数
-        sheet1.write(i + 2, 11, food_acc)  # 写入食材正确数
+            sheet1.write(i + 2, 9, all_jpgs)  # 写入正确总数
+            sheet1.write(i + 2, 10, layer_acc)  # 写入烤层正确数
+            sheet1.write(i + 2, 11, food_acc)  # 写入食材正确数
 
-        sheet1.write(i + 2, 12, round((layer_acc / all_jpgs) * 100, 2))
-        sheet1.write(i + 2, 13, round((food_acc / all_jpgs) * 100, 2))
-        sheet1.write(i + 2, 14, error_noresults)
+            sheet1.write(i + 2, 12, round((layer_acc / all_jpgs) * 100, 2))
+            sheet1.write(i + 2, 13, round((food_acc / all_jpgs) * 100, 2))
+            sheet1.write(i + 2, 14, error_noresults)
 
-        # 烤层和烤盘均正确数量
-        layer_and_food_right = set(c_food_right_list) & set(c_layer_right_list)
-        sheet1.write(i + 2, 15, len(list(layer_and_food_right)))
+            # 烤层和烤盘均正确数量
+            layer_and_food_right = set(c_food_right_list) & set(c_layer_right_list)
+            sheet1.write(i + 2, 15, len(list(layer_and_food_right)))
 
-        print("food name:", c)
-        print("layer accuracy:", round((layer_acc / all_jpgs) * 100, 2))  # 输出烤层正确数
-        jpgs_count_all += all_jpgs
-        layer_jpgs_acc += layer_acc
-        food_jpgs_acc += food_acc
+            print("food name:", c)
+            print("layer accuracy:", round((layer_acc / all_jpgs) * 100, 2))  # 输出烤层正确数
+            jpgs_count_all += all_jpgs
+            layer_jpgs_acc += layer_acc
+            food_jpgs_acc += food_acc
     print("all layer accuracy:", round((layer_jpgs_acc / jpgs_count_all) * 100, 2))  # 输出烤层正确数
     print("all food accuracy:", round((food_jpgs_acc / jpgs_count_all) * 100, 2))  # 输出食材正确数
 
@@ -629,7 +631,7 @@ if __name__ == '__main__':
     sheet1.write(55, 4, round((layer_jpgs_acc / jpgs_count_all) * 100, 2))
     sheet1.write(55, 5, round((food_jpgs_acc / jpgs_count_all) * 100, 2))
 
-    workbook.save("F:/test_from_yejing_202010/results/2phase_{0}{1}.xls".format(mode, tag))
+    workbook.save("F:/Test_set/OVEN/JPGImages_results/all_Set_{0}{1}.xls".format(mode, tag))
 
     end_time = time.time()
     print("all jpgs time:", end_time - end0_time)

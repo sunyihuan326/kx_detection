@@ -83,7 +83,9 @@ class generate_txt(object):
         for txt_file_one in txt_files:
             img_path_name = txt_file_one
             txt_file_name = file_path
+
             if typ == "serve":
+                print(img_path_name)
                 txt_file_name += img_path_name.split("JPGImages")[1]
                 train_all_list.append(txt_file_name)  # 读取一个插入一个
             else:  # .jpg前的字段需要更改
@@ -133,7 +135,7 @@ class append_txt(object):
 
 
 if __name__ == "__main__":
-    root_dir = "E:/DataSets/X_3660_data/bu/serve_data/20210115"
+    root_dir = "F:/serve_data/for_model/202101_03"
     img_dir = "{}/JPGImages".format(root_dir)
     img_save_dir = "{}/JPGImages".format(root_dir)
     original_txt = "{}/train42.txt".format(root_dir)
@@ -143,9 +145,9 @@ if __name__ == "__main__":
     g_t = generate_txt()
     # 生成对应的增强txt文件
     for typ in ["lv", "zi", "hot", "huang"]:
-        # aug.img_mist(typ)  # 图片增强处理
-        file_path = "E:/DataSets/X_3660_data/bu/serve_data/20210115/JPGImages"
-        save_txt_path = "E:/DataSets/X_3660_data/bu/serve_data/20210115/train42_{}.txt".format(typ)
+        aug.img_mist(typ)  # 图片增强处理
+        file_path = "F:/serve_data/for_model/202101_03/JPGImages"
+        save_txt_path = "F:/serve_data/for_model/202101_03/train42_{}.txt".format(typ)
         g_t.change_txt_jpgname(original_txt, save_txt_path, file_path, typ)  # 生成增强单独txt文件
     # 合并原图txt和增强txt，且增强数据仅取部分
     txt_list = [
@@ -159,7 +161,7 @@ if __name__ == "__main__":
     a_t.append_txt2all("{}/train42_huang_hot_lv_zi.txt".format(root_dir), 2)
 
     # 生成serve端数据
-    serve_file_path = "/home/sunyihuan/sunyihuan_algorithm/data/KX_data/3660_202008/bu/serve_data/20210115/JPGImages"
+    serve_file_path = "/home/sunyihuan/sunyihuan_algorithm/data/KX_data/3660_202008/bu/serve_data/202101_03/JPGImages"
     save_serve_txt_path = "{}/serve_3660train42_huang_hot_lv_zi.txt".format(root_dir)
     g_t.change_txt_jpgname("{}/train42_huang_hot_lv_zi.txt".format(root_dir), save_serve_txt_path, serve_file_path,
                            "serve")
